@@ -53,11 +53,7 @@ namespace ZeroMQ.Test
             ZError error;
             using (ZSocket socket = context.CreateSocket(ZSocketType.REP, out error))
             {
-                if (!socket.Bind("inproc://helloworld", out error))
-                {
-                    if (error == ZError.ETERM) return;
-                    throw new ZException(error);
-                }
+                socket.Bind("inproc://helloworld", out error);
 
                 while (!cancellus.IsCancellationRequested)
                 {
@@ -82,12 +78,10 @@ namespace ZeroMQ.Test
                     // Let the response be "Hello " + input
                     var response = new ZMessage();
                     response.Add(ZFrame.CreateFromString("Hello " + request[0].ReadString()));
+                    // var response = ZFrame.CreateFromString("Hello " + request[0].ReadString());
 
-                    if (!socket.SendMessage(response, out error))
-                    {
-                        if (error == ZError.ETERM) return;
-                        throw new ZException(error);
-                    }
+                    socket.SendMessage(response, out error);
+                    // socket.SendFrame(response, out error);
                 }
             }
         }
@@ -101,31 +95,19 @@ namespace ZeroMQ.Test
             {
                 // var message = ZFrame.CreateFromString("Hello World");
 
-                if (!socket.Connect("inproc://helloworld", out error))
-                {
-                    if (error == ZError.ETERM) return output;
-                    throw new ZException(error);
-                }
+                socket.Connect("inproc://helloworld", out error);
 
                 var request = new ZMessage();
                 request.Add(ZFrame.CreateFromString(name));
+                // var request = ZFrame.CreateFromString(name);
 
-                if (!socket.SendMessage(request, out error))
-                {
-                    if (error == ZError.ETERM) return output;
-                    throw new ZException(error);
-                }
+                socket.SendMessage(request, out error);
+                // socket.SendFrame(request, out error);
 
-                ZMessage response;
-                if (null == (response = socket.ReceiveMessage(out error)))
-                {
-                    if (error == ZError.ETERM) return output;
-                    throw new ZException(error);
-                }
-                if (response.Length < 1) {
-                    throw new InvalidOperationException();
-                }
+                ZMessage response = socket.ReceiveMessage(out error);
+                // var response = socket.ReceiveFrame(out error);
                 output = response[0].ReadString();
+                // output = response.ReadString();
             }
 
             return output;
