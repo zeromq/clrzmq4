@@ -60,7 +60,6 @@
     <Compile Include="Devices\ZDeviceException.cs" />
     <Compile Include="lib\DispoIntPtr.cs" />
     <Compile Include="lib\DispoIntPtr.Ansi.cs" />
-    <Compile Include="lib\MonitorEventData.cs" />
     <Compile Include="lib\Platform.cs" />
     <Compile Include="lib\Platform.Posix.cs" />
     <Compile Include="lib\Platform.Win32.cs" />
