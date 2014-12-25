@@ -1,7 +1,7 @@
 ﻿
 **ZeroMQ CLR namespace**
 
-Hello. I've made a new ZeroMQ namespace.
+Hello. I've made a new ZeroMQ namespace for .NET Framwork 4+ and mono 3+.
 
 **Simple REQ connect to REP bind**
 
