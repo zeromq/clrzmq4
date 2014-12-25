@@ -1,7 +1,7 @@
 ﻿
 **ZeroMQ CLR namespace**
 
-Hello. I've made originally a fork of the clrzmq project, however I've touched nearly every file.
+Hello. I've made a new ZeroMQ namespace.
 
 **Simple REQ connect to REP bind**
 
