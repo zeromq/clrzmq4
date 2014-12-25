@@ -92,8 +92,6 @@ namespace ZeroMQ.Test
             ZError error;
             using (ZSocket socket = context.CreateSocket(ZSocketType.REQ, out error))
             {
-                // var message = ZFrame.CreateFromString("Hello World");
-
                 socket.Connect("inproc://helloworld", out error);
 
                 using (var request = new ZMessage())
