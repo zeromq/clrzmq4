@@ -70,10 +70,6 @@ namespace ZeroMQ.Test
                         if (error == ZError.ETERM) return;
                         throw new ZException(error);
                     }
-                    if (request.Length < 1)
-                    {
-                        continue;
-                    }
 
                     // Let the response be "Hello " + input
                     var response = new ZMessage();
