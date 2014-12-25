@@ -89,7 +89,6 @@
     <Compile Include="ZPoll.cs" />
     <Compile Include="ZPollList.cs" />
     <Compile Include="ZPollItem.cs" />
-    <Compile Include="lib\DebugStackTrace.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
