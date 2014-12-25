@@ -449,15 +449,25 @@ namespace ZeroMQ
 			return result;
 		}
 
-		public ZFrame ReceiveFrame(out ZError error)
-		{
-			return ReceiveFrames ( 1, ZSocketFlags.None, out error ).FirstOrDefault();
-		}
+        public ZFrame ReceiveFrame(out ZError error)
+        {
+            return ReceiveFrame(ZSocketFlags.None, out error);
+        }
+
+        public ZFrame ReceiveFrame(ZSocketFlags flags, out ZError error)
+        {
+            return ReceiveFrames(1, flags, out error).FirstOrDefault();
+        }
 
 		public IEnumerable<ZFrame> ReceiveFrames(out ZError error)
 		{
 			return ReceiveFrames ( int.MaxValue, ZSocketFlags.More, out error );
 		}
+
+        public IEnumerable<ZFrame> ReceiveFrames(int receiveCount, out ZError error)
+        {
+            return ReceiveFrames(receiveCount, ZSocketFlags.None, out error);
+        }
 
 		public IEnumerable<ZFrame> ReceiveFrames(int receiveCount, ZSocketFlags flags, out ZError error)
 		{
