@@ -72,12 +72,15 @@ namespace ZeroMQ.Test
                     }
 
                     // Let the response be "Hello " + input
-                    var response = new ZMessage();
-                    response.Add(ZFrame.CreateFromString("Hello " + request[0].ReadString()));
-                    // var response = ZFrame.CreateFromString("Hello " + request[0].ReadString());
-
-                    socket.SendMessage(response, out error);
-                    // socket.SendFrame(response, out error);
+                    using (request)
+                    using (var response = new ZMessage())
+                    {
+                        response.Add(ZFrame.CreateFromString("Hello " + request[0].ReadString()));
+                        socket.SendMessage(response, out error);
+                    }
+                    // using (var response = ZFrame.CreateFromString("Hello " + request[0].ReadString())) {
+                    //     socket.SendFrame(response, out error);
+                    // }
                 }
             }
         }
@@ -93,17 +96,22 @@ namespace ZeroMQ.Test
 
                 socket.Connect("inproc://helloworld", out error);
 
-                var request = new ZMessage();
-                request.Add(ZFrame.CreateFromString(name));
-                // var request = ZFrame.CreateFromString(name);
+                using (var request = new ZMessage())
+                {
+                    request.Add(ZFrame.CreateFromString(name));
+                    socket.SendMessage(request, out error);
+                }
+                // using (var request = ZFrame.CreateFromString(name)) {
+                //     socket.SendFrame(request, out error);
+                // }
 
-                socket.SendMessage(request, out error);
-                // socket.SendFrame(request, out error);
-
-                ZMessage response = socket.ReceiveMessage(out error);
-                // var response = socket.ReceiveFrame(out error);
-                output = response[0].ReadString();
-                // output = response.ReadString();
+                using (ZMessage response = socket.ReceiveMessage(out error))
+                {
+                    output = response[0].ReadString();
+                }
+                // using (var response = socket.ReceiveFrame(out error)) {
+                //     output = response.ReadString();
+                // }
             }
 
             return output;
