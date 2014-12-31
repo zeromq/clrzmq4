@@ -149,13 +149,13 @@
 			// int retry = 3;
 			while (/*--retry > -1 &&*/ -1 == zmq.ctx_term(_contextPtr)) {
 				var error = ZError.GetLastErr();
-				if (error != ZError.EINTR) {
-					// Maybe ZmqStdError.EFAULT
+                if (error == ZError.EINTR)
+                {
+                    continue;
+                }
 
-					break;
-				}
-				// else error == EINTR: Termination was interrupted by a signal. It can be restarted if needed. 
-                throw new ZException(error);
+                // Maybe ZmqStdError.EFAULT
+				break;
 			}
 		}
 

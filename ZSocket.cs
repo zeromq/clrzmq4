@@ -7,6 +7,7 @@ namespace ZeroMQ
 	using System.Linq;
 	using System.Runtime.InteropServices;
     using lib;
+    using ZeroMQ.Monitoring;
 
     /// <summary>
     /// Sends and receives messages across various transports to potentially multiple endpoints
@@ -46,16 +47,18 @@ namespace ZeroMQ
 				throw new ZException (error);
 			}
 
-			return new ZSocket(socketPtr, socketType);
+			return new ZSocket(context, socketPtr, socketType);
 		}
 
+        private ZContext _context;
 
-		private IntPtr _socketPtr;
+		internal IntPtr _socketPtr;
 
-		private ZSocketType _socketType;
+		internal ZSocketType _socketType;
 
-		internal ZSocket(IntPtr socketPtr, ZSocketType socketType)
+		internal ZSocket(ZContext context, IntPtr socketPtr, ZSocketType socketType)
 		{
+            _context = context;
 			_socketPtr = socketPtr;
 			_socketType = socketType;
 		}
@@ -122,52 +125,15 @@ namespace ZeroMQ
 			_socketPtr = IntPtr.Zero;
 		}
 
-
-
-		/*
-
-        /// <summary>
-        /// The maximum buffer length when using the high performance Send/Receive methods (8192).
-        /// </summary>
-        public const int MaxBufferSize = SocketProxy.MaxBufferSize;
-
-        private const int LatestVersion = 3;
-
-#pragma warning disable 618
-        private static readonly SocketOption ReceiveHwmOpt = ZmqVersion.Current.IsAtLeast(LatestVersion) ? ZmqSocketOption.RCVHWM : ZmqSocketOption.HWM;
-        private static readonly SocketOption SendHwmOpt = ZmqVersion.Current.IsAtLeast(LatestVersion) ? ZmqSocketOption.SNDHWM : ZmqSocketOption.HWM;
-#pragma warning restore 618
-
-        private readonly SocketProxy _socketProxy;
-
-        private bool _disposed;
-
-        /// <summary>
-        /// Occurs when at least one message may be received from the socket without blocking.
-        /// </summary>
-        public event EventPtrr<SocketEventArgs> ReceiveReady;
-
-        /// <summary>
-        /// Occurs when at least one message may be sent via the socket without blocking.
-        /// </summary>
-        public event EventPtrr<SocketEventArgs> SendReady;
-		*/ 
-		
+        public ZContext Context
+        {
+            get { return _context; }
+        }
 
 		public IntPtr SocketPtr
 		{
 			get { return _socketPtr; }
 		}
-
-		/*/ <summary>
-		/// Gets the status of the last Receive operation.
-		/// </summary>
-		public ZmqStatus ReceiveStatus { get; private set; } */
-
-		/*/ <summary>
-		/// Gets the status of the last Send operation.
-		/// </summary>
-		public ZmqStatus SendStatus { get; private set; } */
 
         /// <summary>
         /// Gets the <see cref="ZeroMQ.ZSocketType"/> value for the current socket.
@@ -354,41 +320,29 @@ namespace ZeroMQ
 			return Receive(1, ZSocketFlags.None, out buffer, out error);
 		}
 
-		public bool ReceiveMany(int receiveCount, ZSocketFlags flags, out byte[] buffer, out ZError error)
-		{
-			return Receive(receiveCount, flags | ZSocketFlags.More, out buffer, out error);
-		}
-
-		public bool ReceiveMany(int receiveCount, out byte[] buffer, out ZError error)
-		{
-			return Receive(receiveCount, ZSocketFlags.More, out buffer, out error);
-		}
-
-		public bool ReceiveAll(out byte[] buffer, out ZError error)
-		{
-			return ReceiveAll(ZSocketFlags.More, out buffer, out error);
-		}
-
-		public bool ReceiveAll(ZSocketFlags flags, out byte[] buffer, out ZError error)
+		public bool Receive(ZSocketFlags flags, out byte[] buffer, out ZError error)
 		{
 			bool more = (flags & ZSocketFlags.More) == ZSocketFlags.More;
 			return Receive(more ? int.MaxValue : 1, flags, out buffer, out error);
 		}
 			
-		public virtual bool Receive(int receiveCount, ZSocketFlags flags, out byte[] buffer, out ZError error)
+		public virtual bool Receive(int framesToReceive, ZSocketFlags flags, out byte[] buffer, out ZError error)
 		{
 			error = default(ZError);
-			bool result = false;
+            buffer = null;
+
 			EnsureNotDisposed();
-			// EnsureReceiveSocket();
 
-			buffer = null;
+            if (framesToReceive > 1 && this.ReceiveMore)
+            {
+                flags |= ZSocketFlags.More;
+            }
 
-			List<ZFrame> frames = ReceiveFrames(receiveCount, flags, out error).ToList();
-			result = ( error == default(ZError) );
+			List<ZFrame> frames = ReceiveFrames(framesToReceive, flags, out error).ToList();
+			bool result = ( error == default(ZError) );
 
 			int receivedCount = frames.Count;
-			if (result && receiveCount > 0) {
+			if (result && framesToReceive > 0) {
 				// Aggregate all buffers
 				int length = frames.Aggregate(0, (counter, frame) => counter + (int)frame.Length);
 				buffer = new byte[length];
@@ -421,7 +375,10 @@ namespace ZeroMQ
 		public ZMessage ReceiveMessage(ZSocketFlags flags, out ZError error)
 		{
 			ZMessage message = null;
-			flags |= ZSocketFlags.More;
+            if (this.ReceiveMore)
+            {
+                flags |= ZSocketFlags.More;
+            }
 			bool result = ReceiveMessage(int.MaxValue, flags, ref message, out error);
 			if (result) {
 				return message;
@@ -431,17 +388,14 @@ namespace ZeroMQ
 
 		public bool ReceiveMessage(int receiveCount, ZSocketFlags flags, ref ZMessage message, out ZError error)
 		{
-			error = default(ZError);
-			bool result = false;
 			EnsureNotDisposed();
-			// EnsureReceiveSocket();
 
 			IEnumerable<ZFrame> framesQuery = ReceiveFrames(receiveCount, flags, out error);
-			result = error == default(ZError);
+			bool result = error == default(ZError);
 
 			if (result) {
 				if (message == null) {
-					message = new ZMessage (framesQuery);
+					message = new ZMessage(framesQuery);
 				} else {
 					message.AddRange(framesQuery);
 				}
@@ -469,12 +423,19 @@ namespace ZeroMQ
             return ReceiveFrames(receiveCount, ZSocketFlags.None, out error);
         }
 
-		public IEnumerable<ZFrame> ReceiveFrames(int receiveCount, ZSocketFlags flags, out ZError error)
+        public IEnumerable<ZFrame> ReceiveFrames(ZSocketFlags flags, out ZError error)
+        {
+            return ReceiveFrames(int.MaxValue, flags, out error);
+        }
+
+		public IEnumerable<ZFrame> ReceiveFrames(int framesToReceive, ZSocketFlags flags, out ZError error)
 		{
 			bool result = false;
 			error = default(ZError);
 
-			bool more = receiveCount > 1 && ((flags & ZSocketFlags.More) == ZSocketFlags.More);
+            bool more = (framesToReceive > 1 && ((flags & ZSocketFlags.More) == ZSocketFlags.More)) ? this.ReceiveMore : false;
+            if (more) flags |= ZSocketFlags.More;
+
 			var frames = new List<ZFrame>();
 
 			do {
@@ -486,24 +447,29 @@ namespace ZeroMQ
 					if (error == ZError.EINTR) {
 						// if (--retry > -1)
 						error = default(ZError);
+
 						continue;
 					}
+                    if (error == ZError.EAGAIN) {
 
-					frame.Dispose();
+                        if ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait)
+                        {
+                            return frames;
+                        }
 
-					if (error == ZError.EAGAIN) {
-						break;
+                        error = default(ZError);
+                        Thread.Sleep(1);
+
+                        continue;
 					}
+
+
+                    frame.Dispose();
+
 					if (error == ZError.ETERM) {
-						break;
+                        return frames;
 					}
-
 					throw new ZException (error);
-				}
-				if (error == ZError.EAGAIN) {
-
-					Thread.Yield();
-					continue;
 				}
 				if (result) {
 					frames.Add(frame);
@@ -513,7 +479,7 @@ namespace ZeroMQ
 					}
 				}
 
-			} while (result && more && --receiveCount > 0);
+			} while (result && more && --framesToReceive > 0);
 
 			return frames;
 		}
@@ -531,7 +497,6 @@ namespace ZeroMQ
 		public virtual bool Send(byte[] buffer, ZSocketFlags flags, out ZError error) 
 		{
 			EnsureNotDisposed();
-			EnsureSendSocket();
 
 			error = default(ZError);
 			bool result = false;
@@ -569,7 +534,6 @@ namespace ZeroMQ
 		public virtual bool SendFrames(IEnumerable<ZFrame> frames, ZSocketFlags flags, out ZError error) 
 		{
 			EnsureNotDisposed();
-			EnsureSendSocket();
 
 			error = default(ZError);
 			bool result = false;
@@ -591,7 +555,6 @@ namespace ZeroMQ
 		public virtual bool SendFrame(ZFrame msg, out ZError error)
 		{
 			EnsureNotDisposed();
-			EnsureSendSocket();
 
 			return SendFrameInternal(msg, ZSocketFlags.None, out error);
 		}
@@ -599,7 +562,6 @@ namespace ZeroMQ
 		public virtual bool SendFrameMore(ZFrame msg, out ZError error)
 		{
 			EnsureNotDisposed();
-			EnsureSendSocket();
 
 			return SendFrameInternal(msg, ZSocketFlags.More, out error);
 		}
@@ -607,7 +569,6 @@ namespace ZeroMQ
 		public virtual bool SendFrame(ZFrame msg, ZSocketFlags flags, out ZError error)
 		{
 			EnsureNotDisposed();
-			EnsureSendSocket();
 
 			return SendFrameInternal(msg, flags, out error);
 		}
@@ -722,113 +683,6 @@ namespace ZeroMQ
 			return result;
 		}
 
-
-        /*/ <summary>
-        /// Queue a message buffer to be sent by the socket in blocking mode.
-        /// </summary>
-        /// <remarks>
-        /// Performance tip: To increase send performance, especially on low-powered devices, restrict the
-        /// size of <paramref name="buffer"/> to <see cref="MaxBufferSize"/>. This will reduce the number of
-        /// P/Invoke calls required to send the message buffer.
-        /// </remarks>
-        /// <param name="buffer">A <see cref="byte"/> array that contains the message to be sent.</param>
-        /// <param name="size">The size of the message to send.</param>
-        /// <param name="flags">A combination of <see cref="SocketFlags"/> values to use when sending.</param>
-        /// <returns>The number of bytes sent by the socket.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="buffer"/> is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="size"/> is a negative value or is larger than the length of <paramref name="buffer"/>.</exception>
-        /// <exception cref="ZmqSocketException">An error occurred sending data to a remote endpoint.</exception>
-        /// <exception cref="ObjectDisposedException">The <see cref="ZmqSocket"/> has been closed.</exception>
-        /// <exception cref="NotSupportedException">The current socket type does not support Send operations.</exception>
-        public virtual int Send(byte[] buffer, int size, SocketFlags flags)
-        {
-            EnsureNotDisposed();
-
-            if (buffer == null)
-            {
-                throw new ArgumentNullException("buffer");
-            }
-
-            if (size < 0 || size > buffer.Length)
-            {
-                throw new ArgumentOutOfRangeException("size", "Expected a non-negative value less than or equal to the buffer length.");
-            }
-
-            int sentBytes = _socketProxy.Send(buffer, size, (int)flags);
-
-            if (sentBytes >= 0)
-            {
-                SendStatus = (sentBytes == size || LibZmq.MajorVersion < LatestVersion) ? SendStatus.Sent : SendStatus.Incomplete;
-                return sentBytes;
-            }
-
-            if (ErrorProxy.ShouldTryAgain)
-            {
-                SendStatus = SendStatus.TryAgain;
-                return -1;
-            }
-
-            if (ErrorProxy.ContextWasTerminated)
-            {
-                SendStatus = SendStatus.Interrupted;
-                return -1;
-            }
-
-            throw new ZmqSocketException(ErrorProxy.GetLastError());
-        }
-
-        /// <summary>
-        /// Queue a message buffer to be sent by the socket in non-blocking mode with a specified timeout.
-        /// </summary>
-        /// <remarks>
-        /// Performance tip: To increase send performance, especially on low-powered devices, restrict the
-        /// size of <paramref name="buffer"/> to <see cref="MaxBufferSize"/>. This will reduce the number of
-        /// P/Invoke calls required to send the message buffer.
-        /// </remarks>
-        /// <param name="buffer">A <see cref="byte"/> array that contains the message to be sent.</param>
-        /// <param name="size">The size of the message to send.</param>
-        /// <param name="flags">A combination of <see cref="SocketFlags"/> values to use when sending.</param>
-        /// <param name="timeout">A <see cref="TimeSpan"/> specifying the send timeout.</param>
-        /// <returns>The number of bytes sent by the socket.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="buffer"/> is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="size"/> is a negative value or is larger than the length of <paramref name="buffer"/>.
-        /// </exception>
-        /// <exception cref="ZmqSocketException">An error occurred sending data to a remote endpoint.</exception>
-        /// <exception cref="ObjectDisposedException">The <see cref="ZmqSocket"/> has been closed.</exception>
-        /// <exception cref="NotSupportedException">The current socket type does not support Send operations.</exception>
-        public int Send(byte[] buffer, int size, SocketFlags flags, TimeSpan timeout)
-        {
-            return timeout == TimeSpan.MaxValue
-                    ? Send(buffer, size, flags & ~SocketFlags.DontWait)
-                    : this.WithTimeout(Send, buffer, size, flags | SocketFlags.DontWait, timeout);
-        } */
-
-        /*/ <summary>
-        /// Forwards a single-part or all parts of a multi-part message to a destination socket.
-        /// </summary>
-        /// <remarks>
-        /// This method is useful for implementing devices as data is not marshalled into managed code; it
-        /// is forwarded directly in the unmanaged layer. As an example, this method could forward all traffic
-        /// from a device's front-end socket to its backend socket.
-        /// </remarks>
-        /// <param name="destination">A <see cref="ZmqSocket"/> that will receive the incoming message(s).</param>
-        public void Forward(ZmqSocket destination)
-        {
-            if (destination == null)
-            {
-                throw new ArgumentNullException("destination");
-            }
-
-            if (_socketProxy.Forward(destination.SocketPtr) == -1)
-            {
-                throw new ZmqSocketException(ErrorProxy.GetLastError());
-            }
-		} */
-
-		// From options.hpp: unsigned char identity [256];
-		private const int MaxBinaryOptionSize = 255;
-
 		private bool GetOption(ZSocketOption option, IntPtr optionValue, ref int optionLength)
 		{
 			EnsureNotDisposed();
@@ -863,6 +717,9 @@ namespace ZeroMQ
 			}
 			return result;
 		}
+
+        // From options.hpp: unsigned char identity [256];
+        private const int MaxBinaryOptionSize = 256;
 		
 		public bool GetOption(ZSocketOption option, out byte[] value)
 		{
@@ -1120,9 +977,7 @@ namespace ZeroMQ
         /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
         /// <exception cref="NotSupportedException">The current socket type does not support subscriptions.</exception>
         public virtual void Subscribe(byte[] prefix)
-        {
-			EnsureSubscriptionSocket();
-            
+        {            
 			SetOption(ZSocketOption.SUBSCRIBE, prefix);
         }
 
@@ -1151,8 +1006,6 @@ namespace ZeroMQ
         /// <exception cref="NotSupportedException">The current socket type does not support subscriptions.</exception>
         public virtual void Unsubscribe(byte[] prefix)
         {
-			EnsureSubscriptionSocket();
-
 			SetOption(ZSocketOption.UNSUBSCRIBE, prefix);
         }
 
@@ -1459,72 +1312,6 @@ namespace ZeroMQ
 			set { SetOption(ZSocketOption.TCP_KEEPALIVE_INTVL, value); }
 		}
 
-		/*
-        internal void InvokePollEvents(PollEvents readyEvents)
-        {
-            if (readyEvents.HasFlag(PollEvents.PollIn))
-            {
-                InvokeReceiveReady(readyEvents);
-            }
-
-            if (readyEvents.HasFlag(PollEvents.PollOut))
-            {
-                InvokeSendReady(readyEvents);
-            }
-        }
-
-        internal PollEvents GetPollEvents()
-        {
-            var events = PollEvents.None;
-
-            if (ReceiveReady != null)
-            {
-                events |= PollEvents.PollIn;
-            }
-
-            if (SendReady != null)
-            {
-                events |= PollEvents.PollOut;
-            }
-
-            return events;
-        }
-
-        private int GetLegacySocketOption<TLegacy>(SocketOption option, Func<SocketOption, TLegacy> legacyGetter)
-        {
-            return ZmqVersion.Current.IsAtLeast(LatestVersion) ? GetOptionInt32(option) : Convert.ToInt32(legacyGetter(option));
-        }
-
-        private void SetLegacySocketOption<TLegacy>(SocketOption option, int value, TLegacy legacyValue, Action<SocketOption, TLegacy> legacySetter)
-        {
-            if (ZmqVersion.Current.IsAtLeast(LatestVersion))
-            {
-                SetOption(option, value);
-            }
-            else
-            {
-                legacySetter(option, legacyValue);
-            }
-        }
-
-        private void InvokeReceiveReady(PollEvents readyEvents)
-        {
-            EventPtrr<SocketEventArgs> handler = ReceiveReady;
-            if (handler != null)
-            {
-                handler(this, new SocketEventArgs(this, readyEvents));
-            }
-        }
-
-        private void InvokeSendReady(PollEvents readyEvents)
-        {
-            EventPtrr<SocketEventArgs> handler = SendReady;
-            if (handler != null)
-            {
-                handler(this, new SocketEventArgs(this, readyEvents));
-            }
-        } */
-
         private void EnsureNotDisposed()
         {
 			if (_disposed) {
@@ -1532,73 +1319,5 @@ namespace ZeroMQ
 			}
 		}
 
-		private void EnsureSendSocket()
-		{ /*
-			if (SocketType == ZmqSocketType.REQ
-			    || SocketType == ZmqSocketType.REP
-			    || SocketType == ZmqSocketType.ROUTER
-			    || SocketType == ZmqSocketType.DEALER
-			    || SocketType == ZmqSocketType.PAIR
-			    || SocketType == ZmqSocketType.PUSH
-			    || SocketType == ZmqSocketType.PUB
-			    || SocketType == ZmqSocketType.XPUB
-			)
-				return;
-
-			if ( SocketType == ZmqSocketType.PULL
-			    || SocketType == ZmqSocketType.SUB
-			    || SocketType == ZmqSocketType.XSUB
-			) {
-				throw new InvalidOperationException("Socket type can't send: " + SocketType);
-			}
-
-			throw new InvalidOperationException("Invalid socket type specified: " + SocketType);
-		*/ }
-
-		private void EnsureReceiveSocket()
-		{ /*
-			if (SocketType == ZmqSocketType.REQ
-			    || SocketType == ZmqSocketType.REP
-			    || SocketType == ZmqSocketType.ROUTER
-			    || SocketType == ZmqSocketType.DEALER
-			    || SocketType == ZmqSocketType.PAIR
-			    || SocketType == ZmqSocketType.PULL
-			    || SocketType == ZmqSocketType.XPUB
-			    || SocketType == ZmqSocketType.SUB
-			    || SocketType == ZmqSocketType.XSUB
-			)
-				return;
-
-			if (SocketType == ZmqSocketType.PUSH
-			    || SocketType == ZmqSocketType.PUB
-			) {
-				throw new InvalidOperationException("Socket type can't receive: " + SocketType);
-			}
-
-			throw new InvalidOperationException("Invalid socket type specified: " + SocketType);
-		*/ }
-
-		private void EnsureSubscriptionSocket()
-		{ /*
-			if (SocketType == ZmqSocketType.PUB
-			    || SocketType == ZmqSocketType.XPUB
-			    || SocketType == ZmqSocketType.SUB
-			    || SocketType == ZmqSocketType.XSUB
-			)
-				return;
-
-			if (SocketType == ZmqSocketType.REQ
-			    || SocketType == ZmqSocketType.REP
-			    || SocketType == ZmqSocketType.ROUTER
-			    || SocketType == ZmqSocketType.DEALER
-			    || SocketType == ZmqSocketType.PAIR
-			    || SocketType == ZmqSocketType.PUSH
-			    || SocketType == ZmqSocketType.PULL
-			) {
-				throw new InvalidOperationException ("Socket type doesn't have subscriptions: " + SocketType);
-			}
-
-			throw new InvalidOperationException("Invalid socket type specified: " + SocketType);
-		*/ }
     }
 }

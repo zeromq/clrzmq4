@@ -68,6 +68,14 @@
     <Compile Include="lib\zmq.cs" />
     <Compile Include="lib\zmq_pollitem_posix_t.cs" />
     <Compile Include="lib\zmq_pollitem_windows_t.cs" />
+    <Compile Include="Monitoring\ZMonitorContextExtensions.cs" />
+    <Compile Include="Monitoring\ZMonitorEventData.cs" />
+    <Compile Include="Monitoring\ZMonitorEvents.cs" />
+    <Compile Include="Monitoring\ZMonitorSocketExtensions.cs" />
+    <Compile Include="Monitoring\ZMonitor.cs" />
+    <Compile Include="Monitoring\ZMonitorEventArgs.cs" />
+    <Compile Include="Monitoring\ZMonitorFileDescriptorEventArgs.cs" />
+    <Compile Include="Monitoring\ZMonitorIntervalEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouterBehavior.cs" />
     <Compile Include="TcpKeepaliveBehaviour.cs" />
@@ -97,18 +105,17 @@
   <Target Name="AfterBuild" />
   <ItemGroup>
     <None Include="i386\libzmq.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="i386\libzmq.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="amd64\libzmq.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="amd64\libzmq.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="ZeroMQ.snk" />
   </ItemGroup>
-  <ItemGroup />
 </Project>

@@ -103,7 +103,14 @@ namespace ZeroMQ
 
 			// Unexpected error
 			string txt = null;
-			if (resolveText) txt = Marshal.PtrToStringAnsi(zmq.strerror(symbol.Number));
+            if (resolveText)
+            {
+                IntPtr errorString = zmq.strerror(num);
+                if (errorString != IntPtr.Zero)
+                {
+                    txt = Marshal.PtrToStringAnsi(errorString);
+                }
+            }
 			return new ZError (num, null, txt);
 		}
 

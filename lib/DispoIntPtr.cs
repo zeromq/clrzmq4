@@ -9,8 +9,9 @@ namespace ZeroMQ.lib
 
     public partial class DispoIntPtr : IDisposable
 	{
-		internal delegate DispoIntPtr AllocStringNativeDelegate(string str, out int byteCount);
-		internal static readonly AllocStringNativeDelegate AllocStringNative = Ansi.AllocStringNative;
+		private delegate DispoIntPtr AllocStringNativeDelegate(string str, out int byteCount);
+
+        private static readonly AllocStringNativeDelegate AllocStringNative = Ansi.AllocStringNative;
 
 		/* static DispoIntPtr() {
 			// Platform.SetupPlatformImplementation(typeof(DispoIntPtr));

@@ -6,7 +6,7 @@ namespace ZeroMQ.Monitoring
     /// Socket transport events (for TCP and IPC sockets) that can be monitored.
     /// </summary>
     [Flags]
-    public enum MonitorEvents
+    public enum ZMonitorEvents : short
     {
         /// <summary>
         /// Triggered when a connection has been established to a remote peer. This can happen either synchronously or asynchronously.
@@ -63,9 +63,14 @@ namespace ZeroMQ.Monitoring
         Disconnected = 512,
 
         /// <summary>
-        /// A bitwise combination of all <see cref="MonitorEvents"/> values.
+        /// Monitoring on this socket ended.
+        /// </summary>
+        Stopped = 1024,
+
+        /// <summary>
+        /// A bitwise combination of all <see cref="ZMonitorEvents"/> values.
         /// </summary>
         AllEvents = Connected | ConnectDelayed | ConnectRetried | Listening | BindFailed |
-                    Accepted | AcceptFailed | Closed | CloseFailed | Disconnected
+                    Accepted | AcceptFailed | Closed | CloseFailed | Disconnected | Stopped
     }
 }

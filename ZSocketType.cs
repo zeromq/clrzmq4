@@ -38,7 +38,7 @@ namespace ZeroMQ
 			: base(errno, errname, errtext) 
 		{ }
 
-        public static readonly ZSocketType None = default(ZSocketType);
+        public new static readonly ZSocketType None = default(ZSocketType);
 
 		public static readonly ZSocketType
 
