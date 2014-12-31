@@ -161,7 +161,7 @@ namespace ZeroMQ.Monitoring
             private set { _isRunning = value; }
         }
 
-        private static readonly int sizeof_MonitorEventData = Marshal.SizeOf(typeof(ZMonitorEventData));
+        // private static readonly int sizeof_MonitorEventData = Marshal.SizeOf(typeof(ZMonitorEventData));
 
         /// <summary>
         /// Begins monitoring for state changes, raising the appropriate events as they arrive.
@@ -171,53 +171,65 @@ namespace ZeroMQ.Monitoring
         {
             IsRunning = true;
 
+            var poller = new ZPollItem(this, ZPoll.In);
+            poller.ReceiveMessage = (ZSocket socket, out ZMessage message, out ZError _error) => {
+
+                while (null == (message = ReceiveMessage(ZSocketFlags.DontWait, out _error)))
+                {
+                    if (_error == ZError.EAGAIN)
+                    {
+                        return false;
+                    }
+                    if (_error == ZError.ETERM)
+                    {
+                        return false;
+                    }
+                    throw new ZException(_error);
+                }
+
+                return true;
+            };
+
             ZError error;
             if (!Connect(_endpoint, out error)) throw new ZException(error);
 
             while (IsRunning && !cancellus.IsCancellationRequested)
             {
-                ZMessage message;
-
-                if (null == (message = ReceiveMessage(ZSocketFlags.DontWait, out error)))
+                ZMessage incoming;
+                if (!poller.TryPollIn(out incoming, out error, TimeSpan.FromMilliseconds(64)))
                 {
                     if (error == ZError.EAGAIN)
                     {
                         error = ZError.None;
-                        System.Threading.Thread.Sleep(1);
+                        Thread.Sleep(1);
 
                         continue;
                     }
-                    if (error == ZError.ETERM)
-                    {
-                        return;
-                    }
                     throw new ZException(error);
                 }
-                if (message.Count < 1)
+
+                if (1 < incoming.Count)
                 {
-                    // error?
-                    continue;
+                    throw new InvalidOperationException();
                 }
 
-                var eventValue = new byte[sizeof_MonitorEventData];
-                message[0].Read(eventValue, 0, sizeof_MonitorEventData);
+                var eventValue = new ZMonitorEventData();
+                eventValue.Event = (ZMonitorEvents)incoming[0].ReadInt16();
+                eventValue.EventValue = incoming[0].ReadInt32();
+                incoming[0].Position = 0;
 
-                var pinnedBytes = GCHandle.Alloc(eventValue, GCHandleType.Pinned);
-                var eventData = (ZMonitorEventData)Marshal.PtrToStructure(pinnedBytes.AddrOfPinnedObject(), typeof(ZMonitorEventData));
-                pinnedBytes.Free();
-
-                if (message.Count > 1)
+                if (2 < incoming.Count)
                 {
-                    eventData.Address = message[1].ReadString();
+                    eventValue.Address = incoming[1].ReadString();
                 }
 
-                OnMonitor(ref eventData);
+                OnMonitor(eventValue);
             }
 
             if (!Disconnect(_endpoint, out error)) throw new ZException(error);
         }
 
-        internal void OnMonitor(ref ZMonitorEventData data)
+        internal void OnMonitor(ZMonitorEventData data)
         {
             if (_eventHandler.ContainsKey(data.Event))
             {

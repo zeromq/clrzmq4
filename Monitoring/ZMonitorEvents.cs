@@ -6,12 +6,10 @@ namespace ZeroMQ.Monitoring
     /// Socket transport events (for TCP and IPC sockets) that can be monitored.
     /// </summary>
     [Flags]
-    public enum ZMonitorEvents : short
+    public enum ZMonitorEvents
     {
         /// <summary>
-        /// Triggered when a connection has been established to a remote peer. This can happen either synchronously or asynchronously.
-        /// NOTE: Do not rely on the 'addr' value for 'Connected' messages, as the memory
-        /// address contained in the message may no longer point to the correct value.
+        /// Triggered when a connection has been established to a remote peer.
         /// </summary>
         Connected = 1,
 
@@ -47,8 +45,6 @@ namespace ZeroMQ.Monitoring
 
         /// <summary>
         /// Triggered when a connection's underlying descriptor has been closed.
-        /// NOTE: Do not rely on the 'addr' value for 'Closed' messages, as the memory
-        /// address contained in the message may no longer point to the correct value.
         /// </summary>
         Closed = 128,
 

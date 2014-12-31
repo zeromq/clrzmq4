@@ -1,10 +1,8 @@
 namespace ZeroMQ.Monitoring
 {
     using System;
-    using System.Runtime.InteropServices;
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct ZMonitorEventData
+    public class ZMonitorEventData
     {
         public ZMonitorEvents Event;
 

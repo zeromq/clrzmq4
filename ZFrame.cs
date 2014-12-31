@@ -286,7 +286,43 @@ namespace ZeroMQ
 			int byt = Marshal.ReadByte(DataPtr() + _position);
 			++_position;
 			return byt;
-		}
+        }
+
+        public virtual Int16 ReadInt16()
+        {
+            var bytes = new byte[2];
+            int len = Read(bytes, 0, 2);
+            if (len < 2)
+            {
+                return default(Int16);
+            }
+
+            return BitConverter.ToInt16(bytes, 0);
+        }
+
+        public virtual Int32 ReadInt32()
+        {
+            var bytes = new byte[4];
+            int len = Read(bytes, 0, 4);
+            if (len < 4)
+            {
+                return default(Int16);
+            }
+
+            return BitConverter.ToInt16(bytes, 0);
+        }
+
+        public virtual Int32 ReadInt64()
+        {
+            var bytes = new byte[8];
+            int len = Read(bytes, 0, 8);
+            if (len < 8)
+            {
+                return default(Int16);
+            }
+
+            return BitConverter.ToInt16(bytes, 0);
+        }
 
 		public string ReadString() {
 			return ReadString(ZContext.Encoding);

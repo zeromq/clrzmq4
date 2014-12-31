@@ -49,15 +49,15 @@
                 throw new ArgumentException("Unable to publish socket events to an empty endpoint.", "endpoint");
             }
             
-			int endpointPtrSize;
-            using (var endpointPtr = DispoIntPtr.AllocString(endpoint, out endpointPtrSize))
+			// int endpointPtrSize;
+            IntPtr endpointPtr = Marshal.StringToHGlobalAnsi(endpoint);
+            // using (var endpointPtr = DispoIntPtr.AllocString(endpoint, out endpointPtrSize)) {
+            if (-1 == zmq.socket_monitor(socket._socketPtr, endpointPtr, (Int32)eventsToMonitor))
             {
-                if (-1 == zmq.socket_monitor(socket._socketPtr, endpointPtr, (Int32)eventsToMonitor))
-                {
-                    error = ZError.GetLastErr();
-                    return false;
-                }
+                error = ZError.GetLastErr();
+                return false;
             }
+            // }
 
             error = ZError.None;
             return true;
