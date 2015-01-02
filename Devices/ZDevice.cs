@@ -2,6 +2,7 @@
 {
     using System;
     using System.Threading;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Forwards messages received by a front-end socket to a back-end socket, from which
@@ -194,33 +195,54 @@
 
 			Initialize();
 
-			var polls = new ZPollItem[] {
-				new ZPollItem (FrontendSocket, ZPoll.In) {
-					ReceiveMessage = FrontendHandler
-				},
-				new ZPollItem (BackendSocket, ZPoll.In) {
-					ReceiveMessage = BackendHandler
-				}
-			};
+            var polls = new ZPollItem[] {
+                new ZPollItem(FrontendSocket, ZPoll.In)
+                {
+                    ReceiveMessage = FrontendHandler
+                },
+                new ZPollItem(BackendSocket, ZPoll.In)
+                {
+                    ReceiveMessage = BackendHandler
+                }
+            };
+
+            /* ZPollItem[] polls;
+            {
+                var pollItems = new List<ZPollItem>();
+                switch (FrontendSocket.SocketType)
+                {
+                    case ZSocketType.Code.ROUTER:
+                    case ZSocketType.Code.XSUB:
+                    case ZSocketType.Code.PUSH:
+                        // case ZSocketType.Code.STREAM:
+                        pollItems.Add(new ZPollItem(FrontendSocket, ZPoll.In)
+                        {
+                            ReceiveMessage = FrontendHandler
+                        });
+
+                        break;
+                }
+                switch (BackendSocket.SocketType)
+                {
+                    case ZSocketType.Code.DEALER:
+                        // case ZSocketType.Code.STREAM:
+                        pollItems.Add(new ZPollItem(BackendSocket, ZPoll.In)
+                        {
+                            ReceiveMessage = BackendHandler
+                        });
+
+                        break;
+                }
+                polls = pollItems.ToArray();
+            } */
 
 			// Because of using ZmqSocket.Forward, this field will always be null
 			ZMessage[] lastMessageFrames = null;
-
-			/*
-            FrontendSocket.ReceiveReady += (sender, args) => FrontendPtrr(args);
-            BackendSocket.ReceiveReady += (sender, args) => BackendPtrr(args);
-			*/
-
-			/*
-            _poller.ClearSockets();
-            _poller.AddSockets(new[] { FrontendSocket, BackendSocket });
-            */
 			
 			FrontendSetup.BindConnect();
 			BackendSetup.BindConnect();
 
 			bool isValid = false;
-			// var spin = new SpinWait();
 			var error = default(ZError);
             try
             {
@@ -230,10 +252,8 @@
 
 						if (error == ZError.EAGAIN) {
 							error = default(ZError);
-
-							// Thread.Yield();
-							// Thread.Sleep(0);
 							Thread.Sleep(1);
+
 							continue;
 						}
 						if (error == ZError.ETERM) {
@@ -243,7 +263,7 @@
 						// EFAULT
 						throw new ZException(error);
 					}
-				}  // timeout))) { }
+				} 
             }
             catch (ZException)
             {
@@ -256,8 +276,6 @@
 			
 			FrontendSetup.UnbindDisconnect();
 			BackendSetup.UnbindDisconnect();
-			// FrontendSocket.Unbind();
-			// BackendSocket.Unbind();
 			IsRunning = false;
 
 			if (error == ZError.ETERM) {

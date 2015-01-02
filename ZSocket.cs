@@ -168,13 +168,13 @@ namespace ZeroMQ
 						error = default(ZError);
 						continue;
 					}
-					if (error == ZError.ETERM
-					    || error == ZError.ENOTSOCK // The provided socket was invalid.
+					if (error == ZError.ETERM)
+					    /* || error == ZError.ENOTSOCK // The provided socket was invalid.
 					    || error == ZError.EADDRINUSE
 					    || error == ZError.EADDRNOTAVAIL
 					    || error == ZError.ENODEV
 					    || error == ZError.EMTHREAD 
-				    ) {
+				    )*/ {
 						break;
 					}
 
@@ -214,10 +214,10 @@ namespace ZeroMQ
 						error = default(ZError);
 						continue;
 					}
-					if (error == ZError.ETERM
-					    || error == ZError.ENOTSOCK // The provided socket was invalid.
+					if (error == ZError.ETERM)
+					    /* || error == ZError.ENOTSOCK // The provided socket was invalid.
 					    || error == ZError.ENOENT
-				    ) {
+				    )*/ {
 						break;
 					}
 
@@ -257,11 +257,11 @@ namespace ZeroMQ
 						error = default(ZError);
 						continue;
 					}
-					if (error == ZError.ETERM
-					    || error == ZError.ENOTSOCK // The provided socket was invalid.
+					if (error == ZError.ETERM) 
+					    /*|| error == ZError.ENOTSOCK // The provided socket was invalid.
 				    	|| error == ZError.ENOENT
 					    || error == ZError.EMTHREAD 
-					    ) {
+					    )*/ {
 						break;
 					}
 
@@ -301,10 +301,10 @@ namespace ZeroMQ
 						error = default(ZError);
 						continue;
 					}
-					if (error == ZError.ETERM
-					    || error == ZError.ENOTSOCK // The provided socket was invalid.
+					if (error == ZError.ETERM)
+					    /* || error == ZError.ENOTSOCK // The provided socket was invalid.
 				    	|| error == ZError.ENOENT
-				    ) {
+				    )*/ {
 						break;
 					}
 
@@ -588,9 +588,9 @@ namespace ZeroMQ
 					}
 					if (error == ZError.EAGAIN) {
 						error = default(ZError);
-						// TODO: ZmqSocketFlags.AutoAgain?
+                        // TODO: if flags & ZSocketFlags.DontWait
+                        Thread.Sleep(1);
 
-						Thread.Yield();
 						continue;
 					}
 					if (error == ZError.ETERM) {
@@ -621,7 +621,6 @@ namespace ZeroMQ
 
 					// receiving scope
 					{
-						// var recvErr = default(ZmqError);
 						while (!(result = (-1 != zmq.msg_recv(msg.Ptr, this.SocketPtr, (int)ZSocketFlags.DontWait)))) {
 							error = ZError.GetLastErr();
 							
@@ -631,15 +630,14 @@ namespace ZeroMQ
 							}
 							if (error == ZError.EAGAIN) {
 								error = null;
-								// Thread.Yield();
-								Thread.Sleep(0);
+								Thread.Sleep(1);
+
 								continue;
 							}
 
 							break;
 						}
 						if (!result) {
-							// error = recvErr;
 							break;
 						}
 					}
@@ -649,7 +647,6 @@ namespace ZeroMQ
 					
 					// sending scope
 					{ 
-						// var sndErr = default(ZmqError);
 						while (!(result = (-1 != zmq.msg_send(msg.Ptr, destination.SocketPtr, more ? (int)(ZSocketFlags.More | ZSocketFlags.DontWait) : (int)ZSocketFlags.DontWait)))) {
 							error = ZError.GetLastErr();
 							
@@ -659,8 +656,8 @@ namespace ZeroMQ
 							}
 							if (error == ZError.EAGAIN) {
 								error = null;
-								// Thread.Yield();
-								Thread.Sleep(0);
+								Thread.Sleep(1);
+
 								continue;
 							}
 
@@ -670,7 +667,6 @@ namespace ZeroMQ
 							// msg.Dismiss();
 						}
 						else {
-							// error = sndErr;
 							break;
 						}
 					}
@@ -889,7 +885,7 @@ namespace ZeroMQ
 
 			int optionLength = /* Marshal.SizeOf(typeof(byte)) * */ value.Length;
 			using (var optionValue = DispoIntPtr.Alloc(optionLength))
-			{
+			{   
 				Marshal.Copy(value, 0, optionValue.Ptr, optionLength);
 
 				result = SetOption(option, optionValue.Ptr, optionLength);
@@ -1306,11 +1302,17 @@ namespace ZeroMQ
 		/// </summary>
 		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
 		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public int TcpKeepaliveIntvl
+		public int TcpKeepaliveInterval
 		{
 			get { return GetOptionInt32(ZSocketOption.TCP_KEEPALIVE_INTVL); }
 			set { SetOption(ZSocketOption.TCP_KEEPALIVE_INTVL, value); }
 		}
+
+        public int XPubVerbose
+        {
+            get { return GetOptionInt32(ZSocketOption.XPUB_VERBOSE); }
+            set { SetOption(ZSocketOption.XPUB_VERBOSE, value); }
+        }
 
         private void EnsureNotDisposed()
         {

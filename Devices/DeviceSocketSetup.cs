@@ -119,6 +119,8 @@
             return SetSocketOption<TimeSpan>(property, value);
         }
 
+        private byte[] _subscription;
+
         /// <summary>
         /// Configure the socket to subscribe to a specific prefix. See <see cref="ZSocket.Subscribe"/> for details.
         /// </summary>
@@ -126,7 +128,8 @@
         /// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
         public DeviceSocketSetup Subscribe(byte[] prefix)
         {
-            return AddSocketInitializer(s => s.Subscribe(prefix));
+            _subscription = prefix;
+            return this;
         }
 
         /// <summary>
@@ -135,7 +138,8 @@
         /// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
         public DeviceSocketSetup SubscribeAll()
         {
-            return AddSocketInitializer(s => s.SubscribeAll());
+            _subscription = new byte[2] { 0x01, 0x00 };
+            return this;
         }
 
         internal DeviceSocketSetup AddSocketInitializer(Action<ZSocket> setupMethod)
@@ -167,31 +171,50 @@
 
 		internal void BindConnect() {
 
-			foreach (string endpoint in _bindings)
+            ZError error;
+
+            foreach (string endpoint in _bindings)
 			{
-				ZError bindErr;
-				_socket.Bind(endpoint, out bindErr);
+				_socket.Bind(endpoint, out error);
 			}
 
 			foreach (string endpoint in _connections)
 			{
-				ZError connErr;
-				_socket.Connect(endpoint, out connErr);
+				_socket.Connect(endpoint, out error);
 			}
+
+            if (_subscription != null)
+            {
+                // _socket.Subscribe(_subscription);
+
+                var subscription = ZFrame.Create(_subscription.Length);
+                subscription.Write(_subscription, 0, _subscription.Length);
+
+                if (!_socket.SendFrame(subscription, out error))
+                {
+                    throw new ZException(error);
+                }
+
+            }
 		}
 		
 		internal void UnbindDisconnect() {
 
+            /* if (_subscription != null)
+            {
+                _socket.Unsubscribe(_subscription);
+            } */
+
+            ZError error;
+
 			foreach (string endpoint in _bindings)
 			{
-				ZError unbindErr;
-				_socket.Unbind(endpoint, out unbindErr);
+				_socket.Unbind(endpoint, out error);
 			}
 
 			foreach (string endpoint in _connections)
 			{
-				ZError disconnErr;
-				_socket.Disconnect(endpoint, out disconnErr);
+				_socket.Disconnect(endpoint, out error);
 			}
 		}
 

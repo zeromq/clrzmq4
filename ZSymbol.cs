@@ -27,7 +27,7 @@
 		private string _txt;
 		public string Text { get { return _txt; } protected set { _txt = value; } }
 
-		private static void PickupConstantSymbols<T>(ref HashSet<ZSymbol> symbols) 
+		private static void PickupConstantSymbols<T>(ref HashSet<ZSymbol> symbols, bool lookupText = false) 
             where T : ZSymbol
         {
             Type type = typeof(T);
@@ -46,7 +46,7 @@
                     var symbol = Activator.CreateInstance(typeof(T), new object[] {
                         symbolNumber,
                         symbolCodeField.Name,
-                        Marshal.PtrToStringAnsi(zmq.strerror(symbolNumber))
+                        lookupText ? Marshal.PtrToStringAnsi(zmq.strerror(symbolNumber)) : string.Empty
                     });
                     symbolField.SetValue(null, symbol);
                     symbols.Add((ZSymbol)symbol);
@@ -62,7 +62,7 @@
 
 			var symbols = new HashSet<ZSymbol>();
 
-			PickupConstantSymbols<ZError>(ref symbols);
+			PickupConstantSymbols<ZError>(ref symbols, true);
 			PickupConstantSymbols<ZContextOption>(ref symbols);
 			PickupConstantSymbols<ZSocketType>(ref symbols);
 

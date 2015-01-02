@@ -31,10 +31,10 @@
 		public PubSubDevice(ZContext context, string frontendBindAddr, string backendBindAddr)
 			: base(context, FrontendType, BackendType)
 		{
-			FrontendSetup.SubscribeAll();
-			FrontendSetup.Bind(frontendBindAddr);
-			BackendSetup.Bind(backendBindAddr);
-		}
+            FrontendSetup.Bind(frontendBindAddr);
+            BackendSetup.Bind(backendBindAddr);
+            BackendSetup.SubscribeAll();
+        }
 
         /// <summary>
         /// Forwards requests from the frontend socket to the backend socket.
@@ -51,7 +51,7 @@
         /// <param name="args">A <see cref="SocketEventArgs"/> object containing the poll event args.</param>
 		protected override bool BackendHandler(ZSocket args, out ZMessage message, out ZError error)
         {
-			throw new NotSupportedException ();
+            return BackendSocket.Forward(FrontendSocket, out message, out error);
         }
     }
 }
