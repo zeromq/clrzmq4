@@ -34,15 +34,6 @@ namespace ZeroMQ
 					error = default(ZError);
 					continue;
 				}
-				if (error == ZError.EMFILE) {
-					return default(ZSocket);
-				}
-				if (error == ZError.ETERM) {
-					return default(ZSocket);
-				}
-				if (error == ZError.EFAULT) {
-					return default(ZSocket);
-				}
 
 				throw new ZException (error);
 			}
@@ -56,7 +47,7 @@ namespace ZeroMQ
 
 		private ZSocketType _socketType;
 
-		internal ZSocket(ZContext context, IntPtr socketPtr, ZSocketType socketType)
+		protected ZSocket(ZContext context, IntPtr socketPtr, ZSocketType socketType)
 		{
             _context = context;
 			_socketPtr = socketPtr;
@@ -115,12 +106,8 @@ namespace ZeroMQ
 				if (error == ZError.EINTR) {
 					continue;
 				}				
-				if (error == ZError.ENOTSOCK) {
-					// The provided socket was invalid.
-					break;
-				} else {
-					throw new ZException (error);
-				}
+
+                throw new ZException (error);
 			}
 			_socketPtr = IntPtr.Zero;
 		}

@@ -25,7 +25,7 @@ namespace ZeroMQ.Monitoring
 
         private bool _disposed;
 
-        internal ZMonitor(ZContext context, IntPtr socketPtr, string endpoint)
+        protected ZMonitor(ZContext context, IntPtr socketPtr, string endpoint)
             : base(context, socketPtr, ZSocketType.PAIR)
         {
             _endpoint = endpoint;
@@ -63,18 +63,6 @@ namespace ZeroMQ.Monitoring
                 {
                     error = default(ZError);
                     continue;
-                }
-                if (error == ZError.EMFILE)
-                {
-                    return default(ZMonitor);
-                }
-                if (error == ZError.ETERM)
-                {
-                    return default(ZMonitor);
-                }
-                if (error == ZError.EFAULT)
-                {
-                    return default(ZMonitor);
                 }
 
                 throw new ZException(error);
