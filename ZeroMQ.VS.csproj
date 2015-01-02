@@ -94,7 +94,6 @@
     <Compile Include="ZSocketType.cs" />
     <Compile Include="ZSymbol.cs" />
     <Compile Include="ZPoll.cs" />
-    <Compile Include="ZPollList.cs" />
     <Compile Include="ZPollItem.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

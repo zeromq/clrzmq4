@@ -1,13 +1,11 @@
 namespace ZeroMQ {
 	using System;
-	using System.Collections.Generic;
-	using lib;
 
-	public delegate bool ZmqPollReceiveDelegate(ZSocket socket, out ZMessage message, out ZError error);
+    public class ZPollItem
+    {
+        public delegate bool ReceiveDelegate(ZSocket socket, out ZMessage message, out ZError error);
 
-	public delegate bool ZmqPollSendDelegate(ZSocket socket, ZMessage message, out ZError error);
-
-	public partial class ZPollItem {
+        public delegate bool SendDelegate(ZSocket socket, ZMessage message, out ZError error);
 
 		public ZSocket Socket {
 			get;
@@ -18,9 +16,9 @@ namespace ZeroMQ {
 
 		public ZPoll ReadyEvents;
 
-		public ZmqPollReceiveDelegate ReceiveMessage;
+		public ReceiveDelegate ReceiveMessage;
 
-		public ZmqPollSendDelegate SendMessage;
+		public SendDelegate SendMessage;
 
 		public ZPollItem (ZSocket socket)
 		: this (socket, ZPoll.None)

@@ -52,9 +52,9 @@ namespace ZeroMQ
 
         private ZContext _context;
 
-		internal IntPtr _socketPtr;
+		private IntPtr _socketPtr;
 
-		internal ZSocketType _socketType;
+		private ZSocketType _socketType;
 
 		internal ZSocket(ZContext context, IntPtr socketPtr, ZSocketType socketType)
 		{
