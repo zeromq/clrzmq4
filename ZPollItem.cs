@@ -20,11 +20,7 @@ namespace ZeroMQ {
 
 		public SendDelegate SendMessage;
 
-		public ZPollItem (ZSocket socket)
-		: this (socket, ZPoll.None)
-		{ }
-
-		public ZPollItem (ZSocket socket, ZPoll events)
+		protected ZPollItem (ZSocket socket, ZPoll events)
 		{
 			if (socket == null) {
 				throw new ArgumentNullException("socket");
@@ -33,7 +29,24 @@ namespace ZeroMQ {
 			Socket = socket;
 			Events = events;
 		}
-		
+
+        public static ZPollItem Create(ZSocket socket, ReceiveDelegate receiveMessage)
+        {
+            return Create(socket, receiveMessage, null);
+        }
+
+        public static ZPollItem Create(ZSocket socket, ReceiveDelegate receiveMessage, SendDelegate sendMessage)
+        {
+            var pollItem = new ZPollItem(socket, (receiveMessage != null ? ZPoll.In : ZPoll.None) | (sendMessage != null ? ZPoll.Out : ZPoll.None));
+            pollItem.ReceiveMessage = receiveMessage;
+            pollItem.SendMessage = sendMessage;
+            return pollItem;
+        }
+
+        public static ZPollItem CreateSender(ZSocket socket, SendDelegate sendMessage)
+        {
+            return Create(socket, null, sendMessage);
+        }
 	}
 }
 

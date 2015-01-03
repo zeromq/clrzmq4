@@ -83,7 +83,7 @@
 					incoming.Insert(1, ZFrame.Create(0));
 					
 					// Prepend Z_LAST_ENDPOINT
-					incoming.Insert(2, ZFrame.CreateFromString(sock.LastEndpoint));
+					incoming.Insert(2, ZFrame.Create(sock.LastEndpoint));
 
 					// Prepend empty delimiter
 					// incoming.Insert(0, ZFrame.Create(0));

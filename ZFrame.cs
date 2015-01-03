@@ -27,6 +27,23 @@ namespace ZeroMQ
 			return new ZFrame (CreateNative(size), size);
 		}
 
+        public static ZFrame Create(byte[] buffer, int offset, int count)
+        {
+            var frame = new ZFrame(CreateNative(count), count);
+            frame.Write(buffer, offset, count);
+            return frame;
+        }
+
+        public static ZFrame Create(string str)
+        {
+            return Create(str, ZContext.Encoding);
+        }
+
+        public static ZFrame Create(string str, Encoding encoding)
+        {
+            return WriteStringNative(null, str, encoding);
+        }
+
 		/* public static ZmqFrame Create(IntPtr data, int size)
 		{
 			return new ZmqFrame (Alloc(data, size), size);
@@ -372,16 +389,6 @@ namespace ZeroMQ
 				// shouldn't have returned a new one
 				throw new InvalidOperationException ();
 			}
-		}
-
-		public static ZFrame CreateFromString(string str)
-		{
-			return CreateFromString(str, ZContext.Encoding);
-		}
-
-		public static ZFrame CreateFromString(string str, Encoding encoding) 
-		{
-			return WriteStringNative(null, str, encoding);
 		}
 
 		public void ZeroCopyTo(ZFrame other) {

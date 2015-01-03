@@ -128,6 +128,11 @@
             return new ZContext();
         }
 
+        public ZSocket CreateSocket(ZSocketType socketType)
+        {
+            return ZSocket.Create(this, socketType);
+        }
+
         /// <summary>
         /// Create a socket with the current context and the specified socket type.
         /// </summary>

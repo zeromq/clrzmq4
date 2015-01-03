@@ -15,6 +15,16 @@ namespace ZeroMQ
     /// </summary>
     public class ZSocket : IDisposable
 	{
+        public static ZSocket Create(ZContext context, ZSocketType socketType)
+        {
+            ZError error;
+            ZSocket socket;
+            if (null == (socket = Create(context, socketType, out error)))
+            {
+                throw new ZException(error);
+            }
+            return socket;
+        }
 
 		/// <summary>
 		/// Create a socket with the current context and the specified socket type.
@@ -23,9 +33,9 @@ namespace ZeroMQ
 		/// <returns>A <see cref="ZSocket"/> instance with the current context and the specified socket type.</returns>
 		public static ZSocket Create(ZContext context, ZSocketType socketType, out ZError error)
 		{
-			error = default(ZError);
+            error = ZError.None;
 
-			IntPtr socketPtr;
+            IntPtr socketPtr;
 			while (IntPtr.Zero == (socketPtr = zmq.socket(context.ContextPtr, socketType.Number))) 
 			{
 				error = ZError.GetLastErr();
@@ -127,6 +137,16 @@ namespace ZeroMQ
         /// </summary>
 		public ZSocketType SocketType { get { return _socketType; } }
 
+        public bool Bind(string endpoint)
+        {
+            ZError error;
+            if (!Bind(endpoint, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
+
         /// <summary>
         /// Create an endpoint for accepting connections and bind it to the current socket.
         /// </summary>
@@ -172,6 +192,16 @@ namespace ZeroMQ
 			return result;
         }
 
+        public bool Unbind(string endpoint)
+        {
+            ZError error;
+            if (!Unbind(endpoint, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
+
         /// <summary>
         /// Stop accepting connections for a previously bound endpoint on the current socket.
         /// </summary>
@@ -213,6 +243,16 @@ namespace ZeroMQ
 				}
 			}
 			return result;
+        }
+
+        public bool Connect(string endpoint)
+        {
+            ZError error;
+            if (!Connect(endpoint, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
         }
 
         /// <summary>
@@ -259,6 +299,16 @@ namespace ZeroMQ
 			return result;
         }
 
+        public bool Disconnect(string endpoint)
+        {
+            ZError error;
+            if (!Disconnect(endpoint, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
+
         /// <summary>
         /// Disconnect the current socket from a previously connected endpoint.
         /// </summary>
@@ -302,16 +352,46 @@ namespace ZeroMQ
 			return result;
         }
 
+        public bool Receive(out byte[] buffer)
+        {
+            ZError error;
+            if (!Receive(out buffer, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
+
 		public bool Receive(out byte[] buffer, out ZError error)
 		{
 			return Receive(1, ZSocketFlags.None, out buffer, out error);
 		}
+
+        public bool Receive(ZSocketFlags flags, out byte[] buffer)
+        {
+            ZError error;
+            if (!Receive(flags, out buffer, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
 
 		public bool Receive(ZSocketFlags flags, out byte[] buffer, out ZError error)
 		{
 			bool more = (flags & ZSocketFlags.More) == ZSocketFlags.More;
 			return Receive(more ? int.MaxValue : 1, flags, out buffer, out error);
 		}
+
+        public bool Receive(int framesToReceive, ZSocketFlags flags, out byte[] buffer)
+        {
+            ZError error;
+            if (!Receive(framesToReceive, flags, out buffer, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
 			
 		public virtual bool Receive(int framesToReceive, ZSocketFlags flags, out byte[] buffer, out ZError error)
 		{
@@ -354,24 +434,41 @@ namespace ZeroMQ
 			return result;
 		}
 
+        public ZMessage ReceiveMessage()
+        {
+            return ReceiveMessage(ZSocketFlags.None);
+        }
+
 		public ZMessage ReceiveMessage(out ZError error)
 		{
 			return ReceiveMessage(ZSocketFlags.None, out error);
 		}
 
+        public ZMessage ReceiveMessage(ZSocketFlags flags)
+        {
+            return ReceiveMessage(int.MaxValue, flags);
+        }
+
 		public ZMessage ReceiveMessage(ZSocketFlags flags, out ZError error)
 		{
 			ZMessage message = null;
-            if (this.ReceiveMore)
+			if (ReceiveMessage(int.MaxValue, flags, ref message, out error)) 
             {
-                flags |= ZSocketFlags.More;
-            }
-			bool result = ReceiveMessage(int.MaxValue, flags, ref message, out error);
-			if (result) {
 				return message;
 			}
-			return null;
+            throw new ZException(error);
 		}
+
+        public ZMessage ReceiveMessage(int receiveCount, ZSocketFlags flags)
+        {
+            ZError error;
+            ZMessage message = null;
+            if (ReceiveMessage(receiveCount, flags, ref message, out error))
+            {
+                return message;
+            }
+            throw new ZException(error);
+        }
 
 		public bool ReceiveMessage(int receiveCount, ZSocketFlags flags, ref ZMessage message, out ZError error)
 		{
@@ -390,9 +487,25 @@ namespace ZeroMQ
 			return result;
 		}
 
+        public ZFrame ReceiveFrame()
+        {
+            return ReceiveFrame(ZSocketFlags.None);
+        }
+
         public ZFrame ReceiveFrame(out ZError error)
         {
             return ReceiveFrame(ZSocketFlags.None, out error);
+        }
+
+        public ZFrame ReceiveFrame(ZSocketFlags flags)
+        {
+            ZError error;
+            ZFrame frame;
+            if (null == (frame = ReceiveFrame(flags, out error)))
+            {
+                throw new ZException(error);
+            }
+            return frame;
         }
 
         public ZFrame ReceiveFrame(ZSocketFlags flags, out ZError error)
@@ -400,19 +513,45 @@ namespace ZeroMQ
             return ReceiveFrames(1, flags, out error).FirstOrDefault();
         }
 
+        public IEnumerable<ZFrame> ReceiveFrames()
+        {
+            return ReceiveFrames(int.MaxValue, ZSocketFlags.More);
+        }
+
 		public IEnumerable<ZFrame> ReceiveFrames(out ZError error)
 		{
 			return ReceiveFrames ( int.MaxValue, ZSocketFlags.More, out error );
 		}
+
+        public IEnumerable<ZFrame> ReceiveFrames(int receiveCount)
+        {
+            return ReceiveFrames(receiveCount, ZSocketFlags.None);
+        }
 
         public IEnumerable<ZFrame> ReceiveFrames(int receiveCount, out ZError error)
         {
             return ReceiveFrames(receiveCount, ZSocketFlags.None, out error);
         }
 
+        public IEnumerable<ZFrame> ReceiveFrames(ZSocketFlags flags)
+        {
+            return ReceiveFrames(int.MaxValue, flags);
+        }
+
         public IEnumerable<ZFrame> ReceiveFrames(ZSocketFlags flags, out ZError error)
         {
             return ReceiveFrames(int.MaxValue, flags, out error);
+        }
+
+        public IEnumerable<ZFrame> ReceiveFrames(int framesToReceive, ZSocketFlags flags)
+        {
+            ZError error;
+            IEnumerable<ZFrame> frames;
+            if (null == (frames = ReceiveFrames(framesToReceive, flags, out error)))
+            {
+                throw new ZException(error);
+            }
+            return frames;
         }
 
 		public IEnumerable<ZFrame> ReceiveFrames(int framesToReceive, ZSocketFlags flags, out ZError error)
@@ -432,7 +571,6 @@ namespace ZeroMQ
 					error = ZError.GetLastErr();
 
 					if (error == ZError.EINTR) {
-						// if (--retry > -1)
 						error = default(ZError);
 
 						continue;
@@ -471,15 +609,45 @@ namespace ZeroMQ
 			return frames;
 		}
 
+        public virtual bool Send(byte[] buffer)
+        {
+            ZError error;
+            if (!Send(buffer, ZSocketFlags.None, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
+
 		public virtual bool Send(byte[] buffer, out ZError error) 
 		{
 			return Send(buffer, ZSocketFlags.None, out error);
 		}
 
+        public virtual bool SendMore(byte[] buffer)
+        {
+            ZError error;
+            if (!Send(buffer, ZSocketFlags.More, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
+
 		public virtual bool SendMore(byte[] buffer, out ZError error) 
 		{
 			return Send(buffer, ZSocketFlags.More, out error);
 		}
+
+        public virtual bool Send(byte[] buffer, ZSocketFlags flags)
+        {
+            ZError error;
+            if (!Send(buffer, flags, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
 
 		public virtual bool Send(byte[] buffer, ZSocketFlags flags, out ZError error) 
 		{
@@ -498,25 +666,75 @@ namespace ZeroMQ
 			return result;
 		}
 
+        public virtual bool SendMessage(ZMessage msg)
+        {
+            return SendMessage(msg, ZSocketFlags.None);
+        }
+
 		public virtual bool SendMessage(ZMessage msg, out ZError error)
 		{
 			return SendMessage(msg, ZSocketFlags.None, out error);
 		}
+
+        public virtual bool SendMessageMore(ZMessage msg)
+        {
+            return SendMessage(msg, ZSocketFlags.More);
+        }
 
 		public virtual bool SendMessageMore(ZMessage msg, out ZError error)
 		{
 			return SendMessage(msg, ZSocketFlags.More, out error);
 		}
 
+        public virtual bool SendMessageMore(ZMessage msg, ZSocketFlags flags)
+        {
+            return SendMessage(msg, flags | ZSocketFlags.More);
+        }
+
+        public virtual bool SendMessageMore(ZMessage msg, ZSocketFlags flags, out ZError error)
+        {
+            return SendMessage(msg, flags | ZSocketFlags.More, out error);
+        }
+
+        public virtual bool SendMessage(ZMessage msg, ZSocketFlags flags)
+        {
+            ZError error;
+            if (!SendMessage(msg, flags, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
+
 		public virtual bool SendMessage(ZMessage msg, ZSocketFlags flags, out ZError error)
 		{
 			return SendFrames(msg, flags, out error);
 		}
 
+        public virtual bool SendFrames(IEnumerable<ZFrame> frames)
+        {
+            ZError error;
+            if (!SendFrames(frames, ZSocketFlags.None, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
+
 		public virtual bool SendFrames(IEnumerable<ZFrame> frames, out ZError error)
 		{
 			return SendFrames(frames, ZSocketFlags.None, out error);
 		}
+
+        public virtual bool SendFrames(IEnumerable<ZFrame> frames, ZSocketFlags flags)
+        {
+            ZError error;
+            if (!SendFrames(frames, flags, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
 
 		public virtual bool SendFrames(IEnumerable<ZFrame> frames, ZSocketFlags flags, out ZError error) 
 		{
@@ -539,6 +757,11 @@ namespace ZeroMQ
 			return result;
 		}
 
+        public virtual bool SendFrame(ZFrame frame)
+        {
+            return SendFrame(frame, ZSocketFlags.None);
+        }
+
 		public virtual bool SendFrame(ZFrame msg, out ZError error)
 		{
 			EnsureNotDisposed();
@@ -546,12 +769,39 @@ namespace ZeroMQ
 			return SendFrameInternal(msg, ZSocketFlags.None, out error);
 		}
 
-		public virtual bool SendFrameMore(ZFrame msg, out ZError error)
-		{
-			EnsureNotDisposed();
+        public virtual bool SendFrameMore(ZFrame frame)
+        {
+            return SendFrameMore(frame, ZSocketFlags.More);
+        }
 
-			return SendFrameInternal(msg, ZSocketFlags.More, out error);
-		}
+        public virtual bool SendFrameMore(ZFrame msg, out ZError error)
+        {
+            EnsureNotDisposed();
+
+            return SendFrameInternal(msg, ZSocketFlags.More, out error);
+        }
+
+        public virtual bool SendFrameMore(ZFrame frame, ZSocketFlags flags)
+        {
+            return SendFrameMore(frame, flags | ZSocketFlags.More);
+        }
+
+        public virtual bool SendFrameMore(ZFrame msg, ZSocketFlags flags, out ZError error)
+        {
+            EnsureNotDisposed();
+
+            return SendFrameInternal(msg, flags | ZSocketFlags.More, out error);
+        }
+
+        public virtual bool SendFrame(ZFrame frame, ZSocketFlags flags)
+        {
+            ZError error;
+            if (!SendFrame(frame, flags, out error))
+            {
+                throw new ZException(error);
+            }
+            return true;
+        }
 
 		public virtual bool SendFrame(ZFrame msg, ZSocketFlags flags, out ZError error)
 		{

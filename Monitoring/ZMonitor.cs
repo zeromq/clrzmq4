@@ -159,8 +159,7 @@ namespace ZeroMQ.Monitoring
         {
             IsRunning = true;
 
-            var poller = new ZPollItem(this, ZPoll.In);
-            poller.ReceiveMessage = (ZSocket socket, out ZMessage message, out ZError _error) => {
+            var poller = ZPollItem.Create(this, (ZSocket socket, out ZMessage message, out ZError _error) => {
 
                 while (null == (message = ReceiveMessage(ZSocketFlags.DontWait, out _error)))
                 {
@@ -176,7 +175,7 @@ namespace ZeroMQ.Monitoring
                 }
 
                 return true;
-            };
+            });
 
             ZError error;
             if (!Connect(_endpoint, out error)) throw new ZException(error);

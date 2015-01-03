@@ -196,14 +196,8 @@
 			Initialize();
 
             var polls = new ZPollItem[] {
-                new ZPollItem(FrontendSocket, ZPoll.In)
-                {
-                    ReceiveMessage = FrontendHandler
-                },
-                new ZPollItem(BackendSocket, ZPoll.In)
-                {
-                    ReceiveMessage = BackendHandler
-                }
+                ZPollItem.Create(FrontendSocket, FrontendHandler),
+                ZPollItem.Create(BackendSocket, BackendHandler)
             };
 
             /* ZPollItem[] polls;
