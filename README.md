@@ -54,6 +54,9 @@ namespace ZeroMQ.Test
             using (ZSocket socket = context.CreateSocket(ZSocketType.REP))
             {
                 socket.Bind("inproc://helloworld");
+								
+								// SUB requires
+								// socket.SubscribeAll();
 
                 while (!cancellus.IsCancellationRequested)
                 {
@@ -93,6 +96,9 @@ namespace ZeroMQ.Test
             {
                 socket.Connect("inproc://helloworld");
 
+								// PUB requires
+								// Thread.Sleep(64);
+								
                 using (var request = new ZMessage())
                 {
                     request.Add(ZFrame.Create(name));
