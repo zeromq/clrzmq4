@@ -43,6 +43,7 @@ namespace ZeroMQ.Test
 
             // Cancel the Server
             cancellor.Cancel();
+						
             // we could have done here context.Terminate()
         }
 
@@ -50,13 +51,13 @@ namespace ZeroMQ.Test
         {
             var cancellus = (CancellationToken)cancelluS;
 
-            ZError error;
-            using (ZSocket socket = context.CreateSocket(ZSocketType.REP, out error))
+            using (ZSocket socket = context.CreateSocket(ZSocketType.REP))
             {
-                socket.Bind("inproc://helloworld", out error);
+                socket.Bind("inproc://helloworld");
 
                 while (!cancellus.IsCancellationRequested)
                 {
+										ZError error;
                     ZMessage request;
                     if (null == (request = socket.ReceiveMessage(ZSocketFlags.DontWait, out error)))
                     {
@@ -67,7 +68,6 @@ namespace ZeroMQ.Test
                             continue;
                         }
 
-                        if (error == ZError.ETERM) return;
                         throw new ZException(error);
                     }
 
@@ -75,13 +75,13 @@ namespace ZeroMQ.Test
                     using (request)
                     using (var response = new ZMessage())
                     {
-                        response.Add(ZFrame.CreateFromString("Hello " + request[0].ReadString()));
-                        socket.SendMessage(response, out error);
+                        response.Add(ZFrame.Create("Hello " + request[0].ReadString()));
+												
+                        socket.SendMessage(response);
                     }
-                    // using (var response = ZFrame.CreateFromString("Hello " + request[0].ReadString())) {
-                    //     socket.SendFrame(response, out error);
-                    // }
                 }
+								
+								socket.Unbind("inproc://helloworld");
             }
         }
 
@@ -89,27 +89,23 @@ namespace ZeroMQ.Test
         {
             string output = null;
 
-            ZError error;
-            using (ZSocket socket = context.CreateSocket(ZSocketType.REQ, out error))
+            using (ZSocket socket = context.CreateSocket(ZSocketType.REQ))
             {
-                socket.Connect("inproc://helloworld", out error);
+                socket.Connect("inproc://helloworld");
 
                 using (var request = new ZMessage())
                 {
-                    request.Add(ZFrame.CreateFromString(name));
-                    socket.SendMessage(request, out error);
+                    request.Add(ZFrame.Create(name));
+										
+                    socket.SendMessage(request);
                 }
-                // using (var request = ZFrame.CreateFromString(name)) {
-                //     socket.SendFrame(request, out error);
-                // }
 
-                using (ZMessage response = socket.ReceiveMessage(out error))
+                using (ZMessage response = socket.ReceiveMessage())
                 {
                     output = response[0].ReadString();
                 }
-                // using (var response = socket.ReceiveFrame(out error)) {
-                //     output = response.ReadString();
-                // }
+								
+								socket.Disconnect("inproc://helloworld");
             }
 
             return output;
