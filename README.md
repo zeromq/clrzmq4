@@ -43,7 +43,7 @@ namespace ZeroMQ.Test
 
             // Cancel the Server
             cancellor.Cancel();
-						
+            
             // we could have done here context.Terminate()
         }
 
@@ -57,7 +57,7 @@ namespace ZeroMQ.Test
 
                 while (!cancellus.IsCancellationRequested)
                 {
-										ZError error;
+                    ZError error;
                     ZMessage request;
                     if (null == (request = socket.ReceiveMessage(ZSocketFlags.DontWait, out error)))
                     {
@@ -76,12 +76,12 @@ namespace ZeroMQ.Test
                     using (var response = new ZMessage())
                     {
                         response.Add(ZFrame.Create("Hello " + request[0].ReadString()));
-												
+                        
                         socket.SendMessage(response);
                     }
                 }
-								
-								socket.Unbind("inproc://helloworld");
+                
+                socket.Unbind("inproc://helloworld");
             }
         }
 
@@ -96,7 +96,7 @@ namespace ZeroMQ.Test
                 using (var request = new ZMessage())
                 {
                     request.Add(ZFrame.Create(name));
-										
+                    
                     socket.SendMessage(request);
                 }
 
@@ -104,8 +104,8 @@ namespace ZeroMQ.Test
                 {
                     output = response[0].ReadString();
                 }
-								
-								socket.Disconnect("inproc://helloworld");
+                
+                socket.Disconnect("inproc://helloworld");
             }
 
             return output;
