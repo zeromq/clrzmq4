@@ -661,7 +661,7 @@ namespace ZeroMQ
 			var frame = ZFrame.Create(size);
 			Marshal.Copy(buffer, 0, frame.DataPtr(), size);
 
-			result = SendFrameInternal(frame, flags, out error);
+			result = SendFrame(frame, flags, out error);
 
 			return result;
 		}
@@ -749,7 +749,7 @@ namespace ZeroMQ
 				if (i == l - 1 && !finallyMore) {
 					frameFlags &= ~ZSocketFlags.More;
 				}
-				if (!(result = SendFrameInternal(frames.ElementAt(i), frameFlags, out error))) {
+				if (!(result = SendFrame(frames.ElementAt(i), frameFlags, out error))) {
 					break;
 				}
 			}
@@ -766,7 +766,7 @@ namespace ZeroMQ
 		{
 			EnsureNotDisposed();
 
-			return SendFrameInternal(msg, ZSocketFlags.None, out error);
+			return SendFrame(msg, ZSocketFlags.None, out error);
 		}
 
         public virtual bool SendFrameMore(ZFrame frame)
@@ -778,7 +778,7 @@ namespace ZeroMQ
         {
             EnsureNotDisposed();
 
-            return SendFrameInternal(msg, ZSocketFlags.More, out error);
+            return SendFrame(msg, ZSocketFlags.More, out error);
         }
 
         public virtual bool SendFrameMore(ZFrame frame, ZSocketFlags flags)
@@ -790,7 +790,7 @@ namespace ZeroMQ
         {
             EnsureNotDisposed();
 
-            return SendFrameInternal(msg, flags | ZSocketFlags.More, out error);
+            return SendFrame(msg, flags | ZSocketFlags.More, out error);
         }
 
         public virtual bool SendFrame(ZFrame frame, ZSocketFlags flags)
@@ -803,15 +803,10 @@ namespace ZeroMQ
             return true;
         }
 
-		public virtual bool SendFrame(ZFrame msg, ZSocketFlags flags, out ZError error)
+		public virtual bool SendFrame(ZFrame frame, ZSocketFlags flags, out ZError error)
 		{
 			EnsureNotDisposed();
 
-			return SendFrameInternal(msg, flags, out error);
-		}
-
-		private bool SendFrameInternal(ZFrame frame, ZSocketFlags flags, out ZError error) 
-		{
 			error = default(ZError);
 			bool result = false;
 
