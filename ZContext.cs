@@ -15,8 +15,8 @@
     /// successfully closed.
     /// </remarks>
     public class ZContext : IDisposable
-    {
-		internal static Encoding _encoding = System.Text.Encoding.UTF8;
+    {   
+        internal static Encoding _encoding = System.Text.Encoding.UTF8;
 		
 		/// <summary>
 		/// Gets or sets the default encoding 
@@ -67,6 +67,15 @@
         public IntPtr ContextPtr {
 			get { return _contextPtr; }
 		}
+
+        /// <summary>
+        /// Create a <see cref="ZContext"/> instance.
+        /// </summary>
+        /// <returns>A <see cref="ZContext"/> instance with the default thread pool size (1).</returns>
+        public static ZContext Create()
+        {
+            return new ZContext();
+        }
 
 		public void SetOption(ZContextOption option, int optionValue)
 		{
@@ -120,27 +129,14 @@
         }
 
         /// <summary>
-        /// Create a <see cref="ZContext"/> instance.
+        /// Gets or sets the supported socket protocol(s) when using TCP transports. (Default = <see cref="ProtocolType.Ipv4Only"/>).
         /// </summary>
-        /// <returns>A <see cref="ZContext"/> instance with the default thread pool size (1).</returns>
-        public static ZContext Create()
+        /// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
+        /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
+        public bool IPv6Enabled
         {
-            return new ZContext();
-        }
-
-        public ZSocket CreateSocket(ZSocketType socketType)
-        {
-            return ZSocket.Create(this, socketType);
-        }
-
-        /// <summary>
-        /// Create a socket with the current context and the specified socket type.
-        /// </summary>
-        /// <param name="socketType">A <see cref="ZSocketType"/> value for the socket.</param>
-        /// <returns>A <see cref="ZSocket"/> instance with the current context and the specified socket type.</returns>
-        public ZSocket CreateSocket(ZSocketType socketType, out ZError error)
-        {
-			return ZSocket.Create(this, socketType, out error);
+            get { return GetOption(ZContextOption.IPV6) == 1; }
+            set { SetOption(ZContextOption.IPV6, value ? 1 : 0); }
         }
 
         /// <summary>

@@ -55,8 +55,8 @@
 			Context = context;
 
 			ZError frontendSockErr, backendSockErr;
-            FrontendSocket = context.CreateSocket(frontendType, out frontendSockErr);
-            BackendSocket = context.CreateSocket(backendType, out backendSockErr);
+            FrontendSocket = ZSocket.Create(context, frontendType, out frontendSockErr);
+            BackendSocket = ZSocket.Create(context, backendType, out backendSockErr);
 
             FrontendSetup = new DeviceSocketSetup(FrontendSocket);
             BackendSetup = new DeviceSocketSetup(BackendSocket);

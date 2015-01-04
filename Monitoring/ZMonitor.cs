@@ -10,12 +10,14 @@ namespace ZeroMQ.Monitoring
     /// <summary>
     /// Monitors state change events on another socket within the same context.
     /// </summary>
-    public class ZMonitor : ZSocket
+    public class ZMonitor
     {
         /// <summary>
         /// The polling interval in milliseconds.
         /// </summary>
         private const int PollingIntervalMsec = 500;
+
+        private ZSocket _socket;
 
         private readonly string _endpoint;
 
@@ -25,9 +27,9 @@ namespace ZeroMQ.Monitoring
 
         private bool _disposed;
 
-        protected ZMonitor(ZContext context, IntPtr socketPtr, string endpoint)
-            : base(context, socketPtr, ZSocketType.PAIR)
+        protected ZMonitor(ZContext context, ZSocket socket, string endpoint)
         {
+            _socket = socket;
             _endpoint = endpoint;
             _eventHandler = new Dictionary<ZMonitorEvents, Action<ZMonitorEventData>>
             {
@@ -45,30 +47,31 @@ namespace ZeroMQ.Monitoring
             };
         }
 
+        public static ZMonitor Create(ZContext context, string endpoint)
+        {
+            ZError error;
+            ZMonitor monitor;
+            if (null == (monitor = ZMonitor.Create(context, endpoint, out error)))
+            {
+                throw new ZException(error);
+            }
+            return monitor;
+        }
+
         /// <summary>
         /// Create a socket with the current context and the specified socket type.
         /// </summary>
         /// <param name="socketType">A <see cref="ZSocketType"/> value for the socket.</param>
         /// <returns>A <see cref="ZSocket"/> instance with the current context and the specified socket type.</returns>
-        public static ZMonitor CreateMonitor(ZContext context, string endpoint, out ZError error)
+        public static ZMonitor Create(ZContext context, string endpoint, out ZError error)
         {
-            error = default(ZError);
-
-            IntPtr socketPtr;
-            while (IntPtr.Zero == (socketPtr = zmq.socket(context.ContextPtr, ZSocketType.PAIR)))
+            ZSocket socket;
+            if (null == (socket = ZSocket.Create(context, ZSocketType.PAIR, out error)))
             {
-                error = ZError.GetLastErr();
-
-                if (error == ZError.EINTR)
-                {
-                    error = default(ZError);
-                    continue;
-                }
-
                 throw new ZException(error);
             }
 
-            return new ZMonitor(context, socketPtr, endpoint);
+            return new ZMonitor(context, socket, endpoint);
         }
 
         /// <summary>
@@ -159,9 +162,9 @@ namespace ZeroMQ.Monitoring
         {
             IsRunning = true;
 
-            var poller = ZPollItem.Create(this, (ZSocket socket, out ZMessage message, out ZError _error) => {
+            var poller = ZPollItem.Create(_socket, (ZSocket socket, out ZMessage message, out ZError _error) => {
 
-                while (null == (message = ReceiveMessage(ZSocketFlags.DontWait, out _error)))
+                while (null == (message = _socket.ReceiveMessage(ZSocketFlags.DontWait, out _error)))
                 {
                     if (_error == ZError.EAGAIN)
                     {
@@ -178,7 +181,7 @@ namespace ZeroMQ.Monitoring
             });
 
             ZError error;
-            if (!Connect(_endpoint, out error)) throw new ZException(error);
+            if (!_socket.Connect(_endpoint, out error)) throw new ZException(error);
 
             while (IsRunning && !cancellus.IsCancellationRequested)
             {
@@ -213,7 +216,7 @@ namespace ZeroMQ.Monitoring
                 OnMonitor(eventValue);
             }
 
-            if (!Disconnect(_endpoint, out error)) throw new ZException(error);
+            if (!_socket.Disconnect(_endpoint, out error)) throw new ZException(error);
         }
 
         internal void OnMonitor(ZMonitorEventData data)
@@ -233,7 +236,7 @@ namespace ZeroMQ.Monitoring
         /// Releases the unmanaged resources used by the <see cref="ZMonitor"/>, and optionally disposes of the managed resources.
         /// </summary>
         /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-        protected override void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
             {
@@ -241,7 +244,11 @@ namespace ZeroMQ.Monitoring
                 {
                     Stop();
 
-                    base.Dispose(disposing);
+                    if (_socket != null)
+                    {
+                        _socket.Dispose();
+                        _socket = null;
+                    }
                 }
             }
             _disposed = true;

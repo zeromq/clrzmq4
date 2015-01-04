@@ -452,11 +452,8 @@ namespace ZeroMQ
 		public ZMessage ReceiveMessage(ZSocketFlags flags, out ZError error)
 		{
 			ZMessage message = null;
-			if (ReceiveMessage(int.MaxValue, flags, ref message, out error)) 
-            {
-				return message;
-			}
-            throw new ZException(error);
+			ReceiveMessage(int.MaxValue, flags, ref message, out error);
+			return message;
 		}
 
         public ZMessage ReceiveMessage(int receiveCount, ZSocketFlags flags)
@@ -1238,37 +1235,19 @@ namespace ZeroMQ
         }
 
         /// <summary>
-        /// Add a filter that will be applied for each new TCP transport connection on a listening socket.
-        /// Example: "127.0.0.1", "mail.ru/24", "::1", "::1/128", "3ffe:1::", "3ffe:1::/56"
+        /// Gets a value indicating whether the multi-part message currently being read has more message parts to follow.
         /// </summary>
-        /// <seealso cref="ClearTcpAcceptFilter"/>
-        /// <remarks>
-        /// If no filters are applied, then TCP transport allows connections from any IP. If at least one
-        /// filter is applied then new connection source IP should be matched.
-        /// </remarks>
-        /// <param name="filter">IPV6 or IPV4 CIDR filter.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="filter"/> is null.</exception>
-        /// <exception cref="ArgumentException"><paramref name="filter"/> is empty string.</exception>
+        /// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
         /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-        public void AddTcpAcceptFilter(string filter)
+        public bool ReceiveMore
         {
-            if (string.IsNullOrWhiteSpace(filter))
-            {
-				throw new ArgumentException("IsNullOrWhiteSpace", "filter");
-            }
-
-            SetOption(ZSocketOption.TCP_ACCEPT_FILTER, filter);
+            get { return GetOptionInt32(ZSocketOption.RCVMORE) == 1; }
         }
 
-        /// <summary>
-        /// Reset all TCP filters assigned by <see cref="AddTcpAcceptFilter"/> and allow TCP transport to accept connections from any IP.
-        /// </summary>
-        /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-        public void ClearTcpAcceptFilter()
+        public string LastEndpoint
         {
-			SetOption(ZSocketOption.TCP_ACCEPT_FILTER, (string)null);
+            get { return GetOptionString(ZSocketOption.LAST_ENDPOINT); }
         }
-		
 
 		/// <summary>
 		/// Gets or sets the I/O thread affinity for newly created connections on this socket.
@@ -1292,16 +1271,94 @@ namespace ZeroMQ
 			set { SetOption(ZSocketOption.BACKLOG, value); }
 		}
 
-		/// <summary>
-		/// Gets or sets the identity of the current socket.
-		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public byte[] Identity
-		{
-			get { return GetOptionBytes(ZSocketOption.IDENTITY); }
-			set { SetOption(ZSocketOption.IDENTITY, value); }
-		}
+        public byte[] ConnectRID
+        {
+            get { return GetOptionBytes(ZSocketOption.CONNECT_RID); }
+            set { SetOption(ZSocketOption.CONNECT_RID, value); }
+        }
+
+        public bool Conflate
+        {
+            get { return GetOptionInt32(ZSocketOption.CONFLATE) == 1; }
+            set { SetOption(ZSocketOption.CONFLATE, value ? 1 : 0); }
+        }
+
+        public byte[] CurvePublicKey
+        {
+            get { return GetOptionBytes(ZSocketOption.CURVE_PUBLICKEY); }
+            set { SetOption(ZSocketOption.CURVE_PUBLICKEY, value); }
+        }
+
+        public byte[] CurveSecretKey
+        {
+            get { return GetOptionBytes(ZSocketOption.CURVE_SECRETKEY); }
+            set { SetOption(ZSocketOption.CURVE_SECRETKEY, value); }
+        }
+
+        public bool CurveServer
+        {
+            get { return GetOptionInt32(ZSocketOption.CURVE_SERVER) == 1; }
+            set { SetOption(ZSocketOption.CURVE_SERVER, value ? 1 : 0); }
+        }
+
+        public byte[] CurveServerKey
+        {
+            get { return GetOptionBytes(ZSocketOption.CURVE_SERVERKEY); }
+            set { SetOption(ZSocketOption.CURVE_SERVERKEY, value); }
+        }
+
+        public bool GSSAPIPlainText
+        {
+            get { return GetOptionInt32(ZSocketOption.GSSAPI_PLAINTEXT) == 1; }
+            set { SetOption(ZSocketOption.GSSAPI_PLAINTEXT, value ? 1 : 0); }
+        }
+
+        public string GSSAPIPrincipal
+        {
+            get { return GetOptionString(ZSocketOption.GSSAPI_PRINCIPAL); }
+            set { SetOption(ZSocketOption.GSSAPI_PRINCIPAL, value); }
+        }
+
+        public bool GSSAPIServer
+        {
+            get { return GetOptionInt32(ZSocketOption.GSSAPI_SERVER) == 1; }
+            set { SetOption(ZSocketOption.GSSAPI_SERVER, value ? 1 : 0); }
+        }
+
+        public string GSSAPIServicePrincipal
+        {
+            get { return GetOptionString(ZSocketOption.GSSAPI_SERVICE_PRINCIPAL); }
+            set { SetOption(ZSocketOption.GSSAPI_SERVICE_PRINCIPAL, value); }
+        }
+
+        public int HandshakeInterval
+        {
+            get { return GetOptionInt32(ZSocketOption.HANDSHAKE_IVL); }
+            set { SetOption(ZSocketOption.HANDSHAKE_IVL, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the identity of the current socket.
+        /// </summary>
+        /// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
+        /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
+        public byte[] Identity
+        {
+            get { return GetOptionBytes(ZSocketOption.IDENTITY); }
+            set { SetOption(ZSocketOption.IDENTITY, value); }
+        }
+
+        public bool Immediate
+        {
+            get { return GetOptionInt32(ZSocketOption.IMMEDIATE) == 1; }
+            set { SetOption(ZSocketOption.IMMEDIATE, value ? 1 : 0); }
+        }
+
+        public bool IPv6
+        {
+            get { return GetOptionInt32(ZSocketOption.IPV6) == 1; }
+            set { SetOption(ZSocketOption.IPV6, value ? 1 : 0); }
+        }
 
 		/// <summary>
 		/// Gets or sets the linger period for socket shutdown. (Default = <see cref="TimeSpan.MaxValue"/>, infinite).
@@ -1338,26 +1395,39 @@ namespace ZeroMQ
 			set { SetOption(ZSocketOption.MULTICAST_HOPS, value); }
 		}
 
+        public string PlainPassword
+        {
+            get { return GetOptionString(ZSocketOption.PLAIN_PASSWORD); }
+            set { SetOption(ZSocketOption.PLAIN_PASSWORD, value); }
+        }
+
+        public bool PlainServer
+        {
+            get { return GetOptionInt32(ZSocketOption.PLAIN_SERVER) == 1; }
+            set { SetOption(ZSocketOption.PLAIN_SERVER, value ? 1 : 0); }
+        }
+
+        public string PlainUserName
+        {
+            get { return GetOptionString(ZSocketOption.PLAIN_USERNAME); }
+            set { SetOption(ZSocketOption.PLAIN_USERNAME, value); }
+        }
+
+        public bool ProbeRouter
+        {
+            get { return GetOptionInt32(ZSocketOption.PROBE_ROUTER) == 1; }
+            set { SetOption(ZSocketOption.PROBE_ROUTER, value ? 1 : 0); }
+        }
+
 		/// <summary>
 		/// Gets or sets the maximum send or receive data rate for multicast transports (kbps). (Default = 100 kbps).
 		/// </summary>
 		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
 		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public int MulticastRate
+        public int MulticastRate
 		{
 			get { return GetOptionInt32(ZSocketOption.RATE); }
 			set { SetOption(ZSocketOption.RATE, value); }
-		}
-
-		/// <summary>
-		/// Gets or sets the recovery interval for multicast transports. (Default = 10 seconds).
-		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public TimeSpan MulticastRecoveryInterval
-		{
-			get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RECOVERY_IVL)); }
-			set { SetOption(ZSocketOption.RECOVERY_IVL, (int)value.TotalMilliseconds); }
 		}
 
 		/// <summary>
@@ -1380,51 +1450,82 @@ namespace ZeroMQ
 		{
 			get { return GetOptionInt32(ZSocketOption.RCVHWM); }
 			set { SetOption(ZSocketOption.RCVHWM, value); }
-		}
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether the multi-part message currently being read has more message parts to follow.
-		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public bool ReceiveMore
-		{
-			get { return GetOptionInt32(ZSocketOption.RCVMORE) == 1; }
-		}
+        /// <summary>
+        /// Gets or sets the timeout for receive operations. (Default = <see cref="TimeSpan.MaxValue"/>, infinite).
+        /// </summary>
+        /// <exception cref="ZmqVersionException">This socket option was used in ZeroMQ 2.x or lower.</exception>
+        /// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
+        /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
+        public TimeSpan ReceiveTimeout
+        {
+            get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RCVTIMEO)); }
+            set { SetOption(ZSocketOption.RCVTIMEO, (int)value.TotalMilliseconds); }
+        }
 
-		/// <summary>
-		/// Gets or sets the timeout for receive operations. (Default = <see cref="TimeSpan.MaxValue"/>, infinite).
-		/// </summary>
-		/// <exception cref="ZmqVersionException">This socket option was used in ZeroMQ 2.x or lower.</exception>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public TimeSpan ReceiveTimeout
-		{
-			get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RCVTIMEO)); }
-			set { SetOption(ZSocketOption.RCVTIMEO, (int)value.TotalMilliseconds); }
-		}
+        /// <summary>
+        /// Gets or sets the initial reconnection interval. (Default = 100 milliseconds).
+        /// </summary>
+        /// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
+        /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
+        public TimeSpan ReconnectInterval
+        {
+            get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RECONNECT_IVL)); }
+            set { SetOption(ZSocketOption.RECONNECT_IVL, (int)value.TotalMilliseconds); }
+        }
 
-		/// <summary>
-		/// Gets or sets the initial reconnection interval. (Default = 100 milliseconds).
-		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public TimeSpan ReconnectInterval
-		{
-			get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RECONNECT_IVL)); }
-			set { SetOption(ZSocketOption.RECONNECT_IVL, (int)value.TotalMilliseconds); }
-		}
+        /// <summary>
+        /// Gets or sets the maximum reconnection interval. (Default = 0, only use <see cref="ReconnectInterval"/>).
+        /// </summary>
+        /// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
+        /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
+        public TimeSpan ReconnectIntervalMax
+        {
+            get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RECONNECT_IVL_MAX)); }
+            set { SetOption(ZSocketOption.RECONNECT_IVL_MAX, (int)value.TotalMilliseconds); }
+        }
 
-		/// <summary>
-		/// Gets or sets the maximum reconnection interval. (Default = 0, only use <see cref="ReconnectInterval"/>).
-		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public TimeSpan ReconnectIntervalMax
-		{
-			get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RECONNECT_IVL_MAX)); }
-			set { SetOption(ZSocketOption.RECONNECT_IVL_MAX, (int)value.TotalMilliseconds); }
-		}
+        /// <summary>
+        /// Gets or sets the recovery interval for multicast transports. (Default = 10 seconds).
+        /// </summary>
+        /// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
+        /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
+        public TimeSpan MulticastRecoveryInterval
+        {
+            get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RECOVERY_IVL)); }
+            set { SetOption(ZSocketOption.RECOVERY_IVL, (int)value.TotalMilliseconds); }
+        }
+
+        public bool RequestCorrelate
+        {
+            get { return GetOptionInt32(ZSocketOption.REQ_CORRELATE) == 1; }
+            set { SetOption(ZSocketOption.REQ_CORRELATE, value ? 1 : 0); }
+        }
+
+        public bool RequestRelaxed
+        {
+            get { return GetOptionInt32(ZSocketOption.REQ_RELAXED) == 1; }
+            set { SetOption(ZSocketOption.REQ_RELAXED, value ? 1 : 0); }
+        }
+
+        public bool RouterHandover
+        {
+            get { return GetOptionInt32(ZSocketOption.ROUTER_HANDOVER) == 1; }
+            set { SetOption(ZSocketOption.ROUTER_HANDOVER, value ? 1 : 0); }
+        }
+
+        public RouterMandatory RouterMandatory
+        {
+            get { return (RouterMandatory)GetOptionInt32(ZSocketOption.ROUTER_MANDATORY); }
+            set { SetOption(ZSocketOption.ROUTER_MANDATORY, (int)value); }
+        }
+
+        public bool RouterRaw
+        {
+            get { return GetOptionInt32(ZSocketOption.ROUTER_RAW) == 1; }
+            set { SetOption(ZSocketOption.ROUTER_RAW, value ? 1 : 0); }
+        }
 
 		/// <summary>
 		/// Gets or sets the underlying kernel transmit buffer size for the current socket (bytes). (Default = 0, OS default).
@@ -1460,47 +1561,11 @@ namespace ZeroMQ
 		}
 
 		/// <summary>
-		/// Gets or sets the supported socket protocol(s) when using TCP transports. (Default = <see cref="ProtocolType.Ipv4Only"/>).
-		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public bool IPv6Enabled
-		{
-			get { return GetOptionInt32(ZSocketOption.IPV6) == 1; }
-			set { SetOption(ZSocketOption.IPV6, value ? 1 : 0); }
-		}
-
-		/// <summary>
-		/// Gets the last endpoint bound for TCP and IPC transports.
-		/// The returned value will be a string in the form of a ZMQ DSN.
-		/// </summary>
-		/// <remarks>
-		/// Note that if the TCP host is INADDR_ANY, indicated by a *, then the
-		/// returned address will be 0.0.0.0 (for IPv4).</remarks>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public string LastEndpoint
-		{
-			get { return GetOptionString(ZSocketOption.LAST_ENDPOINT); }
-		}
-
-		/// <summary>
-		/// Sets the behavior when an unroutable message is encountered. (Default = <see cref="ZeroMQ.RouterBehavior.Discard"/>).
-		/// Only applicable to the <see cref="ZeroMQ.ZSocketType.ROUTER"/> socket type.
-		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public RouterBehavior RouterBehavior
-		{
-			set { SetOption(ZSocketOption.ROUTER_BEHAVIOR, (int)value); }
-		}
-
-		/// <summary>
 		/// Gets or sets the override value for the SO_KEEPALIVE TCP socket option. (where supported by OS). (Default = -1, OS default).
 		/// </summary>
 		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
 		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public TcpKeepaliveBehaviour TcpKeepalive
+		public TcpKeepaliveBehaviour TcpKeepAlive
 		{
 			get { return (TcpKeepaliveBehaviour)GetOptionInt32(ZSocketOption.TCP_KEEPALIVE); }
 			set { SetOption(ZSocketOption.TCP_KEEPALIVE, (int)value); }
@@ -1512,7 +1577,7 @@ namespace ZeroMQ
 		/// </summary>
 		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
 		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public int TcpKeepaliveCnt
+		public int TcpKeepAliveCount
 		{
 			get { return GetOptionInt32(ZSocketOption.TCP_KEEPALIVE_CNT); }
 			set { SetOption(ZSocketOption.TCP_KEEPALIVE_CNT, value); }
@@ -1523,7 +1588,7 @@ namespace ZeroMQ
 		/// </summary>
 		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
 		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public int TcpKeepaliveIdle
+		public int TcpKeepAliveIdle
 		{
 			get { return GetOptionInt32(ZSocketOption.TCP_KEEPALIVE_IDLE); }
 			set { SetOption(ZSocketOption.TCP_KEEPALIVE_IDLE, value); }
@@ -1534,16 +1599,66 @@ namespace ZeroMQ
 		/// </summary>
 		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
 		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		public int TcpKeepaliveInterval
+		public int TcpKeepAliveInterval
 		{
 			get { return GetOptionInt32(ZSocketOption.TCP_KEEPALIVE_INTVL); }
 			set { SetOption(ZSocketOption.TCP_KEEPALIVE_INTVL, value); }
 		}
 
-        public int XPubVerbose
+        public int TypeOfService
         {
-            get { return GetOptionInt32(ZSocketOption.XPUB_VERBOSE); }
-            set { SetOption(ZSocketOption.XPUB_VERBOSE, value); }
+            get { return GetOptionInt32(ZSocketOption.TOS); }
+            set { SetOption(ZSocketOption.TOS, value); }
+        }
+
+        public bool XPubVerbose
+        {
+            get { return GetOptionInt32(ZSocketOption.XPUB_VERBOSE) == 1; }
+            set { SetOption(ZSocketOption.XPUB_VERBOSE, value ? 1 : 0); }
+        }
+
+        public string ZAPDomain
+        {
+            get { return GetOptionString(ZSocketOption.ZAP_DOMAIN); }
+            set { SetOption(ZSocketOption.ZAP_DOMAIN, value); }
+        }
+
+        /// <summary>
+        /// Add a filter that will be applied for each new TCP transport connection on a listening socket.
+        /// Example: "127.0.0.1", "mail.ru/24", "::1", "::1/128", "3ffe:1::", "3ffe:1::/56"
+        /// </summary>
+        /// <seealso cref="ClearTcpAcceptFilter"/>
+        /// <remarks>
+        /// If no filters are applied, then TCP transport allows connections from any IP. If at least one
+        /// filter is applied then new connection source IP should be matched.
+        /// </remarks>
+        /// <param name="filter">IPV6 or IPV4 CIDR filter.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="filter"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="filter"/> is empty string.</exception>
+        /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
+        public void AddTcpAcceptFilter(string filter)
+        {
+            if (string.IsNullOrWhiteSpace(filter))
+            {
+                throw new ArgumentNullException("filter");
+            }
+
+            SetOption(ZSocketOption.TCP_ACCEPT_FILTER, filter);
+        }
+
+        /// <summary>
+        /// Reset all TCP filters assigned by <see cref="AddTcpAcceptFilter"/> and allow TCP transport to accept connections from any IP.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
+        public void ClearTcpAcceptFilter()
+        {
+            SetOption(ZSocketOption.TCP_ACCEPT_FILTER, (string)null);
+        }
+
+        public bool IPv4Only
+        {
+            get { return GetOptionInt32(ZSocketOption.IPV4_ONLY) == 1; }
+            set { SetOption(ZSocketOption.IPV4_ONLY, value ? 1 : 0); }
         }
 
         private void EnsureNotDisposed()

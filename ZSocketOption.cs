@@ -31,7 +31,7 @@ namespace ZeroMQ
 		RCVTIMEO = 27,
 		SNDTIMEO = 28,
 		LAST_ENDPOINT = 32,
-		ROUTER_BEHAVIOR = 33,
+		ROUTER_MANDATORY = 33,
 		TCP_KEEPALIVE = 34,
 		TCP_KEEPALIVE_CNT = 35,
 		TCP_KEEPALIVE_IDLE = 36,
@@ -71,8 +71,8 @@ namespace ZeroMQ
         /* Deprecated options and aliases */
         IPV4_ONLY = 31,
         TCP_ACCEPT_FILTER = 38,
-        IPC_FILTER_PID = 58,
-        IPC_FILTER_UID = 59,
-        IPC_FILTER_GID = 60,
+        // IPC_FILTER_PID = 58,
+        // IPC_FILTER_UID = 59,
+        // IPC_FILTER_GID = 60,
 	}
 }

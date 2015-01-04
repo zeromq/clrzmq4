@@ -4,7 +4,7 @@ namespace ZeroMQ
     /// Specifies <see cref="ZSocketType.ROUTER"/> socket behavior when
     /// an unroutable message is encountered.
     /// </summary>
-    public enum RouterBehavior
+    public enum RouterMandatory
     {
         /// <summary>
         /// Silently discard messages.

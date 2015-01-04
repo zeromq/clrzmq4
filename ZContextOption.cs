@@ -29,6 +29,8 @@ namespace ZeroMQ
 		: base(errno, errname, errtext) 
 		{ }
 
+        public new static ZContextOption None = default(ZContextOption);
+
 		public static readonly ZContextOption
 				IO_THREADS,
 				MAX_SOCKETS,
