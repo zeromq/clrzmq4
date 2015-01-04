@@ -51,7 +51,7 @@ namespace ZeroMQ.Test
         {
             var cancellus = (CancellationToken)cancelluS;
 
-            using (ZSocket socket = context.CreateSocket(ZSocketType.REP))
+            using (var socket = ZSocket.Create(context, ZSocketType.REP))
             {
                 socket.Bind("inproc://helloworld");
                 
@@ -92,7 +92,7 @@ namespace ZeroMQ.Test
         {
             string output = null;
 
-            using (ZSocket socket = context.CreateSocket(ZSocketType.REQ))
+            using (var socket = ZSocket.Create(context, ZSocketType.REQ))
             {
                 socket.Connect("inproc://helloworld");
 
