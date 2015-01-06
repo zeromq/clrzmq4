@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 namespace ZeroMQ
 {
 	[Flags]
-    public enum ZSocketFlags : int
+	public enum ZSocketFlags : int
 	{
 		/// <summary>
 		/// No socket flags are specified.

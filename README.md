@@ -16,106 +16,106 @@ using ZeroMQ;
 
 namespace ZeroMQ.Test
 {
-    class Program
-    {
-        static ZContext context;
+		class Program
+		{
+				static ZContext context;
 
-        static void Main(string[] args)
-        {
-            // Setup the ZContext
-            context = ZContext.Create();
+				static void Main(string[] args)
+				{
+						// Setup the ZContext
+						context = ZContext.Create();
 
-            // Start the "Server"
-            var cancellor = new CancellationTokenSource();
-            new Thread(Server).Start(cancellor.Token);
+						// Start the "Server"
+						var cancellor = new CancellationTokenSource();
+						new Thread(Server).Start(cancellor.Token);
 
-            if (args == null || args.Length < 1)
-            {
-                // say here were some arguments...
-                args = new string[] { "World" };
-            }
+						if (args == null || args.Length < 1)
+						{
+								// say here were some arguments...
+								args = new string[] { "World" };
+						}
 
-            // foreach arg we are the Client, asking the Server
-            foreach (string arg in args)
-            {
-                Console.WriteLine( Client(arg) );
-            }
+						// foreach arg we are the Client, asking the Server
+						foreach (string arg in args)
+						{
+								Console.WriteLine( Client(arg) );
+						}
 
-            // Cancel the Server
-            cancellor.Cancel();
-            
-            // we could have done here context.Terminate()
-        }
+						// Cancel the Server
+						cancellor.Cancel();
+						
+						// we could have done here context.Terminate()
+				}
 
-        static void Server(object cancelluS)
-        {
-            var cancellus = (CancellationToken)cancelluS;
+				static void Server(object cancelluS)
+				{
+						var cancellus = (CancellationToken)cancelluS;
 
-            using (var socket = ZSocket.Create(context, ZSocketType.REP))
-            {
-                socket.Bind("inproc://helloworld");
-                
-                // SUB requires
-                // socket.SubscribeAll();
+						using (var socket = ZSocket.Create(context, ZSocketType.REP))
+						{
+								socket.Bind("inproc://helloworld");
+								
+								// SUB requires
+								// socket.SubscribeAll();
 
-                while (!cancellus.IsCancellationRequested)
-                {
-                    ZError error;
-                    ZMessage request;
-                    if (null == (request = socket.ReceiveMessage(ZSocketFlags.DontWait, out error)))
-                    {
-                        if (error == ZError.EAGAIN) {
-                            error = ZError.None;
-                            Thread.Sleep(1);
+								while (!cancellus.IsCancellationRequested)
+								{
+										ZError error;
+										ZMessage request;
+										if (null == (request = socket.ReceiveMessage(ZSocketFlags.DontWait, out error)))
+										{
+												if (error == ZError.EAGAIN) {
+														error = ZError.None;
+														Thread.Sleep(1);
 
-                            continue;
-                        }
+														continue;
+												}
 
-                        throw new ZException(error);
-                    }
+												throw new ZException(error);
+										}
 
-                    // Let the response be "Hello " + input
-                    using (request)
-                    using (var response = new ZMessage())
-                    {
-                        response.Add(ZFrame.Create("Hello " + request[0].ReadString()));
-                        
-                        socket.SendMessage(response);
-                    }
-                }
-                
-                socket.Unbind("inproc://helloworld");
-            }
-        }
+										// Let the response be "Hello " + input
+										using (request)
+										using (var response = new ZMessage())
+										{
+												response.Add(ZFrame.Create("Hello " + request[0].ReadString()));
+												
+												socket.SendMessage(response);
+										}
+								}
+								
+								socket.Unbind("inproc://helloworld");
+						}
+				}
 
-        static string Client(string name)
-        {
-            string output = null;
+				static string Client(string name)
+				{
+						string output = null;
 
-            using (var socket = ZSocket.Create(context, ZSocketType.REQ))
-            {
-                socket.Connect("inproc://helloworld");
+						using (var socket = ZSocket.Create(context, ZSocketType.REQ))
+						{
+								socket.Connect("inproc://helloworld");
 
-                // PUB requires
-                // Thread.Sleep(64);
-                
-                using (var request = new ZMessage())
-                {
-                    request.Add(ZFrame.Create(name));
-                    
-                    socket.SendMessage(request);
-                }
+								// PUB requires
+								// Thread.Sleep(64);
+								
+								using (var request = new ZMessage())
+								{
+										request.Add(ZFrame.Create(name));
+										
+										socket.SendMessage(request);
+								}
 
-                using (ZMessage response = socket.ReceiveMessage())
-                {
-                    output = response[0].ReadString();
-                }
-                
-                socket.Disconnect("inproc://helloworld");
-            }
+								using (ZMessage response = socket.ReceiveMessage())
+								{
+										output = response[0].ReadString();
+								}
+								
+								socket.Disconnect("inproc://helloworld");
+						}
 
-            return output;
-        }
-    }
+						return output;
+				}
+		}
 }
 ```

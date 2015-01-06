@@ -1,13 +1,13 @@
 namespace ZeroMQ.Monitoring
 {
-    using System;
+	using System;
 
-    public class ZMonitorEventData
-    {
-        public ZMonitorEvents Event;
+	public class ZMonitorEventData
+	{
+		public ZMonitorEvents Event;
 
-        public Int32 EventValue;
+		public Int32 EventValue;
 
-        public String Address;
-    }
+		public String Address;
+	}
 }

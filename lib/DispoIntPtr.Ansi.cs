@@ -2,20 +2,20 @@
 
 namespace ZeroMQ.lib
 {
-    using System;
+	using System;
 	using System.Text;
 	using System.Threading;
-    using System.Runtime.InteropServices;
+	using System.Runtime.InteropServices;
 
-    public partial class DispoIntPtr : IDisposable
+	public partial class DispoIntPtr : IDisposable
 	{
-		public static class Ansi 
+		public static class Ansi
 		{
 			unsafe internal static DispoIntPtr AllocStringNative(string str, out int byteCount)
 			{
-                // use builtin allocation
-				var dispPtr = new DispoIntPtr ();
-				dispPtr._ptr = Marshal.StringToHGlobalAnsi(str); 
+				// use builtin allocation
+				var dispPtr = new DispoIntPtr();
+				dispPtr._ptr = Marshal.StringToHGlobalAnsi(str);
 				dispPtr.isAllocated = true;
 
 				byteCount = str.Length;
@@ -52,5 +52,5 @@ namespace ZeroMQ.lib
 				return dispPtr; /**/
 			}
 		}
-    }
+	}
 }

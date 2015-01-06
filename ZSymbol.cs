@@ -8,11 +8,12 @@
 	using lib;
 
 	public abstract class ZSymbol
-    {
-		public ZSymbol(int errno) 
-		: this (errno, null, null) { }
-		
-		public ZSymbol(int errno, string errname, string errtext) {
+	{
+		public ZSymbol(int errno)
+			: this(errno, null, null) { }
+
+		public ZSymbol(int errno, string errname, string errtext)
+		{
 			this._num = errno;
 			this._name = errname;
 			this._txt = errtext;
@@ -27,29 +28,31 @@
 		private string _txt;
 		public string Text { get { return _txt; } protected set { _txt = value; } }
 
-		private static void PickupConstantSymbols<T>(ref HashSet<ZSymbol> symbols, bool lookupText = false) 
-            where T : ZSymbol
-        {
-            Type type = typeof(T);
+		private static void PickupConstantSymbols<T>(ref HashSet<ZSymbol> symbols, bool lookupText = false)
+			where T : ZSymbol
+		{
+			Type type = typeof(T);
 
 			FieldInfo[] fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);
 
-            Type codeType = type.GetNestedType("Code");
+			Type codeType = type.GetNestedType("Code");
 
 			// Pickup constant symbols
-			foreach (FieldInfo symbolField in fields.Where(f => typeof(ZSymbol).IsAssignableFrom(f.FieldType))) {
+			foreach (FieldInfo symbolField in fields.Where(f => typeof(ZSymbol).IsAssignableFrom(f.FieldType)))
+			{
 
-                FieldInfo symbolCodeField = codeType.GetField(symbolField.Name);
-				if (symbolCodeField != null) {
-                    var symbolNumber = (int)symbolCodeField.GetValue(null);
+				FieldInfo symbolCodeField = codeType.GetField(symbolField.Name);
+				if (symbolCodeField != null)
+				{
+					var symbolNumber = (int)symbolCodeField.GetValue(null);
 
-                    var symbol = Activator.CreateInstance(typeof(T), new object[] {
-                        symbolNumber,
-                        symbolCodeField.Name,
-                        lookupText ? Marshal.PtrToStringAnsi(zmq.strerror(symbolNumber)) : string.Empty
-                    });
-                    symbolField.SetValue(null, symbol);
-                    symbols.Add((ZSymbol)symbol);
+					var symbol = Activator.CreateInstance(typeof(T), new object[] {
+						symbolNumber,
+						symbolCodeField.Name,
+						lookupText ? Marshal.PtrToStringAnsi(zmq.strerror(symbolNumber)) : string.Empty
+					});
+					symbolField.SetValue(null, symbol);
+					symbols.Add((ZSymbol)symbol);
 				}
 			}
 		}
@@ -66,10 +69,11 @@
 			PickupConstantSymbols<ZContextOption>(ref symbols);
 			PickupConstantSymbols<ZSocketType>(ref symbols);
 
-            _allSymbols = symbols.ToArray();
-        }
+			_allSymbols = symbols.ToArray();
+		}
 
-		public bool IsEmpty() {
+		public bool IsEmpty()
+		{
 			return this == default(ZSymbol);
 		}
 
@@ -78,41 +82,44 @@
 		public static IEnumerable<ZSymbol> Find(string symbol)
 		{
 			return _allSymbols
-				.Where(s => s.Name == null ? false : ( s.Name == symbol ));
-        }
+				.Where(s => s.Name == null ? false : (s.Name == symbol));
+		}
 
 		public static IEnumerable<ZSymbol> Find(string ns, int num)
-        {
-            return _allSymbols
-				.Where(s => s.Name == null ? false : ( s.Name.StartsWith(ns) && s.Number == num ));
-        }
+		{
+			return _allSymbols
+				.Where(s => s.Name == null ? false : (s.Name.StartsWith(ns) && s.Number == num));
+		}
 
 		public override bool Equals(object obj)
 		{
 			return ZSymbol.Equals(this, obj);
 		}
 
-		public static new bool Equals(object a, object b) 
+		public static new bool Equals(object a, object b)
 		{
-			if (object.ReferenceEquals(a, b)) {
+			if (object.ReferenceEquals(a, b))
+			{
 				return true;
 			}
 
 			var symbolA = a as ZSymbol;
-			if (symbolA == null) {
+			if (symbolA == null)
+			{
 				return false;
 			}
 
 			var symbolB = b as ZSymbol;
-			if (symbolB == null) {
+			if (symbolB == null)
+			{
 				return false;
 			}
 
 			return symbolA.GetHashCode() == symbolB.GetHashCode();
 		}
 
-        public override int GetHashCode()
-        {
+		public override int GetHashCode()
+		{
 			int hash = Number.GetHashCode();
 
 			if (Name != null)
@@ -122,11 +129,11 @@
 				hash ^= Text.GetHashCode();
 
 			return hash;
-        }
+		}
 
-        public override string ToString()
-        {
-            return (Name == null ? string.Empty : Name) + "(" + Number + "): " + Text;
+		public override string ToString()
+		{
+			return (Name == null ? string.Empty : Name) + "(" + Number + "): " + Text;
 		}
 
 		public static implicit operator int(ZSymbol errnum)
@@ -134,24 +141,5 @@
 			return errnum == null ? -1 : errnum.Number;
 		}
 
-        /*
-        public static explicit operator ZmqSymbol(int errnum)
-        {
-            return From("E" + errnum);
-        }
-
-        public static explicit operator ZmqSymbol(string sym)
-        {
-            return Get(sym);
-        }*/
-
-        /* public static readonly NNSymbol
-
-            NN_NS_NAMESPACE,
-            NN_NS_VERSION,
-            NN_NS_DOMAIN,
-            NN_NS_TRANSPORT,
-			NN_NS_PROTOCOL; ... */
-
-    }
+	}
 }

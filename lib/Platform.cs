@@ -15,28 +15,31 @@ namespace ZeroMQ.lib
 		
 	} /**/
 
-	public enum PlatformName : int {
+	public enum PlatformName : int
+	{
 		CLI = 0,
 		Unix,
 		Windows,
 		MacOSX,
 	}
 
-	public enum PlatformKind : int {
+	public enum PlatformKind : int
+	{
 		CLI = 0,
 		Posix,
 		Win32,
 	}
 
-	public enum PlatformCompiler : int {
+	public enum PlatformCompiler : int
+	{
 		CLI = 0,
 		VisualC,
 		GCC
 	}
 
-    public static partial class Platform
+	public static partial class Platform
 	{
-		
+
 		public static readonly PlatformKind Kind;
 
 		public static readonly PlatformName Name;
@@ -49,60 +52,63 @@ namespace ZeroMQ.lib
 
 		public static readonly int CVersion;
 
-		static Platform() {
+		static Platform()
+		{
 
 			PortableExecutableKinds peKinds;
 			typeof(object).Module.GetPEKind(out peKinds, out Architecture);
 
 			Version osVersion;
-			switch (Environment.OSVersion.Platform) {
+			switch (Environment.OSVersion.Platform)
+			{
 
-			case PlatformID.Win32Windows: // Win9x supported?
-			case PlatformID.Win32S: // Win16 NTVDM on Win x86?
-			case PlatformID.Win32NT: // Windows NT
-				Kind = PlatformKind.Win32;
-				Name = PlatformName.Windows;
+				case PlatformID.Win32Windows: // Win9x supported?
+				case PlatformID.Win32S: // Win16 NTVDM on Win x86?
+				case PlatformID.Win32NT: // Windows NT
+					Kind = PlatformKind.Win32;
+					Name = PlatformName.Windows;
 
-				/* osVersion = Environment.OSVersion.Version;
-				if (osVersion.Major <= 4) {
-					// WinNT 4
-				} else if (osVersion.Major <= 5) {
-					// Win2000, WinXP
-				} else if (osVersion.Major <= 6) {
-					// WinVista, Win7, Win8.x
-					if (osVersion.Major == 0) {
-					}
-				} else {
-					// info: technet .. msdn .. microsoft research
+					/* osVersion = Environment.OSVersion.Version;
+					if (osVersion.Major <= 4) {
+						// WinNT 4
+					} else if (osVersion.Major <= 5) {
+						// Win2000, WinXP
+					} else if (osVersion.Major <= 6) {
+						// WinVista, Win7, Win8.x
+						if (osVersion.Major == 0) {
+						}
+					} else {
+						// info: technet .. msdn .. microsoft research
 
-				} */
-				break;
+					} */
+					break;
 
-			case PlatformID.WinCE:
-			// case PlatformID.Xbox:
-				Kind = PlatformKind.Win32;
-				Name = PlatformName.Windows;
-				break;
+				case PlatformID.WinCE:
+					// case PlatformID.Xbox:
+					Kind = PlatformKind.Win32;
+					Name = PlatformName.Windows;
+					break;
 
-			case PlatformID.Unix:
-				Kind = PlatformKind.Posix;
-				// TODO: older MS.NET frameworks say Unix for MacOSX ?
-				Name = PlatformName.Unix;
-				break;
-				
-			case PlatformID.MacOSX:
-				Kind = PlatformKind.Posix;
-				Name = PlatformName.MacOSX;
-				break;
+				case PlatformID.Unix:
+					Kind = PlatformKind.Posix;
+					// TODO: older MS.NET frameworks say Unix for MacOSX ?
+					Name = PlatformName.Unix;
+					break;
 
-			default:
-				if ((int)Environment.OSVersion.Platform == 128) {
-					// Mono formerly used 128 for MacOSX
+				case PlatformID.MacOSX:
 					Kind = PlatformKind.Posix;
 					Name = PlatformName.MacOSX;
-				}
+					break;
 
-				break;
+				default:
+					if ((int)Environment.OSVersion.Platform == 128)
+					{
+						// Mono formerly used 128 for MacOSX
+						Kind = PlatformKind.Posix;
+						Name = PlatformName.MacOSX;
+					}
+
+					break;
 			}
 
 			// TODO: Detect and distinguish available Compilers and Runtimes
@@ -130,9 +136,10 @@ namespace ZeroMQ.lib
 				throw new PlatformNotSupportedException ();
 			} */
 			SetupPlatformImplementation(typeof(Platform));
-	    }
+		}
 
-		public static void SetupPlatformImplementation(Type platformDependentType) {
+		public static void SetupPlatformImplementation(Type platformDependentType)
+		{
 
 			/* A typical class should look like
 			 * 
@@ -174,36 +181,41 @@ namespace ZeroMQ.lib
 			AssignImplementations(platformDependentType, Enum.GetName(typeof(PlatformName), Platform.Name));
 		}
 
-		private static void AssignImplementations(Type platformDependentType, string implementationName) 
+		private static void AssignImplementations(Type platformDependentType, string implementationName)
 		{
 			BindingFlags bindings = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
 			// TODO: instance members
 
 			Type platformNameImpl = platformDependentType.GetNestedType(implementationName, bindings);
-			if (platformNameImpl == null) {
+			if (platformNameImpl == null)
+			{
 				// TODO: else fail?
 				return;
 			}
 
 			MemberInfo[] platformMembers = platformNameImpl.GetMembers(bindings);
-			foreach (MemberInfo platformMember in platformMembers) {
+			foreach (MemberInfo platformMember in platformMembers)
+			{
 
 				// TODO: overloaded members, GetBySignature?
 				FieldInfo member = platformDependentType.GetField(platformMember.Name, bindings);
-				if (member == null) {
+				if (member == null)
+				{
 					// TODO: else fail?
 					continue;
 				}
 
-				if (platformMember.MemberType == MemberTypes.Method) {
+				if (platformMember.MemberType == MemberTypes.Method)
+				{
 					// if (typeof(Delegate).IsAssignableFrom(member.FieldType)) {
 					var delegat = Delegate.CreateDelegate(member.FieldType, (MethodInfo)platformMember);
 					member.SetValue(null /* static */, delegat);
 					continue;
 
-				} 
-				if (platformMember.MemberType == MemberTypes.Field) {
+				}
+				if (platformMember.MemberType == MemberTypes.Field)
+				{
 					// if (member.FieldType.IsAssignableFrom(platformMember.FieldType)) {
 					member.SetValue(null /* static */, ((FieldInfo)platformMember).GetValue(null /* static */));
 					continue;
@@ -257,7 +269,7 @@ namespace ZeroMQ.lib
 		public delegate SafeLibraryHandle OpenHandleDelegate(string filename);
 		public static readonly OpenHandleDelegate OpenHandle;
 
-		public delegate IntPtr LoadProcedureDelegate (SafeLibraryHandle handle, string functionName);
+		public delegate IntPtr LoadProcedureDelegate(SafeLibraryHandle handle, string functionName);
 		public static readonly LoadProcedureDelegate LoadProcedure;
 
 		public delegate bool ReleaseHandleDelegate(IntPtr handle);
@@ -268,4 +280,3 @@ namespace ZeroMQ.lib
 
 	}
 }
-

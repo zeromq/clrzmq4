@@ -6,30 +6,30 @@ using System.Runtime.InteropServices;
 
 namespace ZeroMQ
 {
-    public class ZContextOption : ZSymbol
+	public class ZContextOption : ZSymbol
 	{
-        static ZContextOption()
-        {
-            var one = ZSymbol.None;
-        }
+		static ZContextOption()
+		{
+			var one = ZSymbol.None;
+		}
 
-        public static class Code
-        {
-            public static readonly int
-                IO_THREADS = 1,
-                MAX_SOCKETS = 2,
-                IPV6 = 42;
-        }
+		public static class Code
+		{
+			public static readonly int
+				IO_THREADS = 1,
+				MAX_SOCKETS = 2,
+				IPV6 = 42;
+		}
 
 		public ZContextOption(int errno)
-		: base(errno) 
+			: base(errno)
 		{ }
 
 		public ZContextOption(int errno, string errname, string errtext)
-		: base(errno, errname, errtext) 
+			: base(errno, errname, errtext)
 		{ }
 
-        public new static ZContextOption None = default(ZContextOption);
+		public new static ZContextOption None = default(ZContextOption);
 
 		public static readonly ZContextOption
 				IO_THREADS,

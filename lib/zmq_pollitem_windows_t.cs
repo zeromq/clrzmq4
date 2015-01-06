@@ -1,10 +1,10 @@
 ﻿namespace ZeroMQ.lib
 {
-    using System;
+	using System;
 	using System.Runtime.InteropServices;
 
 	[StructLayout(LayoutKind.Sequential)]
-    public struct zmq_pollitem_windows_t // : zmq_pollitem_i
+	public struct zmq_pollitem_windows_t // : zmq_pollitem_i
 	{
 		private IntPtr socketPtr;
 		private IntPtr fileDescriptor; // Windows is an size_t
@@ -22,30 +22,30 @@
 			fileDescriptor = IntPtr.Zero;
 			events = (short)pollEvents;
 			readyEvents = 0;
-        }
+		}
 
-        public IntPtr SocketPtr
-        {
-            get { return socketPtr; }
-            set { socketPtr = value; }
-        }
+		public IntPtr SocketPtr
+		{
+			get { return socketPtr; }
+			set { socketPtr = value; }
+		}
 
-        public IntPtr FileDescriptor
-        {
-            get { return fileDescriptor; }
-            set { fileDescriptor = value; }
-        }
+		public IntPtr FileDescriptor
+		{
+			get { return fileDescriptor; }
+			set { fileDescriptor = value; }
+		}
 
-        public short Events
-        {
-            get { return events; }
-            set { events = value; }
-        }
+		public short Events
+		{
+			get { return events; }
+			set { events = value; }
+		}
 
-        public short ReadyEvents
-        {
-            get { return readyEvents; }
-            set { readyEvents = value; }
-        }
+		public short ReadyEvents
+		{
+			get { return readyEvents; }
+			set { readyEvents = value; }
+		}
 	}
 }

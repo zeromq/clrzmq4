@@ -2,36 +2,36 @@
 
 namespace ZeroMQ.lib
 {
-    using System;
+	using System;
 	using System.Text;
 	using System.Threading;
-    using System.Runtime.InteropServices;
+	using System.Runtime.InteropServices;
 
-    public partial class DispoIntPtr : IDisposable
+	public partial class DispoIntPtr : IDisposable
 	{
 		private delegate DispoIntPtr AllocStringNativeDelegate(string str, out int byteCount);
 
-        private static readonly AllocStringNativeDelegate AllocStringNative = Ansi.AllocStringNative;
+		private static readonly AllocStringNativeDelegate AllocStringNative = Ansi.AllocStringNative;
 
 		/* static DispoIntPtr() {
 			// Platform.SetupPlatformImplementation(typeof(DispoIntPtr));
 		} */
 
-		public static DispoIntPtr Alloc(int size) 
+		public static DispoIntPtr Alloc(int size)
 		{
-			var dispPtr = new DispoIntPtr ();
+			var dispPtr = new DispoIntPtr();
 			dispPtr._ptr = Marshal.AllocHGlobal(size);
 			dispPtr.isAllocated = true;
 			return dispPtr;
 		}
 
-		public static DispoIntPtr AllocString(string str, out int byteCount) 
+		public static DispoIntPtr AllocString(string str, out int byteCount)
 		{
 			return AllocStringNative(str, out byteCount);
 		}
 
-        public static implicit operator IntPtr(DispoIntPtr dispoIntPtr)
-        {
+		public static implicit operator IntPtr(DispoIntPtr dispoIntPtr)
+		{
 			return dispoIntPtr == null ? IntPtr.Zero : dispoIntPtr._ptr;
 		}
 
@@ -55,10 +55,10 @@ namespace ZeroMQ.lib
 			return dispoIntPtr == null ? (short*)null : (short*)dispoIntPtr._ptr;
 		}
 
-        unsafe public static explicit operator ushort*(DispoIntPtr dispoIntPtr)
-        {
-            return dispoIntPtr == null ? (ushort*)null : (ushort*)dispoIntPtr._ptr;
-        }
+		unsafe public static explicit operator ushort*(DispoIntPtr dispoIntPtr)
+		{
+			return dispoIntPtr == null ? (ushort*)null : (ushort*)dispoIntPtr._ptr;
+		}
 
 		unsafe public static explicit operator char*(DispoIntPtr dispoIntPtr)
 		{
@@ -89,37 +89,41 @@ namespace ZeroMQ.lib
 
 		private IntPtr _ptr;
 
-		public IntPtr Ptr {
+		public IntPtr Ptr
+		{
 			get { return _ptr; }
 		}
 
 		internal DispoIntPtr() { }
 
-		~DispoIntPtr() {
+		~DispoIntPtr()
+		{
 			Dispose(false);
 		}
 
-		public void Dispose() {
+		public void Dispose()
+		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-		
-        protected void Dispose(bool disposing)
-        {
+
+		protected void Dispose(bool disposing)
+		{
 			// TODO: instance ThreadStatic && do ( o == null ? return : ( lock(o, ms), check threadId, .. ) ) 
 			IntPtr handle = _ptr;
 			if (handle != IntPtr.Zero)
-            {
-				if (isAllocated) {
+			{
+				if (isAllocated)
+				{
 					Marshal.FreeHGlobal(handle);
 					isAllocated = false;
 				}
-                _ptr = IntPtr.Zero;
-            }
-        }
+				_ptr = IntPtr.Zero;
+			}
+		}
 
 		/* public void ReAlloc(long size) {
 			_ptr = Marshal.ReAllocHGlobal(_ptr, new IntPtr(size));
 		} */
-    }
+	}
 }

@@ -8,37 +8,37 @@ namespace ZeroMQ
 {
 	public class ZSocketType : ZSymbol
 	{
-        static ZSocketType()
-        {
-            var one = ZSymbol.None;
-        }
+		static ZSocketType()
+		{
+			var one = ZSymbol.None;
+		}
 
-        public static class Code
-        {
-            public const int
-                PAIR = 0,
-                PUB = 1,
-                SUB = 2,
-                REQ = 3,
-                REP = 4,
-                DEALER = 5,
-                ROUTER = 6,
-                PULL = 7,
-                PUSH = 8,
-                XPUB = 9,
-                XSUB = 10,
-                STREAM = 11;
-        }
+		public static class Code
+		{
+			public const int
+				PAIR = 0,
+				PUB = 1,
+				SUB = 2,
+				REQ = 3,
+				REP = 4,
+				DEALER = 5,
+				ROUTER = 6,
+				PULL = 7,
+				PUSH = 8,
+				XPUB = 9,
+				XSUB = 10,
+				STREAM = 11;
+		}
 
 		public ZSocketType(int errno)
-			: base(errno) 
+			: base(errno)
 		{ }
 
 		public ZSocketType(int errno, string errname, string errtext)
-			: base(errno, errname, errtext) 
+			: base(errno, errname, errtext)
 		{ }
 
-        public new static readonly ZSocketType None = default(ZSocketType);
+		public new static readonly ZSocketType None = default(ZSocketType);
 
 		public static readonly ZSocketType
 
@@ -120,7 +120,7 @@ namespace ZeroMQ
 			/// Subscription message is a byte '1' (for subscriptions) or byte '0' (for unsubscriptions) followed by the subscription body.
 			/// </remarks>
 			XSUB,
-			
+
 			/// <summary>
 			/// STREAM socket type provides a native "ROUTER-like" TCP socket type.
 			/// </summary>

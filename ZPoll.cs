@@ -1,13 +1,13 @@
 ﻿namespace ZeroMQ
 {
-    using System;
+	using System;
 
-    [Flags]
-    public enum ZPoll : short
-    {
-        None = 0x0,
-        In = 0x1,
-        Out = 0x2,
-        Err = 0x4
-    }
+	[Flags]
+	public enum ZPoll : short
+	{
+		None = 0x0,
+		In = 0x1,
+		Out = 0x2,
+		Err = 0x4
+	}
 }
