@@ -108,22 +108,13 @@ namespace ZeroMQ
 		/// the <see cref="Linger"/> socket option.
 		/// </remarks>
 		/// <exception cref="ZmqSocketException">The underlying socket object is not valid.</exception>
-		public void Close()
+		public bool Close()
 		{
-			if (_socketPtr == IntPtr.Zero) return;
-
-			while (-1 == zmq.close(SocketPtr))
-			{
-				var error = ZError.GetLastErr();
-
-				if (error == ZError.EINTR)
-				{
-					continue;
-				}
-
+			ZError error;
+			if (!Close(out error)) {
 				throw new ZException(error);
 			}
-			_socketPtr = IntPtr.Zero;
+			return true;
 		}
 
 		public bool Close(out ZError error)
@@ -137,6 +128,7 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
+					error = ZError.None;
 					continue;
 				}
 
@@ -665,7 +657,6 @@ namespace ZeroMQ
 			bool result = false;
 
 			int size = buffer.Length;
-			//IntPtr bufP = Marshal.AllocHGlobal(size);
 			var frame = ZFrame.Create(size);
 			Marshal.Copy(buffer, 0, frame.DataPtr(), size);
 
