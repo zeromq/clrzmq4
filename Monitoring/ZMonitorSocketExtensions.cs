@@ -1,8 +1,10 @@
-﻿namespace ZeroMQ.Monitoring
+﻿using System;
+using System.Runtime.InteropServices;
+
+using ZeroMQ.lib;
+
+namespace ZeroMQ.Monitoring
 {
-	using System;
-	using lib;
-	using System.Runtime.InteropServices;
 
 	/// <summary>
 	/// Defines extension methods related to monitoring for <see cref="ZmqSocket"/> instances.
