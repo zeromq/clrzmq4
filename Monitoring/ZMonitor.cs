@@ -1,11 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+using ZeroMQ.lib;
+
 namespace ZeroMQ.Monitoring
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Runtime.InteropServices;
-	using System.Threading;
-	using lib;
 
 	/// <summary>
 	/// Monitors state change events on another socket within the same context.
@@ -164,12 +166,13 @@ namespace ZeroMQ.Monitoring
 
 			var poller = ZPollItem.CreateReceiver(_socket);
 
-			ZError error;
 			_socket.Connect(_endpoint);
+
+			ZError error;
+			ZMessage incoming;
 
 			while (IsRunning && !cancellus.IsCancellationRequested)
 			{
-				ZMessage incoming;
 				if (!poller.PollIn(out incoming, out error, TimeSpan.FromMilliseconds(64)))
 				{
 					if (error == ZError.EAGAIN)
@@ -182,19 +185,16 @@ namespace ZeroMQ.Monitoring
 					throw new ZException(error);
 				}
 
-				if (1 < incoming.Count)
-				{
-					throw new InvalidOperationException();
-				}
-
 				var eventValue = new ZMonitorEventData();
-				eventValue.Event = (ZMonitorEvents)incoming[0].ReadInt16();
-				eventValue.EventValue = incoming[0].ReadInt32();
-				incoming[0].Position = 0;
 
-				if (2 < incoming.Count)
-				{
-					eventValue.Address = incoming[1].ReadString();
+				using (incoming) {
+					eventValue.Event = (ZMonitorEvents)incoming[0].ReadInt16();
+					eventValue.EventValue = incoming[0].ReadInt32();
+					incoming[0].Position = 0;
+
+					if (2 < incoming.Count) {
+						eventValue.Address = incoming[1].ReadString();
+					}
 				}
 
 				OnMonitor(eventValue);
