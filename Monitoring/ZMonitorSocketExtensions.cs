@@ -9,6 +9,16 @@
 	/// </summary>
 	public static class ZMonitorSocketExtensions
 	{
+		public static bool Monitor(this ZSocket socket, string endpoint)
+		{
+			ZError error;
+			if (!Monitor(socket, endpoint, ZMonitorEvents.AllEvents, out error))
+			{
+				throw new ZException(error);
+			}
+			return true;
+		}
+
 		/// <summary>
 		/// Spawns a <see cref="ZmqSocketType.PAIR"/> socket that publishes all state changes (events) for
 		/// the specified socket over the inproc transport at the given endpoint.
@@ -26,6 +36,16 @@
 		public static bool Monitor(this ZSocket socket, string endpoint, out ZError error)
 		{
 			return Monitor(socket, endpoint, ZMonitorEvents.AllEvents, out error);
+		}
+
+		public static bool Monitor(this ZSocket socket, string endpoint, ZMonitorEvents eventsToMonitor)
+		{
+			ZError error;
+			if (!Monitor(socket, endpoint, eventsToMonitor, out error))
+			{
+				throw new ZException(error);
+			}
+			return true;
 		}
 
 		/// <summary>
