@@ -190,7 +190,6 @@ namespace ZeroMQ.Monitoring
 				using (incoming) {
 					eventValue.Event = (ZMonitorEvents)incoming[0].ReadInt16();
 					eventValue.EventValue = incoming[0].ReadInt32();
-					incoming[0].Position = 0;
 
 					if (2 < incoming.Count) {
 						eventValue.Address = incoming[1].ReadString();
