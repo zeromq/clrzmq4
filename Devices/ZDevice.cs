@@ -196,38 +196,38 @@
 			Initialize();
 
 			var polls = new ZPollItem[] {
-								ZPollItem.Create(FrontendSocket, FrontendHandler),
-								ZPollItem.Create(BackendSocket, BackendHandler)
-						};
+				ZPollItem.Create(FrontendSocket, FrontendHandler),
+				ZPollItem.Create(BackendSocket, BackendHandler)
+			};
 
 			/* ZPollItem[] polls;
 			{
-					var pollItems = new List<ZPollItem>();
-					switch (FrontendSocket.SocketType)
-					{
-							case ZSocketType.Code.ROUTER:
-							case ZSocketType.Code.XSUB:
-							case ZSocketType.Code.PUSH:
-									// case ZSocketType.Code.STREAM:
-									pollItems.Add(new ZPollItem(FrontendSocket, ZPoll.In)
-									{
-											ReceiveMessage = FrontendHandler
-									});
+				var pollItems = new List<ZPollItem>();
+				switch (FrontendSocket.SocketType)
+				{
+					case ZSocketType.Code.ROUTER:
+					case ZSocketType.Code.XSUB:
+					case ZSocketType.Code.PUSH:
+						// case ZSocketType.Code.STREAM:
+						pollItems.Add(new ZPollItem(FrontendSocket, ZPoll.In)
+						{
+								ReceiveMessage = FrontendHandler
+						});
 
-									break;
-					}
-					switch (BackendSocket.SocketType)
-					{
-							case ZSocketType.Code.DEALER:
-									// case ZSocketType.Code.STREAM:
-									pollItems.Add(new ZPollItem(BackendSocket, ZPoll.In)
-									{
-											ReceiveMessage = BackendHandler
-									});
+						break;
+				}
+				switch (BackendSocket.SocketType)
+				{
+					case ZSocketType.Code.DEALER:
+						// case ZSocketType.Code.STREAM:
+						pollItems.Add(new ZPollItem(BackendSocket, ZPoll.In)
+						{
+								ReceiveMessage = BackendHandler
+						});
 
-									break;
-					}
-					polls = pollItems.ToArray();
+						break;
+				}
+				polls = pollItems.ToArray();
 			} */
 
 			// Because of using ZmqSocket.Forward, this field will always be null
@@ -243,7 +243,7 @@
 				while (IsRunning)
 				{
 
-					if (!(isValid = ZPollItems.TryPoll(polls, ZPoll.In, ref lastMessageFrames, out error, PollingInterval)))
+					if (!(isValid = ZPollItems.Poll(polls, ZPoll.In, ref lastMessageFrames, out error, PollingInterval)))
 					{
 
 						if (error == ZError.EAGAIN)

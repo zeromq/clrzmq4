@@ -1,10 +1,11 @@
-﻿namespace ZeroMQ
-{
-	using System;
-	using System.Text;
-	using System.Threading;
-	using ZeroMQ.lib;
+﻿using System;
+using System.Text;
+using System.Threading;
 
+using ZeroMQ.lib;
+
+namespace ZeroMQ
+{
 	/// <summary>
 	/// Creates <see cref="ZSocket"/> instances within a process boundary.
 	/// </summary>
@@ -99,10 +100,10 @@
 				if (error == ZError.EINVAL)
 				{
 					throw new ArgumentOutOfRangeException(
-						string.Format("The requested option optionName \"{0}\" is unknown.",
+						string.Format("The requested option optionName \"{0}\" is invalid.",
 							option));
 				}
-				// throw unknown ex?
+				throw new ZException(error);
 			}
 		}
 
@@ -116,10 +117,10 @@
 				if (error == ZError.EINVAL)
 				{
 					throw new ArgumentOutOfRangeException(
-						string.Format("The requested option optionName \"{0}\" is unknown.",
+						string.Format("The requested option optionName \"{0}\" is invalid.",
 								  option));
 				}
-				// throw unknown ex?
+				throw new ZException(error);
 			}
 			return rc;
 		}

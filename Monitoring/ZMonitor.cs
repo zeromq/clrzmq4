@@ -32,19 +32,19 @@ namespace ZeroMQ.Monitoring
 			_socket = socket;
 			_endpoint = endpoint;
 			_eventHandler = new Dictionary<ZMonitorEvents, Action<ZMonitorEventData>>
-						{
-								{ ZMonitorEvents.Connected, data => InvokeEvent(Connected, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
-								{ ZMonitorEvents.ConnectDelayed, data => InvokeEvent(ConnectDelayed, () => new ZMonitorEventArgs(this, data)) },
-								{ ZMonitorEvents.ConnectRetried, data => InvokeEvent(ConnectRetried, () => new ZMonitorIntervalEventArgs(this, data)) },
-								{ ZMonitorEvents.Listening, data => InvokeEvent(Listening, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
-								{ ZMonitorEvents.BindFailed, data => InvokeEvent(BindFailed, () => new ZMonitorEventArgs(this, data)) },
-								{ ZMonitorEvents.Accepted, data => InvokeEvent(Accepted, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
-								{ ZMonitorEvents.AcceptFailed, data => InvokeEvent(AcceptFailed, () => new ZMonitorEventArgs(this, data)) },
-								{ ZMonitorEvents.Closed, data => InvokeEvent(Closed, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
-								{ ZMonitorEvents.CloseFailed, data => InvokeEvent(CloseFailed, () => new ZMonitorEventArgs(this, data)) },
-								{ ZMonitorEvents.Disconnected, data => InvokeEvent(Disconnected, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
-								{ ZMonitorEvents.Stopped, data => InvokeEvent(Stopped, () => new ZMonitorEventArgs(this, data)) },
-						};
+			{
+				{ ZMonitorEvents.Connected, data => InvokeEvent(Connected, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
+				{ ZMonitorEvents.ConnectDelayed, data => InvokeEvent(ConnectDelayed, () => new ZMonitorEventArgs(this, data)) },
+				{ ZMonitorEvents.ConnectRetried, data => InvokeEvent(ConnectRetried, () => new ZMonitorIntervalEventArgs(this, data)) },
+				{ ZMonitorEvents.Listening, data => InvokeEvent(Listening, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
+				{ ZMonitorEvents.BindFailed, data => InvokeEvent(BindFailed, () => new ZMonitorEventArgs(this, data)) },
+				{ ZMonitorEvents.Accepted, data => InvokeEvent(Accepted, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
+				{ ZMonitorEvents.AcceptFailed, data => InvokeEvent(AcceptFailed, () => new ZMonitorEventArgs(this, data)) },
+				{ ZMonitorEvents.Closed, data => InvokeEvent(Closed, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
+				{ ZMonitorEvents.CloseFailed, data => InvokeEvent(CloseFailed, () => new ZMonitorEventArgs(this, data)) },
+				{ ZMonitorEvents.Disconnected, data => InvokeEvent(Disconnected, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
+				{ ZMonitorEvents.Stopped, data => InvokeEvent(Stopped, () => new ZMonitorEventArgs(this, data)) },
+			};
 		}
 
 		public static ZMonitor Create(ZContext context, string endpoint)
@@ -68,7 +68,7 @@ namespace ZeroMQ.Monitoring
 			ZSocket socket;
 			if (null == (socket = ZSocket.Create(context, ZSocketType.PAIR, out error)))
 			{
-				throw new ZException(error);
+				return default(ZMonitor);
 			}
 
 			return new ZMonitor(context, socket, endpoint);
@@ -162,32 +162,15 @@ namespace ZeroMQ.Monitoring
 		{
 			IsRunning = true;
 
-			var poller = ZPollItem.Create(_socket, (ZSocket socket, out ZMessage message, out ZError _error) =>
-			{
-
-				while (null == (message = _socket.ReceiveMessage(ZSocketFlags.DontWait, out _error)))
-				{
-					if (_error == ZError.EAGAIN)
-					{
-						return false;
-					}
-					if (_error == ZError.ETERM)
-					{
-						return false;
-					}
-					throw new ZException(_error);
-				}
-
-				return true;
-			});
+			var poller = ZPollItem.CreateReceiver(_socket);
 
 			ZError error;
-			if (!_socket.Connect(_endpoint, out error)) throw new ZException(error);
+			_socket.Connect(_endpoint);
 
 			while (IsRunning && !cancellus.IsCancellationRequested)
 			{
 				ZMessage incoming;
-				if (!poller.TryPollIn(out incoming, out error, TimeSpan.FromMilliseconds(64)))
+				if (!poller.PollIn(out incoming, out error, TimeSpan.FromMilliseconds(64)))
 				{
 					if (error == ZError.EAGAIN)
 					{
@@ -217,7 +200,7 @@ namespace ZeroMQ.Monitoring
 				OnMonitor(eventValue);
 			}
 
-			if (!_socket.Disconnect(_endpoint, out error)) throw new ZException(error);
+			_socket.Disconnect(_endpoint);
 		}
 
 		internal void OnMonitor(ZMonitorEventData data)

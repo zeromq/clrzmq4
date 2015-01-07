@@ -1,14 +1,14 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+using ZeroMQ.lib;
+using ZeroMQ.Monitoring;
 
 namespace ZeroMQ
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Runtime.InteropServices;
-	using lib;
-	using ZeroMQ.Monitoring;
-
 	/// <summary>
 	/// Sends and receives messages across various transports to potentially multiple endpoints
 	/// using the ZMQ protocol.
@@ -46,7 +46,7 @@ namespace ZeroMQ
 					continue;
 				}
 
-				throw new ZException(error);
+				return default(ZSocket);
 			}
 
 			return new ZSocket(context, socketPtr, socketType);
@@ -126,6 +126,26 @@ namespace ZeroMQ
 			_socketPtr = IntPtr.Zero;
 		}
 
+		public bool Close(out ZError error)
+		{
+			error = ZError.None;
+			if (_socketPtr == IntPtr.Zero) return true;
+
+			while (-1 == zmq.close(SocketPtr))
+			{
+				error = ZError.GetLastErr();
+
+				if (error == ZError.EINTR)
+				{
+					continue;
+				}
+
+				return false;
+			}
+			_socketPtr = IntPtr.Zero;
+			return true;
+		}
+
 		public ZContext Context
 		{
 			get { return _context; }
@@ -182,19 +202,8 @@ namespace ZeroMQ
 						error = default(ZError);
 						continue;
 					}
-					if (error == ZError.ETERM)
-					/* || error == ZError.ENOTSOCK // The provided socket was invalid.
-					|| error == ZError.EADDRINUSE
-					|| error == ZError.EADDRNOTAVAIL
-					|| error == ZError.ENODEV
-					|| error == ZError.EMTHREAD 
-				)*/
-					{
-						break;
-					}
 
-					// error == ZmqError.EINVAL
-					throw new ZException(error);
+					break;
 				}
 			}
 			return result;
@@ -241,16 +250,8 @@ namespace ZeroMQ
 						error = default(ZError);
 						continue;
 					}
-					if (error == ZError.ETERM)
-					/* || error == ZError.ENOTSOCK // The provided socket was invalid.
-					|| error == ZError.ENOENT
-				)*/
-					{
-						break;
-					}
 
-					// error == ZmqError.EINVAL
-					throw new ZException(error);
+					break;
 				}
 			}
 			return result;
@@ -297,17 +298,8 @@ namespace ZeroMQ
 						error = default(ZError);
 						continue;
 					}
-					if (error == ZError.ETERM)
-					/*|| error == ZError.ENOTSOCK // The provided socket was invalid.
-					|| error == ZError.ENOENT
-					|| error == ZError.EMTHREAD 
-					)*/
-					{
-						break;
-					}
 
-					// error == ZmqError.EINVAL
-					throw new ZException(error);
+					break;
 				}
 			}
 			return result;
@@ -354,16 +346,8 @@ namespace ZeroMQ
 						error = default(ZError);
 						continue;
 					}
-					if (error == ZError.ETERM)
-					/* || error == ZError.ENOTSOCK // The provided socket was invalid.
-					|| error == ZError.ENOENT
-				)*/
-					{
-						break;
-					}
 
-					// EINVAL
-					throw new ZException(error);
+					break;
 				}
 			}
 			return result;
@@ -482,11 +466,11 @@ namespace ZeroMQ
 		{
 			ZError error;
 			ZMessage message = null;
-			if (ReceiveMessage(receiveCount, flags, ref message, out error))
+			if (!ReceiveMessage(receiveCount, flags, ref message, out error))
 			{
-				return message;
+				throw new ZException(error);
 			}
-			throw new ZException(error);
+			return message;
 		}
 
 		public bool ReceiveMessage(int receiveCount, ZSocketFlags flags, ref ZMessage message, out ZError error)
@@ -598,12 +582,10 @@ namespace ZeroMQ
 					if (error == ZError.EINTR)
 					{
 						error = default(ZError);
-
 						continue;
 					}
 					if (error == ZError.EAGAIN)
 					{
-
 						if ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait)
 						{
 							return frames;
@@ -618,11 +600,7 @@ namespace ZeroMQ
 
 					frame.Dispose();
 
-					if (error == ZError.ETERM)
-					{
-						return frames;
-					}
-					throw new ZException(error);
+					return null;
 				}
 				if (result)
 				{
@@ -862,12 +840,8 @@ namespace ZeroMQ
 
 						continue;
 					}
-					if (error == ZError.ETERM)
-					{
-						break;
-					}
 
-					throw new ZException(error);
+					break;
 				}
 				if (result)
 				{

@@ -1,6 +1,7 @@
 namespace ZeroMQ
 {
 	using System;
+	using System.Threading;
 
 	public class ZPollItem
 	{
@@ -38,6 +39,11 @@ namespace ZeroMQ
 			return Create(socket, receiveMessage, null);
 		}
 
+		public static ZPollItem CreateSender(ZSocket socket, SendDelegate sendMessage)
+		{
+			return Create(socket, null, sendMessage);
+		}
+
 		public static ZPollItem Create(ZSocket socket, ReceiveDelegate receiveMessage, SendDelegate sendMessage)
 		{
 			var pollItem = new ZPollItem(socket, (receiveMessage != null ? ZPoll.In : ZPoll.None) | (sendMessage != null ? ZPoll.Out : ZPoll.None));
@@ -46,9 +52,76 @@ namespace ZeroMQ
 			return pollItem;
 		}
 
-		public static ZPollItem CreateSender(ZSocket socket, SendDelegate sendMessage)
+		public static ZPollItem CreateReceiver(ZSocket socket)
 		{
-			return Create(socket, null, sendMessage);
+			return Create(socket, (ZSocket _socket, out ZMessage message, out ZError error) =>
+			{
+				while (null == (message = _socket.ReceiveMessage(ZSocketFlags.DontWait, out error)))
+				{
+					if (error == ZError.EAGAIN)
+					{
+						error = ZError.None;
+						Thread.Sleep(1);
+
+						continue;
+					}
+					return false;
+				}
+				return true;
+			}, null);
+		}
+
+		public static ZPollItem CreateSender(ZSocket socket)
+		{
+			return Create(socket, null, (ZSocket _socket, ZMessage message, out ZError error) =>
+			{
+				while (!_socket.SendMessage(message, ZSocketFlags.DontWait, out error))
+				{
+					if (error == ZError.EAGAIN)
+					{
+						error = ZError.None;
+						Thread.Sleep(1);
+
+						continue;
+					}
+					return false;
+				}
+				return true;
+			});
+		}
+
+		public static ZPollItem CreateReceiverSender(ZSocket socket, ReceiveDelegate receiveMessage, SendDelegate sendMessage)
+		{
+			return Create(socket, (ZSocket _socket, out ZMessage message, out ZError error) =>
+			{
+				while (null == (message = _socket.ReceiveMessage(ZSocketFlags.DontWait, out error)))
+				{
+					if (error == ZError.EAGAIN)
+					{
+						error = ZError.None;
+						Thread.Sleep(1);
+
+						continue;
+					}
+					return false;
+				}
+				return true;
+
+			}, (ZSocket _socket, ZMessage message, out ZError error) =>
+			{
+				while (!_socket.SendMessage(message, ZSocketFlags.DontWait, out error))
+				{
+					if (error == ZError.EAGAIN)
+					{
+						error = ZError.None;
+						Thread.Sleep(1);
+
+						continue;
+					}
+					return false;
+				}
+				return true;
+			});
 		}
 	}
 }

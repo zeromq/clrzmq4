@@ -1,13 +1,14 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+
+using ZeroMQ.lib;
 
 namespace ZeroMQ
 {
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.Runtime.InteropServices;
-	using System.IO;
-	using lib;
 
 	/// <summary>
 	/// A single or multi-part message sent or received via a <see cref="ZSocket"/>.
@@ -293,12 +294,6 @@ namespace ZeroMQ
 			return zmq.msg_data(_framePtr);
 		}
 
-		/*
-		public byte* PositionPtr()
-		{
-			return (byte*)_ptr + _position;
-		}*/
-
 		public override long Seek(long offset, SeekOrigin origin)
 		{
 			long pos;
@@ -323,7 +318,6 @@ namespace ZeroMQ
 			{
 				return -1;
 			}
-			// MemoryUtils.PinAndCopyMemory((byte*)(DataPtr() + _position), buffer, offset, count);
 			Marshal.Copy(DataPtr() + _position, buffer, offset, (int)remaining);
 
 			_position += remaining;
@@ -403,7 +397,6 @@ namespace ZeroMQ
 			{
 				throw new InvalidOperationException();
 			}
-			// MemoryUtils.PinAndCopyMemory(buffer, offset, (byte*)(DataPtr() + _position), count);
 			Marshal.Copy(buffer, offset, DataPtr() + _position, count);
 			_position += count;
 		}
