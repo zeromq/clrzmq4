@@ -47,7 +47,7 @@ namespace ZeroMQ
 
 		public static bool Proxy(ZSocket frontend, ZSocket backend, out ZError error)
 		{
-			return Proxy(frontend, backend, out error);
+			return Proxy(frontend, backend, null, out error);
 		}
 
 		public static bool Proxy(ZSocket frontend, ZSocket backend, ZSocket capture, out ZError error)
@@ -205,11 +205,16 @@ namespace ZeroMQ
 			EnsureNotDisposed();
 
 			// int retry = 3;
+			ZError error;
 			while (/*--retry > -1 &&*/ -1 == zmq.ctx_term(_contextPtr))
 			{
-				var error = ZError.GetLastErr();
+				error = ZError.GetLastErr();
+
 				if (error == ZError.EINTR)
 				{
+					error = ZError.None;
+					Thread.Sleep(1);
+
 					continue;
 				}
 

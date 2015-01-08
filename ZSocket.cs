@@ -783,8 +783,12 @@ namespace ZeroMQ
 				}
 				if (error == ZError.EAGAIN)
 				{
+					if ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait)
+					{
+						return false;
+					}
+
 					error = default(ZError);
-					// TODO: if flags & ZSocketFlags.DontWait
 					Thread.Sleep(1);
 
 					continue;
@@ -888,11 +892,8 @@ namespace ZeroMQ
 		{
 			EnsureNotDisposed();
 
-			bool result = false;
-
 			using (var optionLengthP = DispoIntPtr.Alloc(IntPtr.Size))
 			{
-
 				if (IntPtr.Size == 4)
 					Marshal.WriteInt32(optionLengthP.Ptr, optionLength);
 				else if (IntPtr.Size == 8)
@@ -900,12 +901,14 @@ namespace ZeroMQ
 				else
 					throw new PlatformNotSupportedException();
 
-				while (!(result = (-1 != zmq.getsockopt(this._socketPtr, (int)option, optionValue, optionLengthP.Ptr))))
+				ZError error;
+				while (-1 == zmq.getsockopt(this._socketPtr, (int)option, optionValue, optionLengthP.Ptr))
 				{
-					var error = ZError.GetLastErr();
+					error = ZError.GetLastErr();
 
 					if (error == ZError.EINTR)
 					{
+						error = ZError.None;
 						continue;
 					}
 
@@ -919,7 +922,8 @@ namespace ZeroMQ
 				else
 					throw new PlatformNotSupportedException();
 			}
-			return result;
+
+			return true;
 		}
 
 		// From options.hpp: unsigned char identity [256];
@@ -927,21 +931,19 @@ namespace ZeroMQ
 
 		public bool GetOption(ZSocketOption option, out byte[] value)
 		{
-			bool result = false;
 			value = null;
 
 			int optionLength = MaxBinaryOptionSize;
 			using (var optionValue = DispoIntPtr.Alloc(optionLength))
 			{
-				result = GetOption(option, optionValue, ref optionLength);
-				if (result)
+				if (GetOption(option, optionValue, ref optionLength))
 				{
 					value = new byte[optionLength];
 					Marshal.Copy(optionValue, value, 0, optionLength);
+					return true;
 				}
+				return false;
 			}
-
-			return result;
 		}
 
 		public byte[] GetOptionBytes(ZSocketOption option)
@@ -956,20 +958,18 @@ namespace ZeroMQ
 
 		public bool GetOption(ZSocketOption option, out string value)
 		{
-			bool result = false;
 			value = null;
 
 			int optionLength = MaxBinaryOptionSize;
 			using (var optionValue = DispoIntPtr.Alloc(optionLength))
 			{
-				result = GetOption(option, optionValue, ref optionLength);
-				if (result)
+				if (GetOption(option, optionValue, ref optionLength))
 				{
 					value = Marshal.PtrToStringAnsi(optionValue, optionLength);
+					return true;
 				}
+				return false;
 			}
-
-			return result;
 		}
 
 		public string GetOptionString(ZSocketOption option)
@@ -984,21 +984,17 @@ namespace ZeroMQ
 
 		public bool GetOption(ZSocketOption option, out Int32 value)
 		{
-			bool result = false;
 			value = default(Int32);
 
 			int optionLength = Marshal.SizeOf(typeof(Int32));
 			using (var optionValue = DispoIntPtr.Alloc(optionLength))
 			{
-				result = GetOption(option, optionValue.Ptr, ref optionLength);
-
-				if (result)
-				{
+				if (GetOption(option, optionValue.Ptr, ref optionLength)) {
 					value = Marshal.ReadInt32(optionValue.Ptr);
+					return true;
 				}
+				return false;
 			}
-
-			return result;
 		}
 
 		public Int32 GetOptionInt32(ZSocketOption option)
@@ -1031,20 +1027,18 @@ namespace ZeroMQ
 
 		public bool GetOption(ZSocketOption option, out Int64 value)
 		{
-			bool result = false;
 			value = default(Int64);
 
 			int optionLength = Marshal.SizeOf(typeof(Int64));
 			using (var optionValue = DispoIntPtr.Alloc(optionLength))
 			{
-				result = GetOption(option, optionValue.Ptr, ref optionLength);
-				if (result)
+				if (GetOption(option, optionValue.Ptr, ref optionLength))
 				{
 					value = Marshal.ReadInt64(optionValue);
+					return true;
 				}
+				return false;
 			}
-
-			return result;
 		}
 
 		public Int64 GetOptionInt64(ZSocketOption option)
@@ -1080,36 +1074,32 @@ namespace ZeroMQ
 		{
 			EnsureNotDisposed();
 
-			bool result = false;
-
-			while (!(result = (-1 != zmq.setsockopt(this._socketPtr, (int)option, optionValue, optionLength))))
+			ZError error;
+			while (-1 == zmq.setsockopt(this._socketPtr, (int)option, optionValue, optionLength))
 			{
-				var error = ZError.GetLastErr();
+				error = ZError.GetLastErr();
 
 				if (error == ZError.EINTR)
 				{
+					error = ZError.None;
 					continue;
 				}
 
-				throw new ZException(error);
+				return false;
 			}
-			return result;
+			return true;
 		}
 
 		public bool SetOptionNull(ZSocketOption option)
 		{
-
 			return SetOption(option, IntPtr.Zero, 0);
 		}
 
 		public bool SetOption(ZSocketOption option, byte[] value)
 		{
-
-			bool result = false;
-
 			if (value == null)
 			{
-				return result = SetOptionNull(option);
+				return SetOptionNull(option);
 			}
 
 			int optionLength = /* Marshal.SizeOf(typeof(byte)) * */ value.Length;
@@ -1117,45 +1107,33 @@ namespace ZeroMQ
 			{
 				Marshal.Copy(value, 0, optionValue.Ptr, optionLength);
 
-				result = SetOption(option, optionValue.Ptr, optionLength);
+				return SetOption(option, optionValue.Ptr, optionLength);
 			}
-
-			return result;
 		}
 
 		public bool SetOption(ZSocketOption option, string value)
 		{
-
-			bool result = false;
-
 			if (value == null)
 			{
-				return result = SetOptionNull(option);
+				return SetOptionNull(option);
 			}
 
 			int optionLength;
 			using (var optionValue = DispoIntPtr.AllocString(value, out optionLength))
 			{
-				result = SetOption(option, optionValue, optionLength);
+				return SetOption(option, optionValue, optionLength);
 			}
-
-			return result;
 		}
 
 		public bool SetOption(ZSocketOption option, Int32 value)
 		{
-
-			bool result = false;
-
 			int optionLength = Marshal.SizeOf(typeof(Int32));
 			using (var optionValue = DispoIntPtr.Alloc(optionLength))
 			{
 				Marshal.WriteInt32(optionValue, value);
 
-				result = SetOption(option, optionValue.Ptr, optionLength);
+				return SetOption(option, optionValue.Ptr, optionLength);
 			}
-
-			return result;
 		}
 
 		public bool SetOption(ZSocketOption option, UInt32 value)
