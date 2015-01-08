@@ -101,24 +101,18 @@
 	-->
   <Target Name="AfterBuild" />
   <ItemGroup>
-    <None Include="i386\libzmq.dll">
+    <Content Include="i386\libzmq.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="i386\libzmq.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="amd64\libzmq.dll">
+    <Content Include="amd64\libzmq.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="amd64\libzmq.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="ZeroMQ.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="amd64\libsodium.dll" />
-    <Content Include="i386\libsodium.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 </Project>

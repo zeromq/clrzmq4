@@ -26,7 +26,7 @@
 
 		static zmq()
 		{
-			NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName);
+			// NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName);
 			NativeLib = Platform.LoadUnmanagedLibrary(LibraryName);
 
 			int major, minor, patch;
