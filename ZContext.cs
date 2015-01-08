@@ -45,9 +45,23 @@ namespace ZeroMQ
 			return false;
 		}
 
+		public static void Proxy(ZSocket frontend, ZSocket backend)
+		{
+			Proxy(frontend, backend, null);
+		}
+
 		public static bool Proxy(ZSocket frontend, ZSocket backend, out ZError error)
 		{
 			return Proxy(frontend, backend, null, out error);
+		}
+
+		public static void Proxy(ZSocket frontend, ZSocket backend, ZSocket capture)
+		{
+			ZError error;
+			if (!Proxy(frontend, backend, capture, out error))
+			{
+				throw new ZException(error);
+			}
 		}
 
 		public static bool Proxy(ZSocket frontend, ZSocket backend, ZSocket capture, out ZError error)
@@ -62,7 +76,26 @@ namespace ZeroMQ
 			return true;
 		}
 
-		public static bool Proxy(ZSocket frontend, ZSocket backend, ZSocket capture, ZSocket control, out ZError error)
+		public static void ProxySteerable(ZSocket frontend, ZSocket backend, ZSocket control)
+		{
+			ProxySteerable(frontend, backend, null, control);
+		}
+		
+		public static bool ProxySteerable(ZSocket frontend, ZSocket backend, ZSocket control, out ZError error)
+		{
+			return ProxySteerable(frontend, backend, null, control, out error);
+		}
+		
+		public static void ProxySteerable(ZSocket frontend, ZSocket backend, ZSocket capture, ZSocket control)
+		{
+			ZError error;
+			if (!ProxySteerable(frontend, backend, capture, control, out error))
+			{
+				throw new ZException(error);
+			}
+		}
+
+		public static bool ProxySteerable(ZSocket frontend, ZSocket backend, ZSocket capture, ZSocket control, out ZError error)
 		{
 			error = ZError.None;
 
