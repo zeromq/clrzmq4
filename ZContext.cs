@@ -56,6 +56,8 @@ namespace ZeroMQ
 
 			while (-1 == zmq.proxy(frontend.SocketPtr, backend.SocketPtr, capture == null ? IntPtr.Zero : capture.SocketPtr))
 			{
+				error = ZError.GetLastErr();
+
 				if (error == ZError.EINTR)
 				{
 					error = ZError.None;
