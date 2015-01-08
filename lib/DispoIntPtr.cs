@@ -25,6 +25,12 @@ namespace ZeroMQ.lib
 			return dispPtr;
 		}
 
+		public static DispoIntPtr AllocString(string str)
+		{
+			int byteCount;
+			return AllocString(str, out byteCount);
+		}
+
 		public static DispoIntPtr AllocString(string str, out int byteCount)
 		{
 			return AllocStringNative(str, out byteCount);

@@ -73,8 +73,7 @@ namespace ZeroMQ.Monitoring
 
 			error = ZError.None;
 
-			int endpointPtrSize;
-			using (var endpointPtr = DispoIntPtr.AllocString(endpoint, out endpointPtrSize))
+			using (var endpointPtr = DispoIntPtr.AllocString(endpoint))
 			{
 				while (-1 == zmq.socket_monitor(socket.SocketPtr, endpointPtr, (Int32)eventsToMonitor))
 				{

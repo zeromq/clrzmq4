@@ -35,8 +35,7 @@ namespace ZeroMQ
 
 		public static bool Has(string capability)
 		{
-			int capabilityCnt;
-			using (var capabilityPtr = DispoIntPtr.AllocString(capability, out capabilityCnt))
+			using (var capabilityPtr = DispoIntPtr.AllocString(capability))
 			{
 				if (0 < zmq.has(capabilityPtr))
 				{
@@ -44,6 +43,47 @@ namespace ZeroMQ
 				}
 			}
 			return false;
+		}
+
+		public static bool Proxy(ZSocket frontend, ZSocket backend, out ZError error)
+		{
+			return Proxy(frontend, backend, out error);
+		}
+
+		public static bool Proxy(ZSocket frontend, ZSocket backend, ZSocket capture, out ZError error)
+		{
+			error = ZError.None;
+
+			while (-1 == zmq.proxy(frontend.SocketPtr, backend.SocketPtr, capture == null ? IntPtr.Zero : capture.SocketPtr))
+			{
+				if (error == ZError.EINTR)
+				{
+					error = ZError.None;
+					continue;
+				}
+
+				return false;
+			}
+			return true;
+		}
+
+		public static bool Proxy(ZSocket frontend, ZSocket backend, ZSocket capture, ZSocket control, out ZError error)
+		{
+			error = ZError.None;
+
+			while (-1 == zmq.proxy_steerable(frontend.SocketPtr, backend.SocketPtr, capture == null ? IntPtr.Zero : capture.SocketPtr, control == null ? IntPtr.Zero : control.SocketPtr))
+			{
+				error = ZError.GetLastErr();
+
+				if (error == ZError.EINTR)
+				{
+					error = ZError.None;
+					continue;
+				}
+
+				return false;
+			}
+			return true;
 		}
 
 		private readonly IntPtr _contextPtr;
