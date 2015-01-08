@@ -5,9 +5,9 @@
 
 	public static unsafe class zmq
 	{
-		// private const string SodiumLibraryName = "libsodium";
+		private const string SodiumLibraryName = "libsodium";
 
-		// private static readonly UnmanagedLibrary NativeLibSodium;
+		private static readonly UnmanagedLibrary NativeLibSodium;
 
 		private const string LibraryName = "libzmq";
 
@@ -26,7 +26,7 @@
 
 		static zmq()
 		{
-			// NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName);
+			NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName);
 			NativeLib = Platform.LoadUnmanagedLibrary(LibraryName);
 
 			int major, minor, patch;
