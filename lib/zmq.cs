@@ -20,13 +20,23 @@
 		// From zmq.h (v3):
 		// typedef struct {unsigned char _ [32];} zmq_msg_t;
 		private static readonly int sizeof_zmq_msg_t_v3 = 32 * Marshal.SizeOf(typeof(byte));
-		public static readonly int sizeof_zmq_msg_t = sizeof_zmq_msg_t_v3;
+
+		// From zmq.h (v4):
+		// typedef struct zmq_msg_t {unsigned char _ [48];} zmq_msg_t;
+		private static readonly int sizeof_zmq_msg_t_v4 = 48 * Marshal.SizeOf(typeof(byte));
+
+		public static readonly int sizeof_zmq_msg_t = sizeof_zmq_msg_t_v4;
 
 		// public static long PollTimeoutRatio;
 
 		static zmq()
 		{
-			// NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName);
+			try
+			{
+				NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName);
+			}
+			catch (System.IO.FileNotFoundException) { }
+
 			NativeLib = Platform.LoadUnmanagedLibrary(LibraryName);
 
 			int major, minor, patch;
