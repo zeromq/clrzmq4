@@ -27,7 +27,7 @@ namespace ZeroMQ.Test
 
 			// Start the "Server"
 			var cancellor = new CancellationTokenSource();
-			new Thread(() => Server(cancellor.Token)).Start(cancellor.Token);
+			new Thread(() => Server(cancellor.Token)).Start();
 
 			if (args == null || args.Length < 1)
 			{
