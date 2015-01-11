@@ -21,9 +21,9 @@
 		// typedef struct {unsigned char _ [32];} zmq_msg_t;
 		private static readonly int sizeof_zmq_msg_t_v3 = 32 * Marshal.SizeOf(typeof(byte));
 
-		// From zmq.h (v4):
-		// typedef struct zmq_msg_t {unsigned char _ [48];} zmq_msg_t;
-		private static readonly int sizeof_zmq_msg_t_v4 = 48 * Marshal.SizeOf(typeof(byte));
+		// From zmq.h (not v4, but v4.1 and later):
+		// typedef struct zmq_msg_t {unsigned char _ [64];} zmq_msg_t;
+		private static readonly int sizeof_zmq_msg_t_v4 = 64 * Marshal.SizeOf(typeof(byte));
 
 		public static readonly int sizeof_zmq_msg_t = sizeof_zmq_msg_t_v4;
 
