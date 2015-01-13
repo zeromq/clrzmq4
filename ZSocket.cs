@@ -291,16 +291,16 @@ namespace ZeroMQ
 			return true;
 		}
 
-		public void Read(byte[] buffer, int offset, int count)
+		public void Receive(byte[] buffer, int offset, int count)
 		{
 			ZError error;
-			if (!Read(buffer, offset, count, ZSocketFlags.None, out error))
+			if (!Receive(buffer, offset, count, ZSocketFlags.None, out error))
 			{
 				throw new ZException(error);
 			}
 		}
 
-		public bool Read(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
+		public bool Receive(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
 		{
 			error = ZError.None;
 
@@ -312,21 +312,25 @@ namespace ZeroMQ
 			if (-1 == zmq.recv(this.SocketPtr, pinPtr, count, (int)flags))
 			{
 				error = ZError.GetLastErr();
+
+				pin.Free();
 				return false;
 			}
+
+			pin.Free();
 			return true;
 		}
 
-		public void Write(byte[] buffer, int offset, int count)
+		public void Send(byte[] buffer, int offset, int count)
 		{
 			ZError error;
-			if (!Write(buffer, offset, count, ZSocketFlags.None, out error))
+			if (!Send(buffer, offset, count, ZSocketFlags.None, out error))
 			{
 				throw new ZException(error);
 			}
 		}
 
-		public bool Write(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
+		public bool Send(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
 		{
 			error = ZError.None;
 			
@@ -338,8 +342,12 @@ namespace ZeroMQ
 			if (-1 == zmq.send(SocketPtr, pinPtr, count, (int)flags))
 			{
 				error = ZError.GetLastErr();
+
+				pin.Free();
 				return false;
 			}
+
+			pin.Free();
 			return true;
 		}
 
