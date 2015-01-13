@@ -487,6 +487,66 @@ namespace ZeroMQ
 			++_position;
 		}
 
+		public void WriteInt16(Int16 value)
+		{
+			if (Position + 2 > Length)
+			{
+				throw new InvalidOperationException();
+			}
+			Marshal.WriteInt16(DataPtr() + _position, value);
+			_position += 2;
+		}
+
+		public void WriteUInt16(UInt16 value)
+		{
+			WriteInt16((Int16)value);
+		}
+
+		public void WriteChar(Char value)
+		{
+			WriteInt16((Int16)value);
+		}
+
+		public void WriteInt32(Int32 value)
+		{
+			if (Position + 4 > Length)
+			{
+				throw new InvalidOperationException();
+			}
+			Marshal.WriteInt32(DataPtr() + _position, value);
+			_position += 4;
+		}
+
+		public void WriteUInt32(UInt32 value)
+		{
+			WriteInt32((Int32)value);
+		}
+
+		public void WriteSingle(Single value)
+		{
+			WriteInt32((Int32)value);
+		}
+
+		public void WriteInt64(Int64 value)
+		{
+			if (Position + 8 > Length)
+			{
+				throw new InvalidOperationException();
+			}
+			Marshal.WriteInt64(DataPtr() + _position, value);
+			_position += 8;
+		}
+
+		public void WriteUInt64(UInt64 value)
+		{
+			WriteInt64((Int64)value);
+		}
+
+		public void WriteDouble(Double value)
+		{
+			WriteInt64((Int64)value);
+		}
+
 		public void WriteString(string str)
 		{
 			WriteString(str, ZContext.Encoding);
