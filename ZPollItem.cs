@@ -5,10 +5,6 @@ namespace ZeroMQ
 
 	public class ZPollItem
 	{
-		public delegate bool ReceiveDelegate(ZSocket socket, out ZMessage message, out ZError error);
-
-		public delegate bool SendDelegate(ZSocket socket, ZMessage message, out ZError error);
-
 		public ZSocket Socket
 		{
 			get;
@@ -19,9 +15,47 @@ namespace ZeroMQ
 
 		public ZPoll ReadyEvents;
 
+		public delegate bool ReceiveDelegate(ZSocket socket, out ZMessage message, out ZError error);
+
 		public ReceiveDelegate ReceiveMessage;
 
+		public static bool DefaultReceiveMessage(ZSocket socket, out ZMessage message, out ZError error)
+		{
+			message = null;
+
+			while (!socket.ReceiveMessage(ZSocketFlags.DontWait, ref message, out error))
+			{
+				if (error == ZError.EAGAIN)
+				{
+					error = ZError.None;
+					Thread.Sleep(1);
+
+					continue;
+				}
+				return false;
+			}
+			return true;
+		}
+
+		public delegate bool SendDelegate(ZSocket socket, ZMessage message, out ZError error);
+
 		public SendDelegate SendMessage;
+
+		public static bool DefaultSendMessage(ZSocket socket, ZMessage message, out ZError error)
+		{
+			while (!socket.SendMessage(message, ZSocketFlags.DontWait, out error))
+			{
+				if (error == ZError.EAGAIN)
+				{
+					error = ZError.None;
+					Thread.Sleep(1);
+
+					continue;
+				}
+				return false;
+			}
+			return true;
+		}
 
 		protected ZPollItem(ZSocket socket, ZPoll events)
 		{
@@ -54,74 +88,17 @@ namespace ZeroMQ
 
 		public static ZPollItem CreateReceiver(ZSocket socket)
 		{
-			return Create(socket, (ZSocket _socket, out ZMessage message, out ZError error) =>
-			{
-				while (null == (message = _socket.ReceiveMessage(ZSocketFlags.DontWait, out error)))
-				{
-					if (error == ZError.EAGAIN)
-					{
-						error = ZError.None;
-						Thread.Sleep(1);
-
-						continue;
-					}
-					return false;
-				}
-				return true;
-			}, null);
+			return Create(socket, DefaultReceiveMessage, null);
 		}
 
 		public static ZPollItem CreateSender(ZSocket socket)
 		{
-			return Create(socket, null, (ZSocket _socket, ZMessage message, out ZError error) =>
-			{
-				while (!_socket.SendMessage(message, ZSocketFlags.DontWait, out error))
-				{
-					if (error == ZError.EAGAIN)
-					{
-						error = ZError.None;
-						Thread.Sleep(1);
-
-						continue;
-					}
-					return false;
-				}
-				return true;
-			});
+			return Create(socket, null, DefaultSendMessage);
 		}
 
-		public static ZPollItem CreateReceiverSender(ZSocket socket, ReceiveDelegate receiveMessage, SendDelegate sendMessage)
+		public static ZPollItem CreateReceiverSender(ZSocket socket)
 		{
-			return Create(socket, (ZSocket _socket, out ZMessage message, out ZError error) =>
-			{
-				while (null == (message = _socket.ReceiveMessage(ZSocketFlags.DontWait, out error)))
-				{
-					if (error == ZError.EAGAIN)
-					{
-						error = ZError.None;
-						Thread.Sleep(1);
-
-						continue;
-					}
-					return false;
-				}
-				return true;
-
-			}, (ZSocket _socket, ZMessage message, out ZError error) =>
-			{
-				while (!_socket.SendMessage(message, ZSocketFlags.DontWait, out error))
-				{
-					if (error == ZError.EAGAIN)
-					{
-						error = ZError.None;
-						Thread.Sleep(1);
-
-						continue;
-					}
-					return false;
-				}
-				return true;
-			});
+			return Create(socket, DefaultReceiveMessage, DefaultSendMessage);
 		}
 	}
 }

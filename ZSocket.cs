@@ -291,140 +291,120 @@ namespace ZeroMQ
 			return true;
 		}
 
-		public void Receive(out byte[] buffer)
-		{
-			Receive(ZSocketFlags.None, out buffer);
-		}
-
-		public bool Receive(out byte[] buffer, out ZError error)
-		{
-			return Receive(1, ZSocketFlags.None, out buffer, out error);
-		}
-
-		public void Receive(ZSocketFlags flags, out byte[] buffer)
-		{
-			bool more = (flags & ZSocketFlags.More) == ZSocketFlags.More;
-			Receive(more ? int.MaxValue : 1, flags, out buffer);
-		}
-
-		public bool Receive(ZSocketFlags flags, out byte[] buffer, out ZError error)
-		{
-			bool more = (flags & ZSocketFlags.More) == ZSocketFlags.More;
-			return Receive(more ? int.MaxValue : 1, flags, out buffer, out error);
-		}
-
-		public void Receive(int framesToReceive, ZSocketFlags flags, out byte[] buffer)
+		public void Read(byte[] buffer, int offset, int count)
 		{
 			ZError error;
-			if (!Receive(framesToReceive, flags, out buffer, out error))
+			if (!Read(buffer, offset, count, ZSocketFlags.None, out error))
 			{
 				throw new ZException(error);
 			}
 		}
 
-		public virtual bool Receive(int framesToReceive, ZSocketFlags flags, out byte[] buffer, out ZError error)
+		public bool Read(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
 		{
-			error = default(ZError);
-			buffer = null;
+			error = ZError.None;
 
-			EnsureNotDisposed();
+			// int zmq_recv(void* socket, void* buf, size_t len, int flags);
 
-			if (framesToReceive > 1 && this.ReceiveMore)
+			var pin = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+			IntPtr pinPtr = pin.AddrOfPinnedObject();
+
+			if (-1 == zmq.recv(this.SocketPtr, pinPtr, count, (int)flags))
 			{
-				flags |= ZSocketFlags.More;
+				error = ZError.GetLastErr();
+				return false;
 			}
+			return true;
+		}
 
-			IEnumerable<ZFrame> frames = ReceiveFrames(framesToReceive, flags, out error);
-			bool result = (error == default(ZError));
-
-			int receivedCount = frames.Count();
-			if (result && framesToReceive > 0)
+		public void Write(byte[] buffer, int offset, int count)
+		{
+			ZError error;
+			if (!Write(buffer, offset, count, ZSocketFlags.None, out error))
 			{
-				// Aggregate all buffers
-				int length = frames.Aggregate(0, (counter, frame) => counter + (int)frame.Length);
-				buffer = new byte[length];
-
-				// Concatenate the buffers
-				int offset = 0;
-				for (int i = 0, l = receivedCount; i < l; ++i)
-				{
-					ZFrame frame = frames.ElementAt(i);
-					int len = (int)frame.Length;
-					Marshal.Copy(frame.DataPtr(), buffer, offset, len);
-					offset += len;
-
-					frame.Dispose();
-				}
+				throw new ZException(error);
 			}
-			else
+		}
+
+		public bool Write(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
+		{
+			error = ZError.None;
+			
+			// int zmq_send (void *socket, void *buf, size_t len, int flags);
+
+			var pin = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+			IntPtr pinPtr = pin.AddrOfPinnedObject() + offset;
+
+			if (-1 == zmq.send(SocketPtr, pinPtr, count, (int)flags))
 			{
-				for (int i = 0, l = receivedCount; i < l; ++i)
-				{
-					ZFrame frame = frames.ElementAt(i);
-					frame.Dispose();
-				}
+				error = ZError.GetLastErr();
+				return false;
 			}
-
-			return result;
+			return true;
 		}
 
 		public ZMessage ReceiveMessage()
 		{
-			return ReceiveMessage(ZSocketFlags.None);
-		}
-
-		public ZMessage ReceiveMessage(out ZError error)
-		{
-			return ReceiveMessage(ZSocketFlags.None, out error);
-		}
-
-		public ZMessage ReceiveMessage(ZSocketFlags flags)
-		{
-			return ReceiveMessage(int.MaxValue, flags);
-		}
-
-		public ZMessage ReceiveMessage(ZSocketFlags flags, out ZError error)
-		{
-			ZMessage message = null;
-			ReceiveMessage(int.MaxValue, flags, ref message, out error);
-			return message;
-		}
-
-		public ZMessage ReceiveMessage(int receiveCount, ZSocketFlags flags)
-		{
 			ZError error;
-			ZMessage message = null;
-			if (!ReceiveMessage(receiveCount, flags, ref message, out error))
+			ZMessage message = ReceiveMessage(out error);
+			if (error != ZError.None)
 			{
 				throw new ZException(error);
 			}
 			return message;
 		}
 
-		public bool ReceiveMessage(int receiveCount, ZSocketFlags flags, ref ZMessage message, out ZError error)
+		public ZMessage ReceiveMessage(out ZError error)
+		{
+			var message = new ZMessage();
+			if (!ReceiveMessage(ZSocketFlags.None, ref message, out error))
+			{
+				return default(ZMessage);
+			}
+				
+			return message;
+		}
+
+		public bool ReceiveMessage(ZSocketFlags flags, ref ZMessage message, out ZError error)
 		{
 			EnsureNotDisposed();
 
-			IEnumerable<ZFrame> framesQuery = ReceiveFrames(receiveCount, flags, out error);
-			bool result = error == default(ZError);
+			int count = int.MaxValue;
+			List<ZFrame> frames;
+			bool good = true;
 
-			if (result)
+			while (!ReceiveFrames(ref count, out frames, flags, out error))
 			{
-				if (message == null)
+				if (error == ZError.EAGAIN && ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait))
 				{
-					message = new ZMessage(framesQuery);
+					good = false;
+					break;
 				}
-				else
-				{
-					message.AddRange(framesQuery);
-				}
+
+				return false;
 			}
-			return result;
+
+			if (message == null)
+			{
+				message = new ZMessage(frames);
+			}
+			else
+			{
+				message.AddRange(frames);
+			}
+				
+			return good;
 		}
 
 		public ZFrame ReceiveFrame()
 		{
-			return ReceiveFrame(ZSocketFlags.None);
+			ZError error;
+			ZFrame frame = ReceiveFrame(out error);
+			if (error != ZError.None)
+			{
+				throw new ZException(error);
+			}
+			return frame;
 		}
 
 		public ZFrame ReceiveFrame(out ZError error)
@@ -432,78 +412,67 @@ namespace ZeroMQ
 			return ReceiveFrame(ZSocketFlags.None, out error);
 		}
 
-		public ZFrame ReceiveFrame(ZSocketFlags flags)
-		{
-			ZError error;
-			ZFrame frame;
-			if (null == (frame = ReceiveFrame(flags, out error)))
-			{
-				throw new ZException(error);
-			}
-			return frame;
-		}
-
 		public ZFrame ReceiveFrame(ZSocketFlags flags, out ZError error)
 		{
-			return ReceiveFrames(1, flags, out error).FirstOrDefault();
+			IEnumerable<ZFrame> frames = ReceiveFrames(1, flags &= ZSocketFlags.More, out error);
+			if (frames != null)
+			{
+				foreach (ZFrame frame in frames)
+				{
+					return frame;
+				}
+			}
+			return null;
 		}
 
-		public IEnumerable<ZFrame> ReceiveFrames()
+		public IEnumerable<ZFrame> ReceiveFrames(int framesToReceive)
 		{
-			return ReceiveFrames(int.MaxValue, ZSocketFlags.More);
-		}
-
-		public IEnumerable<ZFrame> ReceiveFrames(out ZError error)
-		{
-			return ReceiveFrames(int.MaxValue, ZSocketFlags.More, out error);
-		}
-
-		public IEnumerable<ZFrame> ReceiveFrames(int receiveCount)
-		{
-			return ReceiveFrames(receiveCount, ZSocketFlags.None);
-		}
-
-		public IEnumerable<ZFrame> ReceiveFrames(int receiveCount, out ZError error)
-		{
-			return ReceiveFrames(receiveCount, ZSocketFlags.None, out error);
-		}
-
-		public IEnumerable<ZFrame> ReceiveFrames(ZSocketFlags flags)
-		{
-			return ReceiveFrames(int.MaxValue, flags);
-		}
-
-		public IEnumerable<ZFrame> ReceiveFrames(ZSocketFlags flags, out ZError error)
-		{
-			return ReceiveFrames(int.MaxValue, flags, out error);
+			return ReceiveFrames(framesToReceive, ZSocketFlags.None);
 		}
 
 		public IEnumerable<ZFrame> ReceiveFrames(int framesToReceive, ZSocketFlags flags)
 		{
 			ZError error;
-			IEnumerable<ZFrame> frames;
-			if (null == (frames = ReceiveFrames(framesToReceive, flags, out error)))
+			var frames = ReceiveFrames(framesToReceive, flags, out error);
+			if (error != ZError.None)
 			{
 				throw new ZException(error);
 			}
 			return frames;
 		}
 
+		public IEnumerable<ZFrame> ReceiveFrames(int framesToReceive, out ZError error)
+		{
+			return ReceiveFrames(framesToReceive, ZSocketFlags.None, out error);
+		}
+
 		public IEnumerable<ZFrame> ReceiveFrames(int framesToReceive, ZSocketFlags flags, out ZError error)
 		{
-			bool result = false;
+			List<ZFrame> frames;
+			
+			while (!ReceiveFrames(ref framesToReceive, out frames, flags, out error)) {
+
+				if (error == ZError.EAGAIN && ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait))
+				{
+					return frames;
+				}
+
+				return null;
+			}
+
+			return frames;
+		}
+
+		public bool ReceiveFrames(ref int framesToReceive, out List<ZFrame> frames, ZSocketFlags flags, out ZError error)
+		{
 			error = default(ZError);
+			frames = new List<ZFrame>();
 
-			bool more = (framesToReceive > 1 && ((flags & ZSocketFlags.More) == ZSocketFlags.More)) ? this.ReceiveMore : false;
-			if (more) flags |= ZSocketFlags.More;
+			do {
 
-			var frames = new List<ZFrame>();
-
-			do
-			{
 				var frame = ZFrame.CreateEmpty();
 
-				while (!(result = (-1 != zmq.msg_recv(frame.Ptr, _socketPtr, (int)flags))))
+				while (-1 == zmq.msg_recv(frame.Ptr, _socketPtr, (int)flags))
 				{
 					error = ZError.GetLastErr();
 
@@ -516,7 +485,7 @@ namespace ZeroMQ
 					{
 						if ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait)
 						{
-							return frames;
+							return false;
 						}
 
 						error = default(ZError);
@@ -525,69 +494,18 @@ namespace ZeroMQ
 						continue;
 					}
 
-
 					frame.Dispose();
 
-					return null;
-				}
-				if (result)
-				{
-					frames.Add(frame);
-
-					if (more)
-					{
-						more = ReceiveMore;
-					}
+					return false;
 				}
 
-			} while (result && more && --framesToReceive > 0);
+				frames.Add(frame);
 
-			return frames;
-		}
+				--framesToReceive;
 
-		public virtual void Send(byte[] buffer)
-		{
-			Send(buffer, ZSocketFlags.None);
-		}
+			} while (framesToReceive > 0 && (framesToReceive > 1 ? this.ReceiveMore : false));
 
-		public virtual bool Send(byte[] buffer, out ZError error)
-		{
-			return Send(buffer, ZSocketFlags.None, out error);
-		}
-
-		public virtual void SendMore(byte[] buffer)
-		{
-			Send(buffer, ZSocketFlags.More);
-		}
-
-		public virtual bool SendMore(byte[] buffer, out ZError error)
-		{
-			return Send(buffer, ZSocketFlags.More, out error);
-		}
-
-		public virtual void Send(byte[] buffer, ZSocketFlags flags)
-		{
-			ZError error;
-			if (!Send(buffer, flags, out error))
-			{
-				throw new ZException(error);
-			}
-		}
-
-		public virtual bool Send(byte[] buffer, ZSocketFlags flags, out ZError error)
-		{
-			EnsureNotDisposed();
-
-			error = default(ZError);
-			bool result = false;
-
-			int size = buffer.Length;
-			var frame = ZFrame.Create(size);
-			Marshal.Copy(buffer, 0, frame.DataPtr(), size);
-
-			result = SendFrame(frame, flags, out error);
-
-			return result;
+			return true;
 		}
 
 		public virtual void SendMessage(ZMessage msg)
@@ -598,26 +516,6 @@ namespace ZeroMQ
 		public virtual bool SendMessage(ZMessage msg, out ZError error)
 		{
 			return SendMessage(msg, ZSocketFlags.None, out error);
-		}
-
-		public virtual void SendMessageMore(ZMessage msg)
-		{
-			SendMessage(msg, ZSocketFlags.More);
-		}
-
-		public virtual bool SendMessageMore(ZMessage msg, out ZError error)
-		{
-			return SendMessage(msg, ZSocketFlags.More, out error);
-		}
-
-		public virtual void SendMessageMore(ZMessage msg, ZSocketFlags flags)
-		{
-			SendMessage(msg, flags | ZSocketFlags.More);
-		}
-
-		public virtual bool SendMessageMore(ZMessage msg, ZSocketFlags flags, out ZError error)
-		{
-			return SendMessage(msg, flags | ZSocketFlags.More, out error);
 		}
 
 		public virtual void SendMessage(ZMessage msg, ZSocketFlags flags)
@@ -647,7 +545,8 @@ namespace ZeroMQ
 		public virtual void SendFrames(IEnumerable<ZFrame> frames, ZSocketFlags flags)
 		{
 			ZError error;
-			if (!SendFrames(frames, flags, out error))
+			int sent = 0;
+			if (!SendFrames(frames, ref sent, flags, out error))
 			{
 				throw new ZException(error);
 			}
@@ -655,22 +554,35 @@ namespace ZeroMQ
 
 		public virtual bool SendFrames(IEnumerable<ZFrame> frames, ZSocketFlags flags, out ZError error)
 		{
+			int sent = 0;
+			if (!SendFrames(frames, ref sent, flags, out error))
+			{
+				return false;
+			}
+			return true;
+		}
+
+		public virtual bool SendFrames(IEnumerable<ZFrame> frames, ref int sent, ZSocketFlags flags, out ZError error)
+		{
 			EnsureNotDisposed();
 
-			error = default(ZError);
-			bool finallyMore = (flags & ZSocketFlags.More) == ZSocketFlags.More;
+			error = ZError.None;
+
+			bool more = (flags & ZSocketFlags.More) == ZSocketFlags.More;
+
+			flags |= ZSocketFlags.More;
 
 			for (int i = 0, l = frames.Count(); i < l; ++i)
 			{
-				ZSocketFlags frameFlags = flags | ZSocketFlags.More;
-				if (i == l - 1 && !finallyMore)
+				if (i == l - 1 && !more)
 				{
-					frameFlags &= ~ZSocketFlags.More;
+					flags &= ~ZSocketFlags.More;
 				}
-				if (!SendFrame(frames.ElementAt(i), frameFlags, out error))
+				if (!SendFrame(frames.ElementAt(i), flags, out error))
 				{
 					return false;
 				}
+				++sent;
 			}
 
 			return true;
@@ -746,11 +658,8 @@ namespace ZeroMQ
 				return false;
 			}
 
-			using (frame)
-			{
-				// Tell IDisposable to not unallocate zmq_msg
-				frame.Dismiss();
-			}
+			// Tell IDisposable to not unallocate zmq_msg
+			frame.Dismiss();
 
 			return true;
 		}

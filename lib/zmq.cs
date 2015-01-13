@@ -142,9 +142,8 @@
 		public static readonly zmq_msg_init_data_delegate msg_init_data = zmq_msg_init_data;
 
 		[DllImport(LibraryName, EntryPoint = "zmq_send", CallingConvention = CallingConvention.Cdecl)]
-		private static extern Int32 zmq_send(IntPtr socket, IntPtr buf, Int32 size, Int32 flags);
-		// private static extern Int32 zmq_send(IntPtr socket, byte[] buf, Int32 size, Int32 flags);
-		public delegate Int32 zmq_send_delegate(IntPtr socket, IntPtr buf, Int32 size, Int32 flags);
+		private static extern Int32 zmq_send(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
+		public delegate Int32 zmq_send_delegate(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
 		public static readonly zmq_send_delegate send = zmq_send;
 
 		// [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -152,9 +151,8 @@
 		// private static extern Int32 zmq_send_const(IntPtr socket, byte[] buf, Int32 size, Int32 flags);
 
 		[DllImport(LibraryName, EntryPoint = "zmq_recv", CallingConvention = CallingConvention.Cdecl)]
-		private static extern Int32 zmq_recv(IntPtr socket, IntPtr buf, out Int32 size, Int32 flags);
-		// private static extern Int32 zmq_recv(IntPtr socket, out? byte[] buf, out Int32 size, Int32 flags);
-		public delegate Int32 zmq_recv_delegate(IntPtr socket, IntPtr buf, out Int32 size, Int32 flags);
+		private static extern Int32 zmq_recv(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
+		public delegate Int32 zmq_recv_delegate(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
 		public static readonly zmq_recv_delegate recv = zmq_recv;
 
 		/* Deprecated. Use zmq_msg_send instead.

@@ -199,9 +199,13 @@ namespace ZeroMQ
 			if (_framePtr == null)
 				return;
 
-			// Unalloc the HGlobal ? (currently leads to SIGSEGV)
 			_framePtr.Dispose();
 			_framePtr = null;
+		}
+
+		public bool IsDismissed
+		{
+			get { return _framePtr != null && _framePtr != IntPtr.Zero; }
 		}
 
 		public override bool CanRead
@@ -346,6 +350,30 @@ namespace ZeroMQ
 			return BitConverter.ToInt16(bytes, 0);
 		}
 
+		public virtual UInt16 ReadUInt16()
+		{
+			var bytes = new byte[2];
+			int len = Read(bytes, 0, 2);
+			if (len < 2)
+			{
+				return default(UInt16);
+			}
+
+			return BitConverter.ToUInt16(bytes, 0);
+		}
+
+		public virtual Char ReadChar()
+		{
+			var bytes = new byte[2];
+			int len = Read(bytes, 0, 2);
+			if (len < 2)
+			{
+				return default(Char);
+			}
+
+			return BitConverter.ToChar(bytes, 0);
+		}
+
 		public virtual Int32 ReadInt32()
 		{
 			var bytes = new byte[4];
@@ -355,19 +383,67 @@ namespace ZeroMQ
 				return default(Int16);
 			}
 
-			return BitConverter.ToInt16(bytes, 0);
+			return BitConverter.ToInt32(bytes, 0);
 		}
 
-		public virtual Int32 ReadInt64()
+		public virtual UInt32 ReadUInt32()
+		{
+			var bytes = new byte[4];
+			int len = Read(bytes, 0, 4);
+			if (len < 4)
+			{
+				return default(UInt16);
+			}
+
+			return BitConverter.ToUInt32(bytes, 0);
+		}
+
+		public virtual Single ReadSingle()
+		{
+			var bytes = new byte[4];
+			int len = Read(bytes, 0, 4);
+			if (len < 4)
+			{
+				return default(Single);
+			}
+
+			return BitConverter.ToSingle(bytes, 0);
+		}
+
+		public virtual Int64 ReadInt64()
 		{
 			var bytes = new byte[8];
 			int len = Read(bytes, 0, 8);
 			if (len < 8)
 			{
-				return default(Int16);
+				return default(Int64);
 			}
 
-			return BitConverter.ToInt16(bytes, 0);
+			return BitConverter.ToInt64(bytes, 0);
+		}
+
+		public virtual UInt64 ReadUInt64()
+		{
+			var bytes = new byte[8];
+			int len = Read(bytes, 0, 8);
+			if (len < 8)
+			{
+				return default(UInt64);
+			}
+
+			return BitConverter.ToUInt64(bytes, 0);
+		}
+
+		public virtual Double ReadDouble()
+		{
+			var bytes = new byte[8];
+			int len = Read(bytes, 0, 8);
+			if (len < 8)
+			{
+				return default(Double);
+			}
+
+			return BitConverter.ToDouble(bytes, 0);
 		}
 
 		public string ReadString()
