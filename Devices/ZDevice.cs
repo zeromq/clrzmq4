@@ -17,7 +17,7 @@
 		/// <summary>
 		/// The polling interval in milliseconds.
 		/// </summary>
-		protected readonly TimeSpan PollingInterval = TimeSpan.FromMilliseconds(150);
+		protected readonly TimeSpan PollingInterval = TimeSpan.FromMilliseconds(500);
 
 		/// <summary>
 		/// The ZmqContext reference, to not become finalized

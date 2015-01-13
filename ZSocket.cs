@@ -82,11 +82,7 @@ namespace ZeroMQ
 		{
 			if (!_disposed)
 			{
-				if (disposing)
-				{
-					ZError error;
-					Close(out error);
-				}
+				Close();
 			}
 
 			_disposed = true;
@@ -102,16 +98,16 @@ namespace ZeroMQ
 		/// the <see cref="Linger"/> socket option.
 		/// </remarks>
 		/// <exception cref="ZmqSocketException">The underlying socket object is not valid.</exception>
-		public void Close()
+		public bool Close()
 		{
 			ZError error;
-			if (!Close(out error)) {
-				throw new ZException(error);
-			}
+			return Close(out error);
 		}
 
 		public bool Close(out ZError error)
 		{
+			EnsureNotDisposed();
+
 			error = ZError.None;
 			if (_socketPtr == IntPtr.Zero) return true;
 
@@ -302,12 +298,14 @@ namespace ZeroMQ
 
 		public bool Receive(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
 		{
+			EnsureNotDisposed();
+
 			error = ZError.None;
 
 			// int zmq_recv(void* socket, void* buf, size_t len, int flags);
 
 			var pin = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-			IntPtr pinPtr = pin.AddrOfPinnedObject();
+			IntPtr pinPtr = pin.AddrOfPinnedObject() + offset;
 
 			if (-1 == zmq.recv(this.SocketPtr, pinPtr, count, (int)flags))
 			{
@@ -332,6 +330,8 @@ namespace ZeroMQ
 
 		public bool Send(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
 		{
+			EnsureNotDisposed();
+
 			error = ZError.None;
 			
 			// int zmq_send (void *socket, void *buf, size_t len, int flags);
@@ -473,6 +473,8 @@ namespace ZeroMQ
 
 		public bool ReceiveFrames(ref int framesToReceive, out List<ZFrame> frames, ZSocketFlags flags, out ZError error)
 		{
+			EnsureNotDisposed();
+
 			error = default(ZError);
 			frames = new List<ZFrame>();
 
@@ -568,7 +570,6 @@ namespace ZeroMQ
 			error = ZError.None;
 
 			bool more = (flags & ZSocketFlags.More) == ZSocketFlags.More;
-
 			flags |= ZSocketFlags.More;
 
 			for (int i = 0, l = frames.Count(); i < l; ++i)
@@ -663,12 +664,13 @@ namespace ZeroMQ
 			return true;
 		}
 
-		// message is always null
 		public bool Forward(ZSocket destination, out ZMessage message, out ZError error)
 		{
+			EnsureNotDisposed();
+
 			error = default(ZError);
-			message = null;
-			// bool result = false;
+			message = null; // message is always null
+
 			bool more = false;
 
 			using (var msg = ZFrame.CreateEmpty())
