@@ -380,7 +380,7 @@ namespace ZeroMQ
 			int len = Read(bytes, 0, 4);
 			if (len < 4)
 			{
-				return default(Int16);
+				return default(Int32);
 			}
 
 			return BitConverter.ToInt32(bytes, 0);
@@ -392,7 +392,7 @@ namespace ZeroMQ
 			int len = Read(bytes, 0, 4);
 			if (len < 4)
 			{
-				return default(UInt16);
+				return default(UInt32);
 			}
 
 			return BitConverter.ToUInt32(bytes, 0);
