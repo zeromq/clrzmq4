@@ -5,11 +5,7 @@ namespace ZeroMQ
 
 	public class ZPollItem
 	{
-		public ZSocket Socket
-		{
-			get;
-			protected set;
-		}
+		public ZSocket Socket { get; protected set; }
 
 		public ZPoll Events;
 
@@ -22,19 +18,7 @@ namespace ZeroMQ
 		public static bool DefaultReceiveMessage(ZSocket socket, out ZMessage message, out ZError error)
 		{
 			message = null;
-
-			while (!socket.ReceiveMessage(ZSocketFlags.DontWait, ref message, out error))
-			{
-				if (error == ZError.EAGAIN)
-				{
-					error = ZError.None;
-					Thread.Sleep(1);
-
-					continue;
-				}
-				return false;
-			}
-			return true;
+			return socket.ReceiveMessage(ZSocketFlags.DontWait, ref message, out error);
 		}
 
 		public delegate bool SendDelegate(ZSocket socket, ZMessage message, out ZError error);
@@ -43,18 +27,7 @@ namespace ZeroMQ
 
 		public static bool DefaultSendMessage(ZSocket socket, ZMessage message, out ZError error)
 		{
-			while (!socket.SendMessage(message, ZSocketFlags.DontWait, out error))
-			{
-				if (error == ZError.EAGAIN)
-				{
-					error = ZError.None;
-					Thread.Sleep(1);
-
-					continue;
-				}
-				return false;
-			}
-			return true;
+			return socket.SendMessage(message, ZSocketFlags.DontWait, out error);
 		}
 
 		protected ZPollItem(ZSocket socket, ZPoll events)
