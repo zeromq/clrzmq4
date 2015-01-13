@@ -185,16 +185,20 @@ namespace ZeroMQ.Monitoring
 
 						continue;
 					}
-					throw new ZException(error);
+
+					IsRunning = false;
+					return;
 				}
 
 				var eventValue = new ZMonitorEventData();
 
 				using (incoming) {
-					eventValue.Event = (ZMonitorEvents)incoming[0].ReadInt16();
-					eventValue.EventValue = incoming[0].ReadInt32();
+					if (incoming.Count > 0) {
+						eventValue.Event = (ZMonitorEvents)incoming[0].ReadInt16();
+						eventValue.EventValue = incoming[0].ReadInt32();
+					}
 
-					if (2 < incoming.Count) {
+					if (incoming.Count > 1) {
 						eventValue.Address = incoming[1].ReadString();
 					}
 				}
@@ -202,7 +206,7 @@ namespace ZeroMQ.Monitoring
 				OnMonitor(eventValue);
 			}
 
-			_socket.Disconnect(_endpoint);
+			if (!_socket.Disconnect(_endpoint, out error)) { }
 		}
 
 		internal void OnMonitor(ZMonitorEventData data)
