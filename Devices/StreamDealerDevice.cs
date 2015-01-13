@@ -44,52 +44,47 @@
 			error = default(ZError);
 			message = null;
 
-			do
-			{ // breakable, don't continue
+			// receiving scope
+			// STREAM: get 2 frames, identity and body
+			ZMessage incoming = null;
+			if (!ReceiveMsg(sock, 2, ref incoming, out error))
+			{
+				return false;
+			}
 
-				// receiving scope
-				// STREAM: get 2 frames, identity and body
-				ZMessage incoming = null;
-				if (!ReceiveMsg(sock, 2, ref incoming, out error))
+			// will have to receive more?
+			// always more = ReceiveMore;
+
+			// sending scope
+			// DEALER: forward
+			using (incoming)
+			{
+				if (-1 == incoming[1].ReadByte())
 				{
+					return true; // Ignore the Empty one
+				}
+
+				// Prepend empty delimiter between Identity frame and Data frame
+				incoming.Insert(1, ZFrame.Create(0));
+
+				// Prepend Z_LAST_ENDPOINT
+				// incoming.Insert(2, ZFrame.Create(sock.LastEndpoint));
+
+				while (!BackendSocket.SendMessage(incoming, ZSocketFlags.DontWait, out error))
+				{
+					if (error == ZError.EAGAIN)
+					{
+						error = default(ZError);
+						Thread.Sleep(1);
+
+						continue;
+					}
+
 					return false;
 				}
 
-				// will have to receive more?
-				// always more = ReceiveMore;
-
-				// sending scope
-				// DEALER: forward
-				using (incoming)
-				{
-					if (-1 == incoming[1].ReadByte())
-					{
-						break; // Ignore the Empty one
-					}
-
-					// Prepend empty delimiter between Identity frame and Data frame
-					incoming.Insert(1, ZFrame.Create(0));
-
-					// Prepend Z_LAST_ENDPOINT
-					// incoming.Insert(2, ZFrame.Create(sock.LastEndpoint));
-
-					while (!BackendSocket.SendMessage(incoming, ZSocketFlags.DontWait, out error))
-					{
-						if (error == ZError.EAGAIN)
-						{
-							error = default(ZError);
-							Thread.Sleep(1);
-
-							continue;
-						}
-
-						return false;
-					}
-
-					incoming.Dismiss();
-				}
-
-			} while (false); // (result && more);
+				incoming.Dismiss();
+			}
 
 			return true;
 		}
