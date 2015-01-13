@@ -668,81 +668,50 @@ namespace ZeroMQ
 		{
 			error = default(ZError);
 			message = null;
-			bool result = false;
+			// bool result = false;
 			bool more = false;
 
 			using (var msg = ZFrame.CreateEmpty())
 			{
 				do
 				{
-
-					// receiving scope
+					while (-1 == zmq.msg_recv(msg.Ptr, this.SocketPtr, (int)ZSocketFlags.DontWait))
 					{
-						while (!(result = (-1 != zmq.msg_recv(msg.Ptr, this.SocketPtr, (int)ZSocketFlags.DontWait))))
+						error = ZError.GetLastErr();
+
+						if (error == ZError.EINTR)
 						{
-							error = ZError.GetLastErr();
-
-							if (error == ZError.EINTR)
-							{
-								error = null;
-								continue;
-							}
-							if (error == ZError.EAGAIN)
-							{
-								error = null;
-								Thread.Sleep(1);
-
-								continue;
-							}
-
-							break;
+							error = null;
+							continue;
 						}
-						if (!result)
-						{
-							break;
-						}
+
+						return false;
 					}
 
 					// will have to receive more?
 					more = ReceiveMore;
 
 					// sending scope
+					while (-1 != zmq.msg_send(msg.Ptr, destination.SocketPtr, more ? (int)(ZSocketFlags.More | ZSocketFlags.DontWait) : (int)ZSocketFlags.DontWait))
 					{
-						while (!(result = (-1 != zmq.msg_send(msg.Ptr, destination.SocketPtr, more ? (int)(ZSocketFlags.More | ZSocketFlags.DontWait) : (int)ZSocketFlags.DontWait))))
-						{
-							error = ZError.GetLastErr();
+						error = ZError.GetLastErr();
 
-							if (error == ZError.EINTR)
-							{
-								error = null;
-								continue;
-							}
-							if (error == ZError.EAGAIN)
-							{
-								error = null;
-								Thread.Sleep(1);
-
-								continue;
-							}
-
-							break;
-						}
-						if (result)
+						if (error == ZError.EINTR)
 						{
-							// msg.Dismiss();
+							error = null;
+							continue;
 						}
-						else
-						{
-							break;
-						}
+
+						return false;
 					}
+					
+					// msg.Dismiss
 
-				} while (result && more);
+				} while (more);
 
 			} // using (msg) -> Dispose
 
-
-			return result;
+			return true;
 		}
 
 		private bool GetOption(ZSocketOption option, IntPtr optionValue, ref int optionLength)
