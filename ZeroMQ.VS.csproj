@@ -48,15 +48,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Devices\ZDevice.cs" />
-    <Compile Include="Devices\DeviceMode.cs" />
-    <Compile Include="Devices\DeviceRunner.cs" />
-    <Compile Include="Devices\DeviceSocketSetup.cs" />
-    <Compile Include="Devices\IZDevice.cs" />
+    <Compile Include="ZThread.cs" />
+    <Compile Include="Devices\ZDeviceSocketSetup.cs" />
+    <Compile Include="IZThread.cs" />
     <Compile Include="Devices\PubSubDevice.cs" />
     <Compile Include="Devices\PushPullDevice.cs" />
     <Compile Include="Devices\RouterDealerDevice.cs" />
     <Compile Include="Devices\StreamDealerDevice.cs" />
-    <Compile Include="Devices\ThreadedDeviceRunner.cs" />
     <Compile Include="lib\DispoIntPtr.cs" />
     <Compile Include="lib\DispoIntPtr.Ansi.cs" />
     <Compile Include="lib\Platform.cs" />

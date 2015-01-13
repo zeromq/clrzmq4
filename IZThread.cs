@@ -1,26 +1,26 @@
-namespace ZeroMQ.Devices
+namespace ZeroMQ
 {
 	using System;
+	using System.Threading;
 
 	/// <summary>
 	/// Represents a ZeroMQ device, which connects a set of frontend sockets to a set of backend sockets.
 	/// </summary>
-	public interface IZDevice : IDisposable
+	public interface IZThread : IDisposable
 	{
 		/// <summary>
 		/// Gets a value indicating whether the device loop is running.
 		/// </summary>
-		bool IsRunning { get; }
+		bool IsCancellationRequested { get; }
 
 		/// <summary>
 		/// Start the device.
 		/// </summary>
-		void Start();
+		IZThread Start(CancellationTokenSource cancellor);
 
-		/// <summary>
-		/// Blocks the calling thread until the device terminates.
-		/// </summary>
 		void Join();
+
+		bool Join(int ms);
 
 		/// <summary>
 		/// Blocks the calling thread until the device terminates or the specified time elapses.
@@ -37,11 +37,11 @@ namespace ZeroMQ.Devices
 		/// <summary>
 		/// Stop the device in such a way that it can be restarted.
 		/// </summary>
-		void Stop();
+		IZThread Stop();
 
 		/// <summary>
 		/// Stop the device and safely terminate the underlying sockets.
 		/// </summary>
-		void Close();
+		IZThread Close();
 	}
 }

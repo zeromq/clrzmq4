@@ -8,7 +8,7 @@
 	/// <summary>
 	/// Defines a fluent interface for configuring device sockets.
 	/// </summary>
-	public class DeviceSocketSetup
+	public class ZDeviceSocketSetup
 	{
 		private readonly ZSocket _socket;
 		private readonly List<Action<ZSocket>> _socketInitializers;
@@ -17,7 +17,7 @@
 
 		private bool _isConfigured;
 
-		internal DeviceSocketSetup(ZSocket socket)
+		internal ZDeviceSocketSetup(ZSocket socket)
 		{
 			if (socket == null)
 			{
@@ -34,8 +34,8 @@
 		/// Configure the socket to bind to a given endpoint. See <see cref="ZSocket.Bind"/> for details.
 		/// </summary>
 		/// <param name="endpoint">A string representing the endpoint to which the socket will bind.</param>
-		/// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
-		public DeviceSocketSetup Bind(string endpoint)
+		/// <returns>The current <see cref="ZDeviceSocketSetup"/> object.</returns>
+		public ZDeviceSocketSetup Bind(string endpoint)
 		{
 			if (endpoint == null)
 			{
@@ -51,8 +51,8 @@
 		/// Configure the socket to connect to a given endpoint. See <see cref="ZSocket.Connect"/> for details.
 		/// </summary>
 		/// <param name="endpoint">A string representing the endpoint to which the socket will connect.</param>
-		/// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
-		public DeviceSocketSetup Connect(string endpoint)
+		/// <returns>The current <see cref="ZDeviceSocketSetup"/> object.</returns>
+		public ZDeviceSocketSetup Connect(string endpoint)
 		{
 			if (endpoint == null)
 			{
@@ -69,8 +69,8 @@
 		/// </summary>
 		/// <param name="property">The <see cref="ZSocket"/> property to set.</param>
 		/// <param name="value">The int value to assign.</param>
-		/// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
-		public DeviceSocketSetup SetSocketOption(Expression<Func<ZSocket, int>> property, int value)
+		/// <returns>The current <see cref="ZDeviceSocketSetup"/> object.</returns>
+		public ZDeviceSocketSetup SetSocketOption(Expression<Func<ZSocket, int>> property, int value)
 		{
 			return SetSocketOption<int>(property, value);
 		}
@@ -80,8 +80,8 @@
 		/// </summary>
 		/// <param name="property">The <see cref="ZSocket"/> property to set.</param>
 		/// <param name="value">The long value to assign.</param>
-		/// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
-		public DeviceSocketSetup SetSocketOption(Expression<Func<ZSocket, long>> property, long value)
+		/// <returns>The current <see cref="ZDeviceSocketSetup"/> object.</returns>
+		public ZDeviceSocketSetup SetSocketOption(Expression<Func<ZSocket, long>> property, long value)
 		{
 			return SetSocketOption<long>(property, value);
 		}
@@ -91,8 +91,8 @@
 		/// </summary>
 		/// <param name="property">The <see cref="ZSocket"/> property to set.</param>
 		/// <param name="value">The ulong value to assign.</param>
-		/// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
-		public DeviceSocketSetup SetSocketOption(Expression<Func<ZSocket, ulong>> property, ulong value)
+		/// <returns>The current <see cref="ZDeviceSocketSetup"/> object.</returns>
+		public ZDeviceSocketSetup SetSocketOption(Expression<Func<ZSocket, ulong>> property, ulong value)
 		{
 			return SetSocketOption<ulong>(property, value);
 		}
@@ -102,8 +102,8 @@
 		/// </summary>
 		/// <param name="property">The <see cref="ZSocket"/> property to set.</param>
 		/// <param name="value">The byte array value to assign.</param>
-		/// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
-		public DeviceSocketSetup SetSocketOption(Expression<Func<ZSocket, byte[]>> property, byte[] value)
+		/// <returns>The current <see cref="ZDeviceSocketSetup"/> object.</returns>
+		public ZDeviceSocketSetup SetSocketOption(Expression<Func<ZSocket, byte[]>> property, byte[] value)
 		{
 			return SetSocketOption<byte[]>(property, value);
 		}
@@ -113,8 +113,8 @@
 		/// </summary>
 		/// <param name="property">The <see cref="ZSocket"/> property to set.</param>
 		/// <param name="value">The <see cref="TimeSpan"/> value to assign.</param>
-		/// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
-		public DeviceSocketSetup SetSocketOption(Expression<Func<ZSocket, TimeSpan>> property, TimeSpan value)
+		/// <returns>The current <see cref="ZDeviceSocketSetup"/> object.</returns>
+		public ZDeviceSocketSetup SetSocketOption(Expression<Func<ZSocket, TimeSpan>> property, TimeSpan value)
 		{
 			return SetSocketOption<TimeSpan>(property, value);
 		}
@@ -125,8 +125,8 @@
 		/// Configure the socket to subscribe to a specific prefix. See <see cref="ZSocket.Subscribe"/> for details.
 		/// </summary>
 		/// <param name="prefix">A byte array containing the prefix to which the socket will subscribe.</param>
-		/// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
-		public DeviceSocketSetup Subscribe(byte[] prefix)
+		/// <returns>The current <see cref="ZDeviceSocketSetup"/> object.</returns>
+		public ZDeviceSocketSetup Subscribe(byte[] prefix)
 		{
 			_subscription = prefix;
 			return this;
@@ -135,14 +135,14 @@
 		/// <summary>
 		/// Configure the socket to subscribe to all incoming messages. See <see cref="ZSocket.SubscribeAll"/> for details.
 		/// </summary>
-		/// <returns>The current <see cref="DeviceSocketSetup"/> object.</returns>
-		public DeviceSocketSetup SubscribeAll()
+		/// <returns>The current <see cref="ZDeviceSocketSetup"/> object.</returns>
+		public ZDeviceSocketSetup SubscribeAll()
 		{
 			_subscription = new byte[2] { 0x01, 0x00 };
 			return this;
 		}
 
-		internal DeviceSocketSetup AddSocketInitializer(Action<ZSocket> setupMethod)
+		internal ZDeviceSocketSetup AddSocketInitializer(Action<ZSocket> setupMethod)
 		{
 			_socketInitializers.Add(setupMethod);
 
@@ -220,7 +220,7 @@
 			}
 		}
 
-		private DeviceSocketSetup SetSocketOption<T>(Expression<Func<ZSocket, T>> property, T value)
+		private ZDeviceSocketSetup SetSocketOption<T>(Expression<Func<ZSocket, T>> property, T value)
 		{
 			PropertyInfo propertyInfo;
 
