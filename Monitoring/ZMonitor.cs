@@ -207,6 +207,10 @@ namespace ZeroMQ.Monitoring
 
 		internal void OnMonitor(ZMonitorEventData data)
 		{
+			if (_eventHandler.ContainsKey(ZMonitorEvents.AllEvents))
+			{
+				_eventHandler[ZMonitorEvents.AllEvents](data);
+			}
 			if (_eventHandler.ContainsKey(data.Event))
 			{
 				_eventHandler[data.Event](data);
