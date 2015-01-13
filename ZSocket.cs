@@ -353,8 +353,18 @@ namespace ZeroMQ
 
 		public ZMessage ReceiveMessage()
 		{
+			return ReceiveMessage(ZSocketFlags.None);
+		}
+
+		public ZMessage ReceiveMessage(out ZError error)
+		{
+			return ReceiveMessage(ZSocketFlags.None, out error);
+		}
+
+		public ZMessage ReceiveMessage(ZSocketFlags flags)
+		{
 			ZError error;
-			ZMessage message = ReceiveMessage(out error);
+			ZMessage message = ReceiveMessage(flags, out error);
 			if (error != ZError.None)
 			{
 				throw new ZException(error);
@@ -362,14 +372,14 @@ namespace ZeroMQ
 			return message;
 		}
 
-		public ZMessage ReceiveMessage(out ZError error)
+		public ZMessage ReceiveMessage(ZSocketFlags flags, out ZError error)
 		{
 			var message = new ZMessage();
-			if (!ReceiveMessage(ZSocketFlags.None, ref message, out error))
+			if (!ReceiveMessage(flags, ref message, out error))
 			{
 				return default(ZMessage);
 			}
-				
+
 			return message;
 		}
 
