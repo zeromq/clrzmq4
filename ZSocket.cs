@@ -458,7 +458,7 @@ namespace ZeroMQ
 		{
 			List<ZFrame> frames;
 			
-			while (!ReceiveFrames(ref framesToReceive, out frames, flags, out error)) {
+			if (!ReceiveFrames(ref framesToReceive, out frames, flags, out error)) {
 
 				if (error == ZError.EAGAIN && ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait))
 				{
@@ -489,21 +489,12 @@ namespace ZeroMQ
 						error = default(ZError);
 						continue;
 					}
-					if (error == ZError.EAGAIN)
+					if (error == ZError.EAGAIN && ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait))
 					{
-						if ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait)
-						{
-							return false;
-						}
-
-						error = default(ZError);
-						Thread.Sleep(1);
-
-						continue;
+						return false;
 					}
 
 					frame.Dispose();
-
 					return false;
 				}
 
