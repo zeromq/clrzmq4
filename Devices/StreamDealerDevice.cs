@@ -72,14 +72,6 @@
 
 				while (!BackendSocket.SendMessage(incoming, ZSocketFlags.DontWait, out error))
 				{
-					if (error == ZError.EAGAIN)
-					{
-						error = default(ZError);
-						Thread.Sleep(1);
-
-						continue;
-					}
-
 					return false;
 				}
 
@@ -104,13 +96,6 @@
 					if (error == ZError.EINTR)
 					{
 						error = default(ZError);
-						continue;
-					}
-					if (error == ZError.EAGAIN)
-					{
-						error = default(ZError);
-						Thread.Sleep(1);
-
 						continue;
 					}
 
@@ -143,16 +128,8 @@
 			// receiving scope
 			// DEALER: normal movemsg
 			ZMessage incoming = null;
-			while (!sock.ReceiveMessage(ZSocketFlags.DontWait, ref incoming, out error))
+			if (!sock.ReceiveMessage(ZSocketFlags.DontWait, ref incoming, out error))
 			{
-				if (error == ZError.EAGAIN)
-				{
-					error = ZError.None;
-					Thread.Sleep(1);
-
-					continue;
-				}
-
 				return false;
 			}
 
@@ -199,13 +176,13 @@
 						error = ZError.None;
 						continue;
 					}
-					if (error == ZError.EAGAIN)
+					/* if (error == ZError.EAGAIN)
 					{
 						error = ZError.None;
 						Thread.Sleep(1);
 
 						continue;
-					}
+					} */
 
 					return false;
 				}
