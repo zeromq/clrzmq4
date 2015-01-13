@@ -35,6 +35,7 @@ namespace ZeroMQ.Monitoring
 			_endpoint = endpoint;
 			_eventHandler = new Dictionary<ZMonitorEvents, Action<ZMonitorEventData>>
 			{
+				{ ZMonitorEvents.AllEvents, data => InvokeEvent(AllEvents, () => new ZMonitorEventArgs(this, data)) },
 				{ ZMonitorEvents.Connected, data => InvokeEvent(Connected, () => new ZMonitorFileDescriptorEventArgs(this, data)) },
 				{ ZMonitorEvents.ConnectDelayed, data => InvokeEvent(ConnectDelayed, () => new ZMonitorEventArgs(this, data)) },
 				{ ZMonitorEvents.ConnectRetried, data => InvokeEvent(ConnectRetried, () => new ZMonitorIntervalEventArgs(this, data)) },
@@ -75,6 +76,8 @@ namespace ZeroMQ.Monitoring
 
 			return new ZMonitor(context, socket, endpoint);
 		}
+
+		public event EventHandler<ZMonitorEventArgs> AllEvents;
 
 		/// <summary>
 		/// Occurs when a new connection is established.

@@ -64,9 +64,8 @@ namespace ZeroMQ.Monitoring
 		Stopped = 1024,
 
 		/// <summary>
-		/// A bitwise combination of all <see cref="ZMonitorEvents"/> values.
+		/// Any <see cref="ZMonitorEvents"/> event, maybe readable from EventValue.
 		/// </summary>
-		AllEvents = Connected | ConnectDelayed | ConnectRetried | Listening | BindFailed |
-					Accepted | AcceptFailed | Closed | CloseFailed | Disconnected | Stopped
+		AllEvents = 0xFFFF
 	}
 }
