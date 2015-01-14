@@ -86,7 +86,6 @@
     <Compile Include="ZSymbol.cs" />
     <Compile Include="ZPoll.cs" />
     <Compile Include="ZPollItem.cs" />
-    <Compile Include="IZThread.cs" />
     <Compile Include="ZThread.cs" />
     <Compile Include="Devices\ZDeviceSocketSetup.cs" />
   </ItemGroup>
