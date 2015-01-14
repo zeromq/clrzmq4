@@ -12,12 +12,12 @@ namespace ZeroMQ.Monitoring
 	/// <summary>
 	/// Monitors state change events on another socket within the same context.
 	/// </summary>
-	public class ZMonitor
+	public class ZMonitor : ZThread
 	{
 		/// <summary>
 		/// The polling interval in milliseconds.
 		/// </summary>
-		private const int PollingIntervalMsec = 500;
+		public static readonly TimeSpan PollingInterval = TimeSpan.FromMilliseconds(64);
 
 		private ZSocket _socket;
 
@@ -25,11 +25,8 @@ namespace ZeroMQ.Monitoring
 
 		private readonly Dictionary<ZMonitorEvents, Action<ZMonitorEventData>> _eventHandler;
 
-		private volatile bool _isRunning;
-
-		private bool _disposed;
-
 		protected ZMonitor(ZContext context, ZSocket socket, string endpoint)
+			: base()
 		{
 			_socket = socket;
 			_endpoint = endpoint;
@@ -148,35 +145,23 @@ namespace ZeroMQ.Monitoring
 			get { return _endpoint; }
 		}
 
-		/// <summary>
-		/// Gets a value indicating whether the monitor loop is running.
-		/// </summary>
-		public bool IsRunning
-		{
-			get { return _isRunning; }
-			private set { _isRunning = value; }
-		}
-
 		// private static readonly int sizeof_MonitorEventData = Marshal.SizeOf(typeof(ZMonitorEventData));
 
 		/// <summary>
 		/// Begins monitoring for state changes, raising the appropriate events as they arrive.
 		/// </summary>
 		/// <remarks>NOTE: This is a blocking method and should be run from another thread.</remarks>
-		public void Run(CancellationToken cancellus)
+		protected override void Run()
 		{
-			IsRunning = true;
-
-			var poller = ZPollItem.CreateReceiver(_socket);
-
 			_socket.Connect(_endpoint);
 
 			ZError error;
 			ZMessage incoming;
+			var poller = ZPollItem.CreateReceiver(_socket);
 
-			while (IsRunning && !cancellus.IsCancellationRequested)
+			while (!_cancellor.IsCancellationRequested)
 			{
-				if (!poller.PollIn(out incoming, out error, TimeSpan.FromMilliseconds(64)))
+				if (!poller.PollIn(out incoming, out error, PollingInterval))
 				{
 					if (error == ZError.EAGAIN)
 					{
@@ -186,8 +171,7 @@ namespace ZeroMQ.Monitoring
 						continue;
 					}
 
-					IsRunning = false;
-					return;
+					throw new ZException(error);
 				}
 
 				var eventValue = new ZMonitorEventData();
@@ -206,7 +190,7 @@ namespace ZeroMQ.Monitoring
 				OnMonitor(eventValue);
 			}
 
-			if (!_socket.Disconnect(_endpoint, out error)) { }
+			if (!_socket.Disconnect(_endpoint, out error)) { } // ignore errors
 		}
 
 		internal void OnMonitor(ZMonitorEventData data)
@@ -221,23 +205,16 @@ namespace ZeroMQ.Monitoring
 			}
 		}
 
-		public void Stop()
-		{
-			IsRunning = false;
-		}
-
 		/// <summary>
 		/// Releases the unmanaged resources used by the <see cref="ZMonitor"/>, and optionally disposes of the managed resources.
 		/// </summary>
 		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-		protected virtual void Dispose(bool disposing)
+		protected override void Dispose(bool disposing)
 		{
 			if (!_disposed)
 			{
 				if (disposing)
 				{
-					Stop();
-
 					if (_socket != null)
 					{
 						_socket.Dispose();
@@ -245,7 +222,7 @@ namespace ZeroMQ.Monitoring
 					}
 				}
 			}
-			_disposed = true;
+			base.Dispose(disposing);
 		}
 
 		private void InvokeEvent<T>(EventHandler<T> handler, Func<T> createEventArgs) where T : EventArgs

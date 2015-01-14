@@ -50,7 +50,6 @@
     <Compile Include="Devices\ZDevice.cs" />
     <Compile Include="ZThread.cs" />
     <Compile Include="Devices\ZDeviceSocketSetup.cs" />
-    <Compile Include="IZThread.cs" />
     <Compile Include="Devices\PubSubDevice.cs" />
     <Compile Include="Devices\PushPullDevice.cs" />
     <Compile Include="Devices\RouterDealerDevice.cs" />

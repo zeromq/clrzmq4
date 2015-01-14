@@ -4,8 +4,28 @@
 	using System.Threading;
 	using System.Collections.Generic;
 
-	public abstract class ZThread : IZThread
+	public abstract class ZThread
 	{
+		public class DefaultZThread : ZThread
+		{
+			protected Action _action;
+
+			internal DefaultZThread(Action action)
+			{
+				_action = action;
+			}
+
+			protected override void Run()
+			{
+				_action();
+			}
+		}
+
+		public static ZThread Create(Action action)
+		{
+			return new DefaultZThread(action);
+		}
+
 		protected CancellationTokenSource _cancellor;
 
 		protected Thread _thread;
@@ -34,11 +54,17 @@
 			get { return _cancellor.IsCancellationRequested; }
 		}
 
+		public virtual ZThread Start()
+		{
+			var cancellor = new CancellationTokenSource();
+			return Start(cancellor);
+		}
+
 		/// <summary>
 		/// Start the device in the current thread.
 		/// </summary>
 		/// <exception cref="ObjectDisposedException">The <see cref="ZThread"/> has already been disposed.</exception>
-		public virtual IZThread Start(CancellationTokenSource cancellor)
+		public virtual ZThread Start(CancellationTokenSource cancellor)
 		{
 			EnsureNotDisposed();
 
@@ -93,7 +119,7 @@
 		/// <summary>
 		/// Stop the device in such a way that it can be restarted.
 		/// </summary>
-		public virtual IZThread Stop()
+		public virtual ZThread Stop()
 		{
 			EnsureNotDisposed();
 
@@ -105,7 +131,7 @@
 		/// <summary>
 		/// Stop the device and safely terminate the underlying sockets.
 		/// </summary>
-		public virtual IZThread Close()
+		public virtual void Close()
 		{
 			EnsureNotDisposed();
 
@@ -113,8 +139,6 @@
 			{
 				_thread.Abort();
 			}
-
-			return this;
 		}
 
 		/// <summary>
@@ -141,11 +165,7 @@
 
 			if (disposing)
 			{
-				if (_cancellor != null && !_cancellor.IsCancellationRequested)
-				{
-					_thread.Abort();
-					_cancellor = null;
-				}
+				Close();
 			}
 
 			_disposed = true;
