@@ -99,30 +99,30 @@
 	-->
   <Target Name="AfterBuild" />
   <ItemGroup>
-    <Content Include="amd64\libsodium.dll">
+    <None Include="amd64\libsodium.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="i386\libsodium.dll">
+    </None>
+    <None Include="i386\libsodium.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="i386\libzmq.dll">
+    </None>
+    <None Include="i386\libzmq.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="amd64\libsodium.so">
+    </None>
+    <None Include="amd64\libsodium.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="i386\libsodium.so">
+    </None>
+    <None Include="i386\libsodium.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="i386\libzmq.so">
+    </None>
+    <None Include="i386\libzmq.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="amd64\libzmq.dll">
+    </None>
+    <None Include="amd64\libzmq.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="amd64\libzmq.so">
+    </None>
+    <None Include="amd64\libzmq.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
     <None Include="ZeroMQ.snk" />
   </ItemGroup>
 </Project>
