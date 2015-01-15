@@ -208,37 +208,13 @@ namespace ZeroMQ
 			get { return _framePtr != null && _framePtr != IntPtr.Zero; }
 		}
 
-		public override bool CanRead
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool CanRead { get { return true; } }
 
-		public override bool CanSeek
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool CanSeek { get { return true; } }
 
-		public override bool CanTimeout
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool CanTimeout { get { return false; } }
 
-		public override bool CanWrite
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool CanWrite { get { return true; } }
 
 		private void EnsureCapacity()
 		{
@@ -315,7 +291,7 @@ namespace ZeroMQ
 			return pos;
 		}
 
-		unsafe public override int Read(byte[] buffer, int offset, int count)
+		public override int Read(byte[] buffer, int offset, int count)
 		{
 			int remaining = Math.Min(count, Math.Max(0, (int)(Length - Position)));
 			if (remaining <= 0)
@@ -563,6 +539,42 @@ namespace ZeroMQ
 			}
 		}
 
+		public override void Flush()
+		{
+			throw new NotSupportedException();
+		}
+
+		public override void Close()
+		{
+			if (_framePtr == null)
+				return;
+
+			if (_framePtr.Ptr == IntPtr.Zero)
+			{
+				_framePtr = null;
+				return;
+			}
+
+			while (-1 == zmq.msg_close(_framePtr))
+			{
+				var error = ZError.GetLastErr();
+
+				if (error == ZError.EINTR)
+				{
+					continue;
+				}
+				if (error == ZError.EFAULT)
+				{
+					// Ignore: Invalid message.
+					break;
+				}
+				throw new ZException(error, "zmq_msg_close");
+			}
+
+			// Go unallocating the HGlobal
+			Dismiss();
+		}
+
 		public void ZeroCopyTo(ZFrame other)
 		{
 
@@ -606,40 +618,62 @@ namespace ZeroMQ
 			Close();
 		}
 
-		public override void Flush()
+		public int GetOption(int property)
 		{
-			throw new NotSupportedException();
+			ZError error;
+			int result;
+			if (-1 == (result = GetOption(property, out error)))
+			{
+				throw new ZException(error);
+			}
+			return result;
 		}
 
-		public override void Close()
+		public int GetOption(int property, out ZError error)
 		{
-			if (_framePtr == null)
-				return;
+			error = ZError.None;
 
-			if (_framePtr.Ptr == IntPtr.Zero)
+			int result;
+			if (-1 == (result = zmq.msg_get(this._framePtr, property)))
 			{
-				_framePtr = null;
-				return;
+				error = ZError.GetLastErr();
+				return -1;
 			}
+			return result;
+		}
 
-			while (-1 == zmq.msg_close(_framePtr))
+		public string GetOption(string property)
+		{
+			ZError error;
+			string result;
+			if (null == (result = GetOption(property, out error))) {
+				if (error != ZError.None)
+				{
+					throw new ZException(error);
+				}
+			}
+			return result;
+		}
+
+		public string GetOption(string property, out ZError error)
+		{
+			error = ZError.None;
+
+			string result = null;
+			using (var propertyPtr = DispoIntPtr.AllocString(property))
 			{
-				var error = ZError.GetLastErr();
-
-				if (error == ZError.EINTR)
+				IntPtr resultPtr;
+				if (IntPtr.Zero == (resultPtr = zmq.msg_gets(this._framePtr, propertyPtr)))
 				{
-					continue;
+					error = ZError.GetLastErr();
+					return null;
 				}
-				if (error == ZError.EFAULT)
+				else
 				{
-					// Ignore: Invalid message.
-					break;
+					result = Marshal.PtrToStringAnsi(resultPtr);
 				}
-				throw new ZException(error, "zmq_msg_close");
 			}
-
-			// Go unallocating the HGlobal
-			Dismiss();
+			return result;
 		}
 	}
 }

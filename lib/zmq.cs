@@ -15,8 +15,6 @@
 
 		// private static CharSet LibraryCharSet = CharSet.Ansi;
 
-		public static readonly Version Version;
-
 		// From zmq.h (v3):
 		// typedef struct {unsigned char _ [32];} zmq_msg_t;
 		private static readonly int sizeof_zmq_msg_t_v3 = 32 * Marshal.SizeOf(typeof(byte));
@@ -27,14 +25,9 @@
 
 		public static readonly int sizeof_zmq_msg_t = sizeof_zmq_msg_t_v4;
 
-		// public static long PollTimeoutRatio;
-
 		static zmq()
 		{
-			try
-			{
-				NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName);
-			}
+			try { NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName); } 
 			catch (System.IO.FileNotFoundException) { }
 
 			NativeLib = Platform.LoadUnmanagedLibrary(LibraryName);
@@ -49,10 +42,10 @@
 			if (major >= 4)
 			{
 				// Current Version 4
-				// Use default delegate settings from field initializers
-				// "Compatability" is done by "disabling" old methods, 
-				// or "redirecting" to new methods
-				// so the developer is forced to work against the latest API */
+
+				// Use default delegate settings from field initializers.
+				// "Compatability" is done by "disabling" old methods, or "redirecting" to new methods,
+				// so the developer is forced to work against the latest API
 
 			}
 			else // if (major >= 3)
@@ -70,12 +63,12 @@
 			{
 				return new NotSupportedException(
 					string.Format(
-						"Libzmq version not supported. Required version {0}",
+						"libzmq version not supported. Required version {0}",
 						requiredVersion));
 			}
 			return new NotSupportedException(
 				string.Format(
-					"{0}: Libzmq version not supported. Required version {1}",
+					"{0}: libzmq version not supported. Required version {1}",
 					methodName,
 					requiredVersion));
 		}
@@ -84,6 +77,8 @@
 		private static extern void zmq_version(out int major, out int minor, out int patch);
 		public delegate void zmq_version_delegate(out int major, out int minor, out int patch);
 		public static readonly zmq_version_delegate version = zmq_version;
+
+		public static readonly Version Version;
 
 		/* Deprecated. Use zmq_ctx_new instead.
 		[DllImport(LibraryName, EntryPoint = "zmq_init", CallingConvention = CallingConvention.Cdecl)]
@@ -141,32 +136,10 @@
 		public delegate Int32 zmq_msg_init_data_delegate(IntPtr msg, IntPtr data, Int32 size, FreeMessageDataDelegate ffn, IntPtr hint);
 		public static readonly zmq_msg_init_data_delegate msg_init_data = zmq_msg_init_data;
 
-		[DllImport(LibraryName, EntryPoint = "zmq_send", CallingConvention = CallingConvention.Cdecl)]
-		private static extern Int32 zmq_send(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
-		public delegate Int32 zmq_send_delegate(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
-		public static readonly zmq_send_delegate send = zmq_send;
-
-		// [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-		// private static extern Int32 zmq_send_const(IntPtr socket, IntPtr buf, Int32 size, Int32 flags);
-		// private static extern Int32 zmq_send_const(IntPtr socket, byte[] buf, Int32 size, Int32 flags);
-
-		[DllImport(LibraryName, EntryPoint = "zmq_recv", CallingConvention = CallingConvention.Cdecl)]
-		private static extern Int32 zmq_recv(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
-		public delegate Int32 zmq_recv_delegate(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
-		public static readonly zmq_recv_delegate recv = zmq_recv;
-
-		/* Deprecated. Use zmq_msg_send instead.
-		[DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Int32 zmq_sendmsg(IntPtr msg, IntPtr socket, Int32 flags); /**/
-
 		[DllImport(LibraryName, EntryPoint = "zmq_msg_send", CallingConvention = CallingConvention.Cdecl)]
 		private static extern Int32 zmq_msg_send(IntPtr msg, IntPtr socket, Int32 flags);
 		public delegate Int32 zmq_msg_send_delegate(IntPtr msg, IntPtr socket, Int32 flags);
 		public static readonly zmq_msg_send_delegate msg_send = zmq_msg_send;
-
-		/* Deprecated. Use zmq_msg_recv instead.
-		[DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Int32 zmq_recvmsg(IntPtr msg, IntPtr socket, Int32 flags); /**/
 
 		[DllImport(LibraryName, EntryPoint = "zmq_msg_recv", CallingConvention = CallingConvention.Cdecl)]
 		private static extern Int32 zmq_msg_recv(IntPtr msg, IntPtr socket, Int32 flags);
@@ -194,8 +167,6 @@
 		public static readonly zmq_msg_more_delegate msg_more = zmq_msg_more;
 
 		[DllImport(LibraryName, EntryPoint = "zmq_msg_gets", CallingConvention = CallingConvention.Cdecl)]
-		// private static extern string zmq_msg_gets(IntPtr msg, string property);
-		// private static extern IntPtr zmq_msg_gets(IntPtr msg, string property);
 		private static extern IntPtr zmq_msg_gets(IntPtr msg, IntPtr property);
 		public delegate IntPtr zmq_msg_gets_delegate(IntPtr msg, IntPtr property);
 		public static readonly zmq_msg_gets_delegate msg_gets = zmq_msg_gets;
@@ -265,20 +236,23 @@
 		[DllImport(LibraryName, EntryPoint = "zmq_poll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern Int32 zmq_poll(void* items, Int32 numItems, long timeout);
 		// private static extern Int32 zmq_poll(IntPtr items, Int32 numItems, long timeout);
-		// private static extern Int32 zmq_poll([In, Out] PollItem[] items, Int32 numItems, long timeout);
 		public delegate Int32 zmq_poll_delegate(void* items, Int32 numItems, long timeout);
 		public static readonly zmq_poll_delegate poll = zmq_poll;
 
 
-		/* [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Int32 zmq_device(int context, IntPtr frontend, IntPtr backend);
-		public delegate Int32 zmq_device_delegate(int context, IntPtr frontend, IntPtr backend);
-		[Obsolete("Deprecated in v3 and removed in v4. Try using zmq_proxy instead.")]
-		public static readonly zmq_device_delegate device = ThrowDeviceNotImplemented;
+		[DllImport(LibraryName, EntryPoint = "zmq_send", CallingConvention = CallingConvention.Cdecl)]
+		private static extern Int32 zmq_send(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
+		public delegate Int32 zmq_send_delegate(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
+		public static readonly zmq_send_delegate send = zmq_send;
 
-		internal static Int32 ThrowDeviceNotImplemented(int context, IntPtr frontend, IntPtr backend) {
-			throw new NotSupportedException("zmq_device obsolete");
-		} */
+		// [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+		// private static extern Int32 zmq_send_const(IntPtr socket, IntPtr buf, Int32 size, Int32 flags);
+
+		[DllImport(LibraryName, EntryPoint = "zmq_recv", CallingConvention = CallingConvention.Cdecl)]
+		private static extern Int32 zmq_recv(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
+		public delegate Int32 zmq_recv_delegate(IntPtr socket, IntPtr buf, Int32 len, Int32 flags);
+		public static readonly zmq_recv_delegate recv = zmq_recv;
+
 
 		[DllImport(LibraryName, EntryPoint = "zmq_has", CallingConvention = CallingConvention.Cdecl)]
 		private static extern Int32 zmq_has(IntPtr capability);
@@ -304,7 +278,6 @@
 
 		[DllImport(LibraryName, EntryPoint = "zmq_curve_keypair", CallingConvention = CallingConvention.Cdecl)]
 		private static extern Int32 zmq_curve_keypair(IntPtr z85_public_key, IntPtr z85_secret_key);
-		//? private static extern Int32 zmq_curve_keypair(byte[41] z85_public_key, byte[41] z85_secret_key);
 		public delegate Int32 zmq_curve_keypair_delegate(IntPtr z85_public_key, IntPtr z85_secret_key);
 		public static readonly zmq_curve_keypair_delegate curve_keypair = zmq_curve_keypair;
 

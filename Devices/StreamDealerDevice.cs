@@ -52,6 +52,12 @@
 				return false;
 			}
 
+			string ip = incoming[0].GetOption("Address");
+			if (ip != null)
+			{
+				Console.WriteLine("Address: {0}", ip);
+			}
+
 			// will have to receive more?
 			// always more = ReceiveMore;
 

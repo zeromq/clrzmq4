@@ -2,7 +2,7 @@ namespace ZeroMQ.Monitoring
 {
 	using System;
 
-	public class ZMonitorEventData
+	public struct ZMonitorEventData
 	{
 		public ZMonitorEvents Event;
 
