@@ -52,13 +52,8 @@
 				return false;
 			}
 
-			string ip = incoming[0].GetOption("RemoteAddress");
-			if (ip != null)
-			{
-				Console.WriteLine("Address: {0}", ip);
-			}
+			// string ip = incoming[0].GetOption("RemoteAddress");
 
-			// will have to receive more?
 			// always more = ReceiveMore;
 
 			// sending scope
