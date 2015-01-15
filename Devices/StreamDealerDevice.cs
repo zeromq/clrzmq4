@@ -52,7 +52,7 @@
 				return false;
 			}
 
-			string ip = incoming[0].GetOption("Address");
+			string ip = incoming[0].GetOption("RemoteAddress");
 			if (ip != null)
 			{
 				Console.WriteLine("Address: {0}", ip);
