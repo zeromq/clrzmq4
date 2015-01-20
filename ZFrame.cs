@@ -138,19 +138,17 @@ namespace ZeroMQ
 			{
 				int byteCount = enc.GetByteCount(strP, charCount, false);
 
-				if (!createOnWrongLength)
-				{
-					if (this._position + byteCount > this.Length)
-					{
-						// fail if frame is too small
-						throw new InvalidOperationException();
-					}
-				}
-				else
+				if (createOnWrongLength)
 				{
 					this._framePtr = CreateNative(byteCount);
 					this._position = 0;
 					this._capacity = byteCount;
+				}
+
+				if (this._position + byteCount > this.Length)
+				{
+					// fail if frame is too small
+					throw new InvalidOperationException();
 				}
 
 				byteCount = enc.GetBytes(strP, charCount, (byte*)(this.DataPtr() + this._position), byteCount, true);
