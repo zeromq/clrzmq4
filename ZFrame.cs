@@ -398,18 +398,6 @@ namespace ZeroMQ
 			return BitConverter.ToUInt32(bytes, 0);
 		}
 
-		public virtual Single ReadSingle()
-		{
-			var bytes = new byte[4];
-			int len = Read(bytes, 0, 4);
-			if (len < 4)
-			{
-				return default(Single);
-			}
-
-			return BitConverter.ToSingle(bytes, 0);
-		}
-
 		public virtual Int64 ReadInt64()
 		{
 			var bytes = new byte[8];
@@ -432,18 +420,6 @@ namespace ZeroMQ
 			}
 
 			return BitConverter.ToUInt64(bytes, 0);
-		}
-
-		public virtual Double ReadDouble()
-		{
-			var bytes = new byte[8];
-			int len = Read(bytes, 0, 8);
-			if (len < 8)
-			{
-				return default(Double);
-			}
-
-			return BitConverter.ToDouble(bytes, 0);
 		}
 
 		public string ReadString()
@@ -477,7 +453,7 @@ namespace ZeroMQ
 			_position += count;
 		}
 
-		public override void WriteByte(byte value)
+		public virtual void Write(byte value)
 		{
 			if (Position + 1 > Length)
 			{
@@ -487,7 +463,12 @@ namespace ZeroMQ
 			++_position;
 		}
 
-		public void WriteInt16(Int16 value)
+		public override void WriteByte(byte value)
+		{
+			Write(value);
+		}
+
+		public void Write(Int16 value)
 		{
 			if (Position + 2 > Length)
 			{
@@ -497,17 +478,17 @@ namespace ZeroMQ
 			_position += 2;
 		}
 
-		public void WriteUInt16(UInt16 value)
+		public void Write(UInt16 value)
 		{
-			WriteInt16((Int16)value);
+			Write((Int16)value);
 		}
 
-		public void WriteChar(Char value)
+		public void Write(Char value)
 		{
-			WriteInt16((Int16)value);
+			Write((Int16)value);
 		}
 
-		public void WriteInt32(Int32 value)
+		public void Write(Int32 value)
 		{
 			if (Position + 4 > Length)
 			{
@@ -517,17 +498,12 @@ namespace ZeroMQ
 			_position += 4;
 		}
 
-		public void WriteUInt32(UInt32 value)
+		public void Write(UInt32 value)
 		{
-			WriteInt32((Int32)value);
+			Write((Int32)value);
 		}
 
-		public void WriteSingle(Single value)
-		{
-			WriteInt32((Int32)value);
-		}
-
-		public void WriteInt64(Int64 value)
+		public void Write(Int64 value)
 		{
 			if (Position + 8 > Length)
 			{
@@ -537,22 +513,17 @@ namespace ZeroMQ
 			_position += 8;
 		}
 
-		public void WriteUInt64(UInt64 value)
+		public void Write(UInt64 value)
 		{
-			WriteInt64((Int64)value);
+			Write((Int64)value);
 		}
 
-		public void WriteDouble(Double value)
+		public void Write(string str)
 		{
-			WriteInt64((Int64)value);
+			Write(str, ZContext.Encoding);
 		}
 
-		public void WriteString(string str)
-		{
-			WriteString(str, ZContext.Encoding);
-		}
-
-		public void WriteString(string str, Encoding encoding)
+		public void Write(string str, Encoding encoding)
 		{
 			WriteStringNative(str, encoding, false);
 		}
@@ -593,7 +564,7 @@ namespace ZeroMQ
 			Dismiss();
 		}
 
-		public void ZeroCopyTo(ZFrame other)
+		public void CopyZeroTo(ZFrame other)
 		{
 
 			// zmq.msg_copy(dest, src)
@@ -613,7 +584,7 @@ namespace ZeroMQ
 			}
 		}
 
-		public void ZeroMoveTo(ZFrame other)
+		public void MoveZeroTo(ZFrame other)
 		{
 
 			// zmq.msg_copy(dest, src)
