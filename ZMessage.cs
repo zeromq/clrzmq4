@@ -67,6 +67,23 @@ namespace ZeroMQ
 			_frames = null;
 		}
 
+		public void ReplaceAt(int index, ZFrame replacement)
+		{
+			ReplaceAt(index, replacement, true);
+		}
+
+		public ZFrame ReplaceAt(int index, ZFrame replacement, bool dismiss) 
+		{
+			ZFrame old = _frames[index];
+			_frames[index] = replacement;
+			if (dismiss)
+			{
+				old.Dismiss();
+				return null;
+			}
+			return old;
+		}
+
 		#region IList implementation
 
 		public int IndexOf(ZFrame item)
