@@ -78,7 +78,7 @@ namespace ZeroMQ.Test
 						// Let the response be "Hello " + input
 						response.Add(new ZFrame("Hello " + request[0].ReadString()));
 						
-						socket.SendMessage(response);
+						socket.Send(response);
 					}
 				}
 				
@@ -98,7 +98,7 @@ namespace ZeroMQ.Test
 				{
 					request.Add(new ZFrame(name));
 					
-					socket.SendMessage(request);
+					socket.Send(request);
 				}
 
 				using (ZMessage response = socket.ReceiveMessage())
