@@ -114,7 +114,11 @@ namespace ZeroMQ
 			{
 
 				ZError recvWorkerE;
-				if (item.ReceiveMessage(item.Socket, out message, out recvWorkerE))
+				if (item.ReceiveMessage == null)
+				{
+					// throw?
+				}
+				else if (item.ReceiveMessage(item.Socket, out message, out recvWorkerE))
 				{
 					// what to do?
 
@@ -130,7 +134,11 @@ namespace ZeroMQ
 			{
 
 				ZError sendWorkerE;
-				if (item.SendMessage(item.Socket, message, out sendWorkerE))
+				if (item.SendMessage == null)
+				{
+					// throw?
+				}
+				else if (item.SendMessage(item.Socket, message, out sendWorkerE))
 				{
 					// what to do?
 
@@ -165,9 +173,9 @@ namespace ZeroMQ
 
 					return true;
 				}
-
-				error = ZError.EAGAIN;
 			}
+
+			error = ZError.EAGAIN;
 			return false;
 		}
 
