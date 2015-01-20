@@ -27,7 +27,7 @@ namespace ZeroMQ
 
 		public static bool DefaultSendMessage(ZSocket socket, ZMessage message, out ZError error)
 		{
-			return socket.SendMessage(message, out error);
+			return socket.Send(message, out error);
 		}
 
 		protected ZPollItem(ZSocket socket, ZPoll events)

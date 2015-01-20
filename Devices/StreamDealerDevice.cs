@@ -71,7 +71,7 @@
 				// Prepend Z_LAST_ENDPOINT
 				// incoming.Insert(2, ZFrame.Create(sock.LastEndpoint));
 
-				while (!BackendSocket.SendMessage(incoming, ZSocketFlags.DontWait, out error))
+				while (!BackendSocket.Send(incoming, ZSocketFlags.DontWait, out error))
 				{
 					return false;
 				}

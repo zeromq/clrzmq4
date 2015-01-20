@@ -158,7 +158,7 @@ namespace ZeroMQ
 			}
 		}
 
-		unsafe public string ReadStringNative(int byteCount, Encoding encoding)
+		unsafe internal string ReadStringNative(int byteCount, Encoding encoding)
 		{
 			int remaining = Math.Min(byteCount, Math.Max(0, (int)(this.Length - this._position)));
 			if (remaining <= 0)

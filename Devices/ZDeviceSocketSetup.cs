@@ -190,7 +190,7 @@
 
 				var subscription = new ZFrame(_subscription);
 
-				if (!_socket.SendFrame(subscription, out error))
+				if (!_socket.Send(subscription, out error))
 				{
 					throw new ZException(error);
 				}
