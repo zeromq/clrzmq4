@@ -246,7 +246,7 @@ namespace ZeroMQ
 				}
 
 				// Maybe ZmqStdError.EFAULT
-				throw new ZException(error);
+				// throw new ZException(error);
 			}
 		}
 
