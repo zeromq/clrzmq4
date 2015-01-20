@@ -72,13 +72,12 @@ namespace ZeroMQ
 			ReplaceAt(index, replacement, true);
 		}
 
-		public ZFrame ReplaceAt(int index, ZFrame replacement, bool dismiss) 
+		public ZFrame ReplaceAt(int index, ZFrame replacement, bool dispose) 
 		{
 			ZFrame old = _frames[index];
 			_frames[index] = replacement;
-			if (dismiss)
+			if (dispose)
 			{
-				old.Dismiss();
 				old.Dispose();
 				return null;
 			}
