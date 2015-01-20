@@ -13,8 +13,6 @@
 
 		private static readonly UnmanagedLibrary NativeLib;
 
-		// private static CharSet LibraryCharSet = CharSet.Ansi;
-
 		// From zmq.h (v3):
 		// typedef struct {unsigned char _ [32];} zmq_msg_t;
 		private static readonly int sizeof_zmq_msg_t_v3 = 32 * Marshal.SizeOf(typeof(byte));
