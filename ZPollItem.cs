@@ -18,7 +18,7 @@ namespace ZeroMQ
 		public static bool DefaultReceiveMessage(ZSocket socket, out ZMessage message, out ZError error)
 		{
 			message = null;
-			return socket.ReceiveMessage(ZSocketFlags.DontWait, ref message, out error);
+			return socket.ReceiveMessage(ZSocketFlags.None, ref message, out error);
 		}
 
 		public delegate bool SendDelegate(ZSocket socket, ZMessage message, out ZError error);
@@ -27,7 +27,7 @@ namespace ZeroMQ
 
 		public static bool DefaultSendMessage(ZSocket socket, ZMessage message, out ZError error)
 		{
-			return socket.SendMessage(message, ZSocketFlags.DontWait, out error);
+			return socket.SendMessage(message, out error);
 		}
 
 		protected ZPollItem(ZSocket socket, ZPoll events)

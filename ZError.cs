@@ -17,6 +17,11 @@ namespace ZeroMQ
 
 		public static class Code
 		{
+			static Code() 
+			{
+				Platform.SetupPlatformImplementation(typeof(Code));
+			}
+
 			private const int HAUSNUMERO = 156384712;
 
 			public static readonly int
@@ -55,8 +60,6 @@ namespace ZeroMQ
 				EDOM = 33,
 				ERANGE = 34, // 34
 
-				// EADDRINUSE_LINUX = 98,
-
 				ENOTSUP = HAUSNUMERO + 1,
 				EPROTONOSUPPORT = HAUSNUMERO + 2,
 				ENOBUFS = HAUSNUMERO + 3,
@@ -83,6 +86,12 @@ namespace ZeroMQ
 				ETERM = HAUSNUMERO + 53,
 				EMTHREAD // = HAUSNUMERO + 54
 			;
+
+			public static class Posix
+			{
+				public static readonly int
+					EADDRINUSE = 98;
+			}
 		}
 
 		public static ZError GetLastErr()
@@ -167,8 +176,6 @@ namespace ZeroMQ
 			EPIPE,
 			EDOM,
 			ERANGE, // 34
-
-			EADDRINUSE_LINUX,
 
 			ENOTSUP,
 			EPROTONOSUPPORT,

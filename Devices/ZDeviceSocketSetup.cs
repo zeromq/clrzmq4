@@ -188,8 +188,7 @@
 			{
 				// _socket.Subscribe(_subscription);
 
-				var subscription = ZFrame.Create(_subscription.Length);
-				subscription.Write(_subscription, 0, _subscription.Length);
+				var subscription = new ZFrame(_subscription);
 
 				if (!_socket.SendFrame(subscription, out error))
 				{

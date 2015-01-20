@@ -66,7 +66,7 @@
 				}
 
 				// Prepend empty delimiter between Identity frame and Data frame
-				incoming.Insert(1, ZFrame.Create(0));
+				incoming.Insert(1, new ZFrame());
 
 				// Prepend Z_LAST_ENDPOINT
 				// incoming.Insert(2, ZFrame.Create(sock.LastEndpoint));
@@ -147,12 +147,11 @@
 			}
 
 			// Append Identity frame
-			var identity0 = ZFrame.Create(identityBytes.Length);
-			identity0.Write(identityBytes, 0, identityBytes.Length);
+			var identity0 = new ZFrame(identityBytes);
 			incoming.Add(identity0);
 
 			// Append STREAM's empty delimiter frame
-			incoming.Add(ZFrame.Create(0));
+			incoming.Add(new ZFrame());
 
 			if (!SendMsg(FrontendSocket, incoming, out error))
 			{

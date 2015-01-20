@@ -17,37 +17,66 @@ namespace ZeroMQ
 	{
 		public const int DefaultFrameSize = 2048;
 
+		private DispoIntPtr _framePtr;
+
+		private int _capacity;
+
+		private int _position;
+
+		// private ZeroMQ.lib.FreeMessageDelegate _freePtr;
+
+		public ZFrame(byte[] buffer)
+			: this (buffer.Length)
+		{
+			this.Write(buffer, 0, buffer.Length);
+		}
+
+		public ZFrame(byte[] buffer, int offset, int count)
+			: this(count)
+		{
+			this.Write(buffer, offset, count);
+		}
+
+		public ZFrame(string str)
+			: this(str, ZContext.Encoding)
+		{ }
+
+		public ZFrame(string str, Encoding encoding)
+		{
+			WriteStringNative(str, encoding, true);
+		}
+
 		public static ZFrame CreateEmpty()
 		{
-			DispoIntPtr msg = CreateEmptyNative();
-			return new ZFrame(msg, -1);
+			return new ZFrame(-1);
 		}
 
-		public static ZFrame Create(int size)
+		public ZFrame()
+			: this(0)
+		{ }
+
+		public ZFrame(int size)
 		{
-			return new ZFrame(CreateNative(size), size);
+			if (size < -1)
+			{
+				throw new ArgumentOutOfRangeException("size");
+			}
+			if (size == -1)
+			{
+				_framePtr = CreateEmptyNative();
+			}
+			else
+			{
+				_framePtr = CreateNative(size);
+			}
+
+			_capacity = size;
+			_position = 0;
 		}
 
-		public static ZFrame Create(byte[] buffer, int offset, int count)
+		/* protected ZmqFrame(IntPtr data, int size)
 		{
-			var frame = new ZFrame(CreateNative(count), count);
-			frame.Write(buffer, offset, count);
-			return frame;
-		}
-
-		public static ZFrame Create(string str)
-		{
-			return Create(str, ZContext.Encoding);
-		}
-
-		public static ZFrame Create(string str, Encoding encoding)
-		{
-			return WriteStringNative(null, str, encoding);
-		}
-
-		/* public static ZmqFrame Create(IntPtr data, int size)
-		{
-			return new ZmqFrame (Alloc(data, size), size);
+			 Alloc(data, size), size);
 		} */
 
 		internal static DispoIntPtr CreateEmptyNative()
@@ -95,45 +124,49 @@ namespace ZeroMQ
 			return msg;
 		}
 
-		unsafe internal static ZFrame WriteStringNative(ZFrame frame, string str, Encoding encoding)
+		unsafe internal void WriteStringNative(string str, Encoding encoding, bool createOnWrongLength)
 		{
+			if (string.IsNullOrEmpty(str))
+			{
+				return;
+			}
+
 			int charCount = str.Length;
 			Encoder enc = encoding.GetEncoder();
-			bool create = (frame == null);
 
 			fixed (char* strP = str)
 			{
 				int byteCount = enc.GetByteCount(strP, charCount, false);
 
-				if (create)
+				if (!createOnWrongLength)
 				{
-					// return a new one
-					frame = ZFrame.Create(byteCount);
-				}
-				else
-				{
-					if (frame._position + byteCount > frame.Length)
+					if (this._position + byteCount > this.Length)
 					{
 						// fail if frame is too small
 						throw new InvalidOperationException();
 					}
 				}
+				else
+				{
+					this._framePtr = CreateNative(byteCount);
+					this._position = 0;
+					this._capacity = byteCount;
+				}
 
-				byteCount = enc.GetBytes(strP, charCount, (byte*)(frame.DataPtr() + frame._position), byteCount, true);
-				frame._position += byteCount;
+				byteCount = enc.GetBytes(strP, charCount, (byte*)(this.DataPtr() + this._position), byteCount, true);
+				this._position += byteCount;
 			}
-			return frame;
 		}
 
-		unsafe public static string ReadStringNative(ZFrame frame, int byteCount, Encoding encoding)
+		unsafe public string ReadStringNative(int byteCount, Encoding encoding)
 		{
-			int remaining = Math.Min(byteCount, Math.Max(0, (int)(frame.Length - frame._position)));
+			int remaining = Math.Min(byteCount, Math.Max(0, (int)(this.Length - this._position)));
 			if (remaining <= 0)
 			{
 				return null;
 			}
 
-			var bytes = (byte*)(frame.DataPtr() + frame._position);
+			var bytes = (byte*)(this.DataPtr() + this._position);
 
 			Decoder dec = encoding.GetDecoder();
 			int charCount = dec.GetCharCount(bytes, remaining, false);
@@ -169,18 +202,6 @@ namespace ZeroMQ
 			return msg;
 		} */
 
-		private DispoIntPtr _framePtr;
-		private int _capacity;
-		private int _position;
-		// private LibZmq.FreeMessageDataDelegate _freePtrr;
-
-		private ZFrame(DispoIntPtr msgPtr, int capacity)
-		{
-			_framePtr = msgPtr;
-			_capacity = capacity;
-			_position = 0;
-		}
-
 		protected override void Dispose(bool disposing)
 		{
 			if (_framePtr != null)
@@ -205,7 +226,7 @@ namespace ZeroMQ
 
 		public bool IsDismissed
 		{
-			get { return _framePtr != null && _framePtr != IntPtr.Zero; }
+			get { return _framePtr != null || _framePtr != IntPtr.Zero; }
 		}
 
 		public override bool CanRead { get { return true; } }
@@ -294,7 +315,10 @@ namespace ZeroMQ
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			int remaining = Math.Min(count, Math.Max(0, (int)(Length - Position)));
-			if (remaining <= 0)
+			if (remaining == 0) {
+				return 0;
+			}
+			if (remaining < 0)
 			{
 				return -1;
 			}
@@ -440,7 +464,7 @@ namespace ZeroMQ
 		public string ReadString(int length, Encoding encoding)
 		{
 			int byteCount = encoding.GetMaxByteCount(length);
-			return ReadStringNative(this, byteCount, encoding);
+			return ReadStringNative(byteCount, encoding);
 		}
 
 		public override void Write(byte[] buffer, int offset, int count)
@@ -530,13 +554,7 @@ namespace ZeroMQ
 
 		public void WriteString(string str, Encoding encoding)
 		{
-			ZFrame me = WriteStringNative(this, str, encoding);
-
-			if (!object.ReferenceEquals(this, me))
-			{
-				// shouldn't have returned a new one
-				throw new InvalidOperationException();
-			}
+			WriteStringNative(str, encoding, false);
 		}
 
 		public override void Flush()

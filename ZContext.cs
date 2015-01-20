@@ -68,9 +68,14 @@ namespace ZeroMQ
 		{
 			error = ZError.None;
 
-			if (-1 == zmq.proxy(frontend.SocketPtr, backend.SocketPtr, capture == null ? IntPtr.Zero : capture.SocketPtr))
+			while (-1 == zmq.proxy(frontend.SocketPtr, backend.SocketPtr, capture == null ? IntPtr.Zero : capture.SocketPtr))
 			{
 				error = ZError.GetLastErr();
+				if (error == ZError.EINTR)
+				{
+					error = ZError.None;
+					continue;
+				}
 				return false;
 			}
 			return true;
@@ -99,9 +104,14 @@ namespace ZeroMQ
 		{
 			error = ZError.None;
 
-			if (-1 == zmq.proxy_steerable(frontend.SocketPtr, backend.SocketPtr, capture == null ? IntPtr.Zero : capture.SocketPtr, control == null ? IntPtr.Zero : control.SocketPtr))
+			while (-1 == zmq.proxy_steerable(frontend.SocketPtr, backend.SocketPtr, capture == null ? IntPtr.Zero : capture.SocketPtr, control == null ? IntPtr.Zero : control.SocketPtr))
 			{
 				error = ZError.GetLastErr();
+				if (error == ZError.EINTR)
+				{
+					error = ZError.None;
+					continue;
+				}
 				return false;
 			}
 			return true;
@@ -232,13 +242,11 @@ namespace ZeroMQ
 				if (error == ZError.EINTR)
 				{
 					error = ZError.None;
-					Thread.Sleep(1);
-
 					continue;
 				}
 
 				// Maybe ZmqStdError.EFAULT
-				break;
+				throw new ZException(error);
 			}
 		}
 
