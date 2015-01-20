@@ -1033,6 +1033,11 @@ namespace ZeroMQ
 			SetOption(ZSocketOption.SUBSCRIBE, prefix);
 		}
 
+		public virtual void Subscribe(string prefix)
+		{
+			SetOption(ZSocketOption.SUBSCRIBE, ZContext.Encoding.GetBytes(prefix));
+		}
+
 		/// <summary>
 		/// Unsubscribe from all messages.
 		/// </summary>
@@ -1173,6 +1178,12 @@ namespace ZeroMQ
 		{
 			get { return GetOptionBytes(ZSocketOption.IDENTITY); }
 			set { SetOption(ZSocketOption.IDENTITY, value); }
+		}
+
+		public string IdentityString
+		{
+			get { return ZContext.Encoding.GetString(Identity); }
+			set { Identity = ZContext.Encoding.GetBytes(value); }
 		}
 
 		public bool Immediate
