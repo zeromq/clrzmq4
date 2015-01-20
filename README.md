@@ -3,7 +3,10 @@
 
 Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 3+.
 
-There are also examples in [clrzmq-test](http://github.com/metadings/clrzmq-test).
+Links:
+
+- ZeroMQ - The Guide [Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
+- ZeroMQ C# Projects [clrzmq-test](http://github.com/metadings/clrzmq-test)
 
 **Simple REQ connect to REP bind**
 
