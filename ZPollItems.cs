@@ -173,9 +173,9 @@ namespace ZeroMQ
 
 					return true;
 				}
-			}
 
-			error = ZError.EAGAIN;
+				error = ZError.EAGAIN;
+			}
 			return false;
 		}
 
