@@ -15,7 +15,9 @@ namespace ZeroMQ
 	/// </summary>
 	public class ZFrame : System.IO.Stream, IDisposable
 	{
-		public const int DefaultFrameSize = 2048;
+		public const int DefaultFrameSize = 4096;
+
+		public static readonly int MinimumFrameSize = zmq.sizeof_zmq_msg_t;
 
 		private DispoIntPtr _framePtr;
 
