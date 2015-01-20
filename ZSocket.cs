@@ -1066,6 +1066,11 @@ namespace ZeroMQ
 			SetOption(ZSocketOption.UNSUBSCRIBE, prefix);
 		}
 
+		public virtual void Unsubscribe(string prefix)
+		{
+			SetOption(ZSocketOption.UNSUBSCRIBE, ZContext.Encoding.GetBytes(prefix));
+		}
+
 		/// <summary>
 		/// Gets a value indicating whether the multi-part message currently being read has more message parts to follow.
 		/// </summary>
