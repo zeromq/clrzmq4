@@ -79,6 +79,7 @@ namespace ZeroMQ
 			if (dismiss)
 			{
 				old.Dismiss();
+				old.Dispose();
 				return null;
 			}
 			return old;
