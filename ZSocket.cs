@@ -383,6 +383,11 @@ namespace ZeroMQ
 			return message;
 		}
 
+		public bool ReceiveMessage(ref ZMessage message, out ZError error)
+		{
+			return ReceiveMessage(ZSocketFlags.None, ref message, out error);
+		}
+
 		public bool ReceiveMessage(ZSocketFlags flags, ref ZMessage message, out ZError error)
 		{
 			EnsureNotDisposed();
