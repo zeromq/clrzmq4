@@ -540,7 +540,7 @@ namespace ZeroMQ
 
 		public virtual bool Send(ZMessage msg, ZSocketFlags flags, out ZError error)
 		{
-			return Send(msg, flags, out error);
+			return Send((IEnumerable<ZFrame>)msg, flags, out error);
 		}
 
 		public virtual void Send(IEnumerable<ZFrame> frames)
