@@ -91,6 +91,11 @@ namespace ZeroMQ
 			return _frames.IndexOf(item);
 		}
 
+		public void Prepend(ZFrame item) 
+		{
+			Insert(0, item);
+		}
+
 		public void Insert(int index, ZFrame item)
 		{
 			_frames.Insert(index, item);
@@ -98,7 +103,38 @@ namespace ZeroMQ
 
 		public void RemoveAt(int index)
 		{
+			RemoveAt(index, true);
+		}
+
+		public ZFrame RemoveAt(int index, bool dispose)
+		{
+			ZFrame frame = _frames[index];
 			_frames.RemoveAt(index);
+
+			if (dispose)
+			{
+				frame.Dispose();
+				return null;
+			}
+			return frame;
+		}
+
+		public void Wrap(ZFrame frame) 
+		{
+			if (Count > 0 && _frames[0].Length > 0)
+			{
+				Insert(0, new ZFrame());
+			}
+			Insert(0, frame);
+		}
+
+		public ZFrame Unwrap() 
+		{
+			if (Count > 1 && this[1].Length == 0)
+			{
+				RemoveAt(1);
+			}
+			return RemoveAt(0, false);
 		}
 
 		public ZFrame this[int index]
@@ -117,6 +153,16 @@ namespace ZeroMQ
 
 		#region ICollection implementation
 
+		public void Append(ZFrame item)
+		{
+			Add(item);
+		}
+
+		public void AppendRange(IEnumerable<ZFrame> items)
+		{
+			AddRange(items);
+		}
+
 		public void Add(ZFrame item)
 		{
 			_frames.Add(item);
@@ -129,6 +175,10 @@ namespace ZeroMQ
 
 		public void Clear()
 		{
+			foreach (ZFrame frame in _frames)
+			{
+				frame.Dispose();
+			}
 			_frames.Clear();
 		}
 
@@ -144,7 +194,24 @@ namespace ZeroMQ
 
 		public bool Remove(ZFrame item)
 		{
-			return _frames.Remove(item);
+			if (null != Remove(item))
+			{
+				return false;
+			}
+			return true;
+		}
+
+		public ZFrame Remove(ZFrame item, bool dispose)
+		{
+			if (_frames.Remove(item))
+			{
+				if (dispose)
+				{
+					item.Dispose();
+					return null;
+				}
+			}
+			return item;
 		}
 
 		public int Count { get { return _frames.Count; } }

@@ -648,6 +648,11 @@ namespace ZeroMQ
 
 			error = default(ZError);
 
+			if (frame.IsDismissed)
+			{
+				throw new ObjectDisposedException("frame");
+			}
+
 			while (-1 == zmq.msg_send(frame.Ptr, _socketPtr, (int)flags))
 			{
 				error = ZError.GetLastErr();

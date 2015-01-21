@@ -226,7 +226,7 @@ namespace ZeroMQ
 
 		public bool IsDismissed
 		{
-			get { return _framePtr != null || _framePtr != IntPtr.Zero; }
+			get { return _framePtr == null || _framePtr == IntPtr.Zero; }
 		}
 
 		public override bool CanRead { get { return true; } }
