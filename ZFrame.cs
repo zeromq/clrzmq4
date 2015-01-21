@@ -28,13 +28,13 @@ namespace ZeroMQ
 		// private ZeroMQ.lib.FreeMessageDelegate _freePtr;
 
 		public ZFrame(byte[] buffer)
-			: this (buffer.Length)
+			: this (CreateNative(buffer.Length), buffer.Length)
 		{
 			this.Write(buffer, 0, buffer.Length);
 		}
 
 		public ZFrame(byte[] buffer, int offset, int count)
-			: this(count)
+			: this(CreateNative(count), count)
 		{
 			this.Write(buffer, offset, count);
 		}
@@ -48,30 +48,30 @@ namespace ZeroMQ
 			WriteStringNative(str, encoding, true);
 		}
 
-		public static ZFrame CreateEmpty()
-		{
-			return new ZFrame(-1);
+		public ZFrame()
+		{ 
+			_framePtr = CreateNative(0);
+			_capacity = 0;
+			_position = 0;
 		}
 
-		public ZFrame()
-			: this(0)
-		{ }
-
-		public ZFrame(int size)
+		public static ZFrame Create(int size) 
 		{
-			if (size < -1)
+			if (size < 0)
 			{
 				throw new ArgumentOutOfRangeException("size");
 			}
-			if (size == -1)
-			{
-				_framePtr = CreateEmptyNative();
-			}
-			else
-			{
-				_framePtr = CreateNative(size);
-			}
+			return new ZFrame(CreateNative(size), size);
+		}
 
+		public static ZFrame CreateEmpty()
+		{
+			return new ZFrame(CreateEmptyNative(), -1);
+		}
+
+		protected ZFrame(DispoIntPtr framePtr, int size)
+		{
+			_framePtr = framePtr;
 			_capacity = size;
 			_position = 0;
 		}
