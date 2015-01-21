@@ -194,7 +194,7 @@ namespace ZeroMQ
 
 		public bool Remove(ZFrame item)
 		{
-			if (null != Remove(item))
+			if (null != Remove(item, true))
 			{
 				return false;
 			}
