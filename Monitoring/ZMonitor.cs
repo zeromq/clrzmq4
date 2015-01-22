@@ -157,11 +157,11 @@ namespace ZeroMQ.Monitoring
 
 			ZError error;
 			ZMessage incoming;
-			var poller = ZPollItem.CreateReceiver(_socket);
+			var poller = ZPollItem.CreateReceiver();
 
 			while (!_cancellor.IsCancellationRequested)
 			{
-				if (!poller.PollIn(out incoming, out error, PollingInterval))
+				if (!_socket.PollIn(poller, out incoming, out error, PollingInterval))
 				{
 					if (error == ZError.EAGAIN)
 					{

@@ -12,8 +12,10 @@
 	{
 		public static class Posix
 		{
-
-			unsafe internal static bool PollMany(IEnumerable<ZPollItem> items, ZPoll pollEvents, out ZError error, TimeSpan? timeout = null)
+			unsafe internal static bool PollMany(
+				IEnumerable<ZSocket> sockets, 
+				IEnumerable<ZPollItem> items, ZPoll pollEvents, 
+				out ZError error, TimeSpan? timeout = null)
 			{
 				error = default(ZError);
 				bool result = false;
@@ -25,10 +27,11 @@
 
 				for (int i = 0; i < count; ++i)
 				{
+					ZSocket socket = sockets.ElementAt(i);
 					ZPollItem item = items.ElementAt(i);
 					zmq_pollitem_posix_t* native = natives + i;
 
-					native->SocketPtr = item.Socket.SocketPtr;
+					native->SocketPtr = socket.SocketPtr;
 					native->Events = (short)(item.Events & pollEvents);
 					native->ReadyEvents = (short)ZPoll.None;
 				}
@@ -58,6 +61,7 @@
 			}
 
 			unsafe internal static bool PollSingle(
+				ZSocket socket,
 				ZPollItem item, ZPoll pollEvents,
 				out ZError error, TimeSpan? timeout = null)
 			{
@@ -68,7 +72,7 @@
 				zmq_pollitem_posix_t* native = stackalloc zmq_pollitem_posix_t[1];
 				// fixed (zmq_pollitem_posix_t* native = managedArray) {
 
-				native->SocketPtr = item.Socket.SocketPtr;
+				native->SocketPtr = socket.SocketPtr;
 				native->Events = (short)(item.Events & pollEvents);
 				native->ReadyEvents = (short)ZPoll.None;
 

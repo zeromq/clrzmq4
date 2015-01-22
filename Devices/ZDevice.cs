@@ -104,9 +104,15 @@
 
 			Initialize();
 
+			var sockets = new ZSocket[]
+			{
+				FrontendSocket,
+				BackendSocket
+			};
+
 			var polls = new ZPollItem[] {
-				ZPollItem.Create(FrontendSocket, FrontendHandler),
-				ZPollItem.Create(BackendSocket, BackendHandler)
+				ZPollItem.Create(FrontendHandler),
+				ZPollItem.Create(BackendHandler)
 			};
 
 			/* ZPollItem[] polls;
@@ -152,7 +158,7 @@
 				while (!_cancellor.IsCancellationRequested)
 				{
 
-					if (!(isValid = ZPollItems.Poll(polls, ZPoll.In, ref lastMessageFrames, out error, PollingInterval)))
+					if (!(isValid = sockets.Poll(polls, ZPoll.In, ref lastMessageFrames, out error, PollingInterval)))
 					{
 
 						if (error == ZError.EAGAIN)

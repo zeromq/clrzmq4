@@ -12,7 +12,10 @@
 	{
 		public static class Win32
 		{
-			unsafe internal static bool PollMany(IEnumerable<ZPollItem> items, ZPoll pollEvents, out ZError error, TimeSpan? timeout = null)
+			unsafe internal static bool PollMany(
+				IEnumerable<ZSocket> sockets, 
+				IEnumerable<ZPollItem> items, ZPoll pollEvents, 
+				out ZError error, TimeSpan? timeout = null)
 			{
 				error = default(ZError);
 				bool result = false;
@@ -24,10 +27,11 @@
 
 				for (int i = 0; i < count; ++i)
 				{
+					ZSocket socket = sockets.ElementAt(i);
 					ZPollItem item = items.ElementAt(i);
 					zmq_pollitem_windows_t* native = natives + i;
 
-					native->SocketPtr = item.Socket.SocketPtr;
+					native->SocketPtr = socket.SocketPtr;
 					native->Events = (short)(item.Events & pollEvents);
 					native->ReadyEvents = (short)ZPoll.None;
 				}
@@ -57,7 +61,8 @@
 			}
 
 			unsafe internal static bool PollSingle(
-				ZPollItem item, ZPoll pollFirst,
+				ZSocket socket, 
+				ZPollItem item, ZPoll pollEvents,
 				out ZError error, TimeSpan? timeout = null)
 			{
 				error = default(ZError);
@@ -67,15 +72,16 @@
 				zmq_pollitem_windows_t* native = stackalloc zmq_pollitem_windows_t[1];
 				// fixed (zmq_pollitem_windows_t* native = managedArray) {
 
-				native->SocketPtr = item.Socket.SocketPtr;
-				native->Events = (short)item.Events;
+				native->SocketPtr = socket.SocketPtr;
+				native->Events = (short)(item.Events & pollEvents);
 				native->ReadyEvents = (short)ZPoll.None;
 
 				while (!(result = (-1 != zmq.poll(native, 1, timeoutMs))))
 				{
 					error = ZError.GetLastErr();
 
-					/* if (error == ZmqError.EINTR) {
+					/* if (error == ZmqError.EINTR) 
+					{
 						error = default(ZmqError);
 						continue;
 					} */
