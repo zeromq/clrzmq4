@@ -1180,16 +1180,21 @@ namespace ZeroMQ
 		}
 
 		/// <summary>
-		/// Gets or sets the identity of the current socket.
+		/// Gets or sets the Identity.
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
+		/// <value>Identity as byte[]</value>
 		public byte[] Identity
 		{
 			get { return GetOptionBytes(ZSocketOption.IDENTITY); }
 			set { SetOption(ZSocketOption.IDENTITY, value); }
 		}
 
+		/// <summary>
+		/// Gets or sets the Identity.
+		/// Note: The string contains chars like \0 (null terminator,
+		/// which are NOT printed (in Console.WriteLine)!
+		/// </summary>
+		/// <value>Identity as string</value>
 		public string IdentityString
 		{
 			get { return ZContext.Encoding.GetString(Identity); }

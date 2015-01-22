@@ -49,11 +49,12 @@ namespace ZeroMQ
 		}
 
 		public ZFrame()
-		{ 
-			_framePtr = CreateNative(0);
-			_capacity = 0;
-			_position = 0;
-		}
+			: this(CreateNative(0), 0)
+		{ }
+
+		/* protected ZFrame(IntPtr data, int size)
+			: this(Alloc(data, size), size)
+		{ } */
 
 		public static ZFrame Create(int size) 
 		{
@@ -75,11 +76,6 @@ namespace ZeroMQ
 			_capacity = size;
 			_position = 0;
 		}
-
-		/* protected ZmqFrame(IntPtr data, int size)
-		{
-			 Alloc(data, size), size);
-		} */
 
 		internal static DispoIntPtr CreateEmptyNative()
 		{

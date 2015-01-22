@@ -121,20 +121,20 @@ namespace ZeroMQ
 
 		public void Wrap(ZFrame frame) 
 		{
-			if (Count > 0 && _frames[0].Length > 0)
-			{
-				Insert(0, new ZFrame());
-			}
+			Insert(0, new ZFrame());
 			Insert(0, frame);
 		}
 
 		public ZFrame Unwrap() 
 		{
-			if (Count > 1 && this[1].Length == 0)
+			ZFrame frame = RemoveAt(0, false);
+
+			if (Count > 0 && this[0].Length == 0)
 			{
-				RemoveAt(1);
+				RemoveAt(0);
 			}
-			return RemoveAt(0, false);
+
+			return frame;
 		}
 
 		public ZFrame this[int index]
