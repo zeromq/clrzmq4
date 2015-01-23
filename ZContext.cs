@@ -233,9 +233,8 @@ namespace ZeroMQ
 		{
 			EnsureNotDisposed();
 
-			// int retry = 3;
 			ZError error;
-			while (/*--retry > -1 &&*/ -1 == zmq.ctx_term(_contextPtr))
+			while (-1 == zmq.ctx_term(_contextPtr))
 			{
 				error = ZError.GetLastErr();
 
@@ -245,7 +244,9 @@ namespace ZeroMQ
 					continue;
 				}
 
-				// Maybe ZmqStdError.EFAULT
+				// Maybe ZError.EFAULT
+
+				break;
 				// throw new ZException(error);
 			}
 		}
