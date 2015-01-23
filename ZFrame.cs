@@ -15,6 +15,27 @@ namespace ZeroMQ
 	/// </summary>
 	public class ZFrame : System.IO.Stream, IDisposable
 	{
+		public static ZFrame CopyFrom(ZFrame frame)
+		{
+			var copy = ZFrame.CreateEmpty();
+			frame.CopyZeroTo(copy);
+			return copy;
+		}
+
+		public static ZFrame Create(int size) 
+		{
+			if (size < 0)
+			{
+				throw new ArgumentOutOfRangeException("size");
+			}
+			return new ZFrame(CreateNative(size), size);
+		}
+
+		public static ZFrame CreateEmpty()
+		{
+			return new ZFrame(CreateEmptyNative(), -1);
+		}
+
 		public const int DefaultFrameSize = 4096;
 
 		public static readonly int MinimumFrameSize = zmq.sizeof_zmq_msg_t;
@@ -55,20 +76,6 @@ namespace ZeroMQ
 		/* protected ZFrame(IntPtr data, int size)
 			: this(Alloc(data, size), size)
 		{ } */
-
-		public static ZFrame Create(int size) 
-		{
-			if (size < 0)
-			{
-				throw new ArgumentOutOfRangeException("size");
-			}
-			return new ZFrame(CreateNative(size), size);
-		}
-
-		public static ZFrame CreateEmpty()
-		{
-			return new ZFrame(CreateEmptyNative(), -1);
-		}
 
 		protected ZFrame(DispoIntPtr framePtr, int size)
 		{
