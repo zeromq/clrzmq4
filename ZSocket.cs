@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using ZeroMQ.lib;
-using ZeroMQ.Monitoring;
 
 namespace ZeroMQ
 {
