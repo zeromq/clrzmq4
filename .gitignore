@@ -1,5 +1,6 @@
 bin/*
 obj/*
+*.user
 *.userprefs
 *.old*
 amd64/v*
