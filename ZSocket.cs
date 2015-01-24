@@ -492,10 +492,15 @@ namespace ZeroMQ
 
 			error = default(ZError);
 			frames = new List<ZFrame>();
+			flags |= ZSocketFlags.More;
 
 			do {
-
 				var frame = ZFrame.CreateEmpty();
+
+				if (framesToReceive == 1) 
+				{
+					flags &= ~ZSocketFlags.More;
+				}
 
 				while (-1 == zmq.msg_recv(frame.Ptr, _socketPtr, (int)flags))
 				{

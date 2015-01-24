@@ -117,9 +117,7 @@ namespace ZeroMQ
 			return true;
 		}
 
-		private readonly IntPtr _contextPtr;
-
-		private bool _disposed;
+		private IntPtr _contextPtr;
 
 		internal ZContext()
 		{
@@ -163,6 +161,8 @@ namespace ZeroMQ
 
 		public void SetOption(ZContextOption option, int optionValue)
 		{
+			EnsureNotDisposed();
+
 			int rc = zmq.ctx_set(_contextPtr, option.Number, optionValue);
 			if (rc == -1)
 			{
@@ -180,6 +180,8 @@ namespace ZeroMQ
 
 		public int GetOption(ZContextOption option)
 		{
+			EnsureNotDisposed();
+
 			int rc = zmq.ctx_get(_contextPtr, option.Number);
 			if (rc == -1)
 			{
@@ -231,7 +233,10 @@ namespace ZeroMQ
 		/// <exception cref="System.ObjectDisposedException">The <see cref="ZContext"/> has already been disposed.</exception>
 		public void Terminate()
 		{
-			EnsureNotDisposed();
+			if (_contextPtr == IntPtr.Zero)
+			{
+				return;
+			}
 
 			ZError error;
 			while (-1 == zmq.ctx_term(_contextPtr))
@@ -246,9 +251,12 @@ namespace ZeroMQ
 
 				// Maybe ZError.EFAULT
 
-				break;
+				// Do not throw new ZExceptions:
 				// throw new ZException(error);
+				break;
 			}
+
+			_contextPtr = IntPtr.Zero;
 		}
 
 		/// <summary>
@@ -266,17 +274,15 @@ namespace ZeroMQ
 		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!_disposed)
+			if (disposing)
 			{
 				Terminate();
 			}
-
-			_disposed = true;
 		}
 
 		private void EnsureNotDisposed()
 		{
-			if (_disposed)
+			if (_contextPtr == IntPtr.Zero)
 			{
 				throw new ObjectDisposedException(GetType().FullName);
 			}
