@@ -981,18 +981,13 @@ namespace ZeroMQ
 
 		public bool SetOption(ZSocketOption option, Int64 value)
 		{
-
-			bool result = false;
-
 			int optionLength = Marshal.SizeOf(typeof(Int64));
 			using (var optionValue = DispoIntPtr.Alloc(optionLength))
 			{
 				Marshal.WriteInt64(optionValue, value);
 
-				result = SetOption(option, optionValue.Ptr, optionLength);
+				return SetOption(option, optionValue.Ptr, optionLength);
 			}
-
-			return result;
 		}
 
 		public bool SetOption(ZSocketOption option, UInt64 value)
