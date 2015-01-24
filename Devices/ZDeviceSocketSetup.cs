@@ -171,30 +171,24 @@
 
 		internal void BindConnect()
 		{
-
-			ZError error;
-
 			foreach (string endpoint in _bindings)
 			{
-				_socket.Bind(endpoint, out error);
+				_socket.Bind(endpoint);
 			}
 
 			foreach (string endpoint in _connections)
 			{
-				_socket.Connect(endpoint, out error);
+				_socket.Connect(endpoint);
 			}
 
 			if (_subscription != null)
 			{
 				// _socket.Subscribe(_subscription);
 
-				var subscription = new ZFrame(_subscription);
-
-				if (!_socket.Send(subscription, out error))
+				using (var subscription = new ZFrame(_subscription))
 				{
-					throw new ZException(error);
+					_socket.Send(subscription);
 				}
-
 			}
 		}
 
