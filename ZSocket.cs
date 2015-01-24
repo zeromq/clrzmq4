@@ -10,8 +10,7 @@ using ZeroMQ.Monitoring;
 namespace ZeroMQ
 {
 	/// <summary>
-	/// Sends and receives messages across various transports to potentially multiple endpoints
-	/// using the ZMQ protocol.
+	/// Sends and receives messages, single frames and byte frames across ZeroMQ.
 	/// </summary>
 	public class ZSocket : IDisposable
 	{
@@ -66,12 +65,10 @@ namespace ZeroMQ
 			Dispose(false);
 		}
 
-		private bool _disposed;
-
 		public void Dispose()
 		{
-			Dispose(true);
 			GC.SuppressFinalize(this);
+			Dispose(true);
 		}
 
 		/// <summary>
@@ -80,24 +77,15 @@ namespace ZeroMQ
 		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!_disposed)
+			if (disposing)
 			{
 				Close();
 			}
-
-			_disposed = true;
 		}
 
 		/// <summary>
 		/// Close the current socket.
 		/// </summary>
-		/// <remarks>
-		/// Any outstanding messages physically received from the network but not yet received by the application
-		/// with Receive shall be discarded. The behaviour for discarding messages sent by the application
-		/// with Send but not yet physically transferred to the network depends on the value of
-		/// the <see cref="Linger"/> socket option.
-		/// </remarks>
-		/// <exception cref="ZmqSocketException">The underlying socket object is not valid.</exception>
 		public bool Close()
 		{
 			ZError error;
@@ -106,8 +94,6 @@ namespace ZeroMQ
 
 		public bool Close(out ZError error)
 		{
-			EnsureNotDisposed();
-
 			error = ZError.None;
 			if (_socketPtr == IntPtr.Zero) return true;
 
@@ -145,12 +131,9 @@ namespace ZeroMQ
 		}
 
 		/// <summary>
-		/// Create an endpoint for accepting connections and bind it to the current socket.
+		/// Bind the specified endpoint.
 		/// </summary>
 		/// <param name="endpoint">A string consisting of a transport and an address, formatted as <c><em>transport</em>://<em>address</em></c>.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="endpoint"/> is null.</exception>
-		/// <exception cref="ZmqSocketException">An error occurred binding the socket to an endpoint.</exception>
-		/// <exception cref="System.ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public bool Bind(string endpoint, out ZError error)
 		{
 			EnsureNotDisposed();
@@ -173,6 +156,10 @@ namespace ZeroMQ
 			return true;
 		}
 
+		/// <summary>
+		/// Unbind the specified endpoint.
+		/// </summary>
+		/// <param name="endpoint">A string consisting of a transport and an address, formatted as <c><em>transport</em>://<em>address</em></c>.</param>
 		public void Unbind(string endpoint)
 		{
 			ZError error;
@@ -183,12 +170,9 @@ namespace ZeroMQ
 		}
 
 		/// <summary>
-		/// Stop accepting connections for a previously bound endpoint on the current socket.
+		/// Unbind the specified endpoint.
 		/// </summary>
 		/// <param name="endpoint">A string consisting of a transport and an address, formatted as <c><em>transport</em>://<em>address</em></c>.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="endpoint"/> is null.</exception>
-		/// <exception cref="ZmqSocketException">An error occurred unbinding the socket to an endpoint.</exception>
-		/// <exception cref="System.ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public bool Unbind(string endpoint, out ZError error)
 		{
 			EnsureNotDisposed();
@@ -211,6 +195,10 @@ namespace ZeroMQ
 			return true;
 		}
 
+		/// <summary>
+		/// Connect the specified endpoint.
+		/// </summary>
+		/// <param name="endpoint">A string consisting of a transport and an address, formatted as <c><em>transport</em>://<em>address</em></c>.</param>
 		public void Connect(string endpoint)
 		{
 			ZError error;
@@ -221,12 +209,9 @@ namespace ZeroMQ
 		}
 
 		/// <summary>
-		/// Connect the current socket to the specified endpoint.
+		/// Connect the specified endpoint.
 		/// </summary>
 		/// <param name="endpoint">A string consisting of a transport and an address, formatted as <c><em>transport</em>://<em>address</em></c>.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="endpoint"/> is null.</exception>
-		/// <exception cref="ZmqSocketException">An error occurred connecting the socket to a remote endpoint.</exception>
-		/// <exception cref="System.ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public bool Connect(string endpoint, out ZError error)
 		{
 			EnsureNotDisposed();
@@ -249,6 +234,9 @@ namespace ZeroMQ
 			return true;
 		}
 
+		/// <summary>
+		/// Disconnect the specified endpoint.
+		/// </summary>
 		public void Disconnect(string endpoint)
 		{
 			ZError error;
@@ -259,12 +247,9 @@ namespace ZeroMQ
 		}
 
 		/// <summary>
-		/// Disconnect the current socket from a previously connected endpoint.
+		/// Disconnect the specified endpoint.
 		/// </summary>
 		/// <param name="endpoint">A string consisting of a transport and an address, formatted as <c><em>transport</em>://<em>address</em></c>.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="endpoint"/> is null.</exception>
-		/// <exception cref="ZmqSocketException">An error occurred disconnecting the socket from a remote endpoint.</exception>
-		/// <exception cref="System.ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public bool Disconnect(string endpoint, out ZError error)
 		{
 			EnsureNotDisposed();
@@ -1021,8 +1006,6 @@ namespace ZeroMQ
 		/// <remarks>
 		/// Only applies to <see cref="ZeroMQ.ZSocketType.SUB"/> and <see cref="ZeroMQ.ZSocketType.XSUB"/> sockets.
 		/// </remarks>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		/// <exception cref="NotSupportedException">The current socket type does not support subscriptions.</exception>
 		public void SubscribeAll()
 		{
 			Subscribe(new byte[0]);
@@ -1035,14 +1018,18 @@ namespace ZeroMQ
 		/// Only applies to <see cref="ZeroMQ.ZSocketType.SUB"/> and <see cref="ZeroMQ.ZSocketType.XSUB"/> sockets.
 		/// </remarks>
 		/// <param name="prefix">Prefix for subscribed messages.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="prefix"/> is null.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		/// <exception cref="NotSupportedException">The current socket type does not support subscriptions.</exception>
 		public virtual void Subscribe(byte[] prefix)
 		{
 			SetOption(ZSocketOption.SUBSCRIBE, prefix);
 		}
 
+		/// <summary>
+		/// Subscribe to messages that begin with a specified prefix.
+		/// </summary>
+		/// <remarks>
+		/// Only applies to <see cref="ZeroMQ.ZSocketType.SUB"/> and <see cref="ZeroMQ.ZSocketType.XSUB"/> sockets.
+		/// </remarks>
+		/// <param name="prefix">Prefix for subscribed messages.</param>
 		public virtual void Subscribe(string prefix)
 		{
 			SetOption(ZSocketOption.SUBSCRIBE, ZContext.Encoding.GetBytes(prefix));
@@ -1054,8 +1041,6 @@ namespace ZeroMQ
 		/// <remarks>
 		/// Only applies to <see cref="ZeroMQ.ZSocketType.SUB"/> and <see cref="ZeroMQ.ZSocketType.XSUB"/> sockets.
 		/// </remarks>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		/// <exception cref="NotSupportedException">The current socket type does not support subscriptions.</exception>
 		public void UnsubscribeAll()
 		{
 			Unsubscribe(new byte[0]);
@@ -1068,14 +1053,18 @@ namespace ZeroMQ
 		/// Only applies to <see cref="ZeroMQ.ZSocketType.SUB"/> and <see cref="ZeroMQ.ZSocketType.XSUB"/> sockets.
 		/// </remarks>
 		/// <param name="prefix">Prefix for subscribed messages.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="prefix"/> is null.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
-		/// <exception cref="NotSupportedException">The current socket type does not support subscriptions.</exception>
 		public virtual void Unsubscribe(byte[] prefix)
 		{
 			SetOption(ZSocketOption.UNSUBSCRIBE, prefix);
 		}
 
+		/// <summary>
+		/// Unsubscribe from messages that begin with a specified prefix.
+		/// </summary>
+		/// <remarks>
+		/// Only applies to <see cref="ZeroMQ.ZSocketType.SUB"/> and <see cref="ZeroMQ.ZSocketType.XSUB"/> sockets.
+		/// </remarks>
+		/// <param name="prefix">Prefix for subscribed messages.</param>
 		public virtual void Unsubscribe(string prefix)
 		{
 			SetOption(ZSocketOption.UNSUBSCRIBE, ZContext.Encoding.GetBytes(prefix));
@@ -1084,8 +1073,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets a value indicating whether the multi-part message currently being read has more message parts to follow.
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public bool ReceiveMore
 		{
 			get { return GetOptionInt32(ZSocketOption.RCVMORE) == 1; }
@@ -1099,8 +1086,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the I/O thread affinity for newly created connections on this socket.
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public ulong Affinity
 		{
 			get { return GetOptionUInt64(ZSocketOption.AFFINITY); }
@@ -1110,8 +1095,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the maximum length of the queue of outstanding peer connections. (Default = 100 connections).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public int Backlog
 		{
 			get { return GetOptionInt32(ZSocketOption.BACKLOG); }
@@ -1221,8 +1204,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the linger period for socket shutdown. (Default = <see cref="TimeSpan.MaxValue"/>, infinite).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public TimeSpan Linger
 		{
 			get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.LINGER)); }
@@ -1232,9 +1213,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the maximum size for inbound messages (bytes). (Default = -1, no limit).
 		/// </summary>
-		/// <exception cref="ZmqVersionException">This socket option was used in ZeroMQ 2.x or lower.</exception>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public long MaxMessageSize
 		{
 			get { return GetOptionInt64(ZSocketOption.MAX_MSG_SIZE); }
@@ -1244,9 +1222,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the time-to-live field in every multicast packet sent from this socket (network hops). (Default = 1 hop).
 		/// </summary>
-		/// <exception cref="ZmqVersionException">This socket option was used in ZeroMQ 2.x or lower.</exception>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public int MulticastHops
 		{
 			get { return GetOptionInt32(ZSocketOption.MULTICAST_HOPS); }
@@ -1280,8 +1255,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the maximum send or receive data rate for multicast transports (kbps). (Default = 100 kbps).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public int MulticastRate
 		{
 			get { return GetOptionInt32(ZSocketOption.RATE); }
@@ -1291,8 +1264,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the underlying kernel receive buffer size for the current socket (bytes). (Default = 0, OS default).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public int ReceiveBufferSize
 		{
 			get { return GetOptionInt32(ZSocketOption.RCVBUF); }
@@ -1302,8 +1273,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the high water mark for inbound messages (number of messages). (Default = 0, no limit).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public int ReceiveHighWatermark
 		{
 			get { return GetOptionInt32(ZSocketOption.RCVHWM); }
@@ -1313,9 +1282,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the timeout for receive operations. (Default = <see cref="TimeSpan.MaxValue"/>, infinite).
 		/// </summary>
-		/// <exception cref="ZmqVersionException">This socket option was used in ZeroMQ 2.x or lower.</exception>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public TimeSpan ReceiveTimeout
 		{
 			get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RCVTIMEO)); }
@@ -1325,8 +1291,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the initial reconnection interval. (Default = 100 milliseconds).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public TimeSpan ReconnectInterval
 		{
 			get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RECONNECT_IVL)); }
@@ -1336,8 +1300,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the maximum reconnection interval. (Default = 0, only use <see cref="ReconnectInterval"/>).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public TimeSpan ReconnectIntervalMax
 		{
 			get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RECONNECT_IVL_MAX)); }
@@ -1347,8 +1309,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the recovery interval for multicast transports. (Default = 10 seconds).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public TimeSpan MulticastRecoveryInterval
 		{
 			get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.RECOVERY_IVL)); }
@@ -1388,8 +1348,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the underlying kernel transmit buffer size for the current socket (bytes). (Default = 0, OS default).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public int SendBufferSize
 		{
 			get { return GetOptionInt32(ZSocketOption.SNDBUF); }
@@ -1399,8 +1357,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the high water mark for outbound messages (number of messages). (Default = 0, no limit).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public int SendHighWatermark
 		{
 			get { return GetOptionInt32(ZSocketOption.SNDHWM); }
@@ -1410,8 +1366,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the timeout for send operations. (Default = <see cref="TimeSpan.MaxValue"/>, infinite).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public TimeSpan SendTimeout
 		{
 			get { return TimeSpan.FromMilliseconds(GetOptionInt32(ZSocketOption.SNDTIMEO)); }
@@ -1421,8 +1375,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the override value for the SO_KEEPALIVE TCP socket option. (where supported by OS). (Default = -1, OS default).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public TcpKeepaliveBehaviour TcpKeepAlive
 		{
 			get { return (TcpKeepaliveBehaviour)GetOptionInt32(ZSocketOption.TCP_KEEPALIVE); }
@@ -1433,8 +1385,6 @@ namespace ZeroMQ
 		/// Gets or sets the override value for the 'TCP_KEEPCNT' socket option (where supported by OS). (Default = -1, OS default).
 		/// The default value of '-1' means to skip any overrides and leave it to OS default.
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public int TcpKeepAliveCount
 		{
 			get { return GetOptionInt32(ZSocketOption.TCP_KEEPALIVE_CNT); }
@@ -1444,8 +1394,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the override value for the TCP_KEEPCNT (or TCP_KEEPALIVE on some OS). (Default = -1, OS default).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public int TcpKeepAliveIdle
 		{
 			get { return GetOptionInt32(ZSocketOption.TCP_KEEPALIVE_IDLE); }
@@ -1455,8 +1403,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the override value for the TCP_KEEPINTVL socket option (where supported by OS). (Default = -1, OS default).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public int TcpKeepAliveInterval
 		{
 			get { return GetOptionInt32(ZSocketOption.TCP_KEEPALIVE_INTVL); }
@@ -1491,9 +1437,6 @@ namespace ZeroMQ
 		/// filter is applied then new connection source IP should be matched.
 		/// </remarks>
 		/// <param name="filter">IPV6 or IPV4 CIDR filter.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="filter"/> is null.</exception>
-		/// <exception cref="ArgumentException"><paramref name="filter"/> is empty string.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public void AddTcpAcceptFilter(string filter)
 		{
 			if (string.IsNullOrWhiteSpace(filter))
@@ -1507,7 +1450,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Reset all TCP filters assigned by <see cref="AddTcpAcceptFilter"/> and allow TCP transport to accept connections from any IP.
 		/// </summary>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public void ClearTcpAcceptFilter()
 		{
 			SetOption(ZSocketOption.TCP_ACCEPT_FILTER, (string)null);
@@ -1521,7 +1463,7 @@ namespace ZeroMQ
 
 		private void EnsureNotDisposed()
 		{
-			if (_disposed)
+			if (_socketPtr == IntPtr.Zero)
 			{
 				throw new ObjectDisposedException(GetType().FullName);
 			}

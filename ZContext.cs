@@ -9,18 +9,13 @@ namespace ZeroMQ
 	/// <summary>
 	/// Creates <see cref="ZSocket"/> instances within a process boundary.
 	/// </summary>
-	/// <remarks>
-	/// The <see cref="ZContext"/> object is a container for all sockets in a single process,
-	/// and acts as the transport for inproc sockets. <see cref="ZContext"/> is thread safe.
-	/// A <see cref="ZContext"/> must not be terminated until all spawned sockets have been
-	/// successfully closed.
-	/// </remarks>
 	public class ZContext : IDisposable
 	{
-		internal static Encoding _encoding = System.Text.Encoding.UTF8;
+		static Encoding _encoding = System.Text.Encoding.UTF8;
 
 		/// <summary>
-		/// Gets or sets the default encoding
+		/// Gets and protected sets the default Encoding.
+		/// Note: Do not set the Encoding after ZContext.Create.
 		/// </summary>
 		public static Encoding Encoding
 		{
@@ -129,22 +124,14 @@ namespace ZeroMQ
 			}
 		}
 
-		/// <summary>
-		/// Finalizes an instance of the <see cref="ZContext"/> class.
-		/// </summary>
 		~ZContext()
 		{
 			Dispose(false);
 		}
 
 		/// <summary>
-		/// Gets a handle to the native 0MQ context.
+		/// Gets a handle to the native ZeroMQ context.
 		/// </summary>
-		/// <remarks>
-		/// May be used to share a single ZmqContext with native libraries that use the
-		/// 0MQ API directly. Allows the inproc transport to be used if a single process
-		/// has a heterogeneous codebase.
-		/// </remarks>
 		public IntPtr ContextPtr
 		{
 			get { return _contextPtr; }
@@ -153,7 +140,7 @@ namespace ZeroMQ
 		/// <summary>
 		/// Create a <see cref="ZContext"/> instance.
 		/// </summary>
-		/// <returns>A <see cref="ZContext"/> instance with the default thread pool size (1).</returns>
+		/// <returns><see cref="ZContext"/></returns>
 		public static ZContext Create()
 		{
 			return new ZContext();
@@ -219,8 +206,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Gets or sets the supported socket protocol(s) when using TCP transports. (Default = <see cref="ProtocolType.Ipv4Only"/>).
 		/// </summary>
-		/// <exception cref="ZmqSocketException">An error occurred when getting or setting the socket option.</exception>
-		/// <exception cref="ObjectDisposedException">The <see cref="ZSocket"/> has been closed.</exception>
 		public bool IPv6Enabled
 		{
 			get { return GetOption(ZContextOption.IPV6) == 1; }
@@ -230,7 +215,6 @@ namespace ZeroMQ
 		/// <summary>
 		/// Terminate the ZeroMQ context.
 		/// </summary>
-		/// <exception cref="System.ObjectDisposedException">The <see cref="ZContext"/> has already been disposed.</exception>
 		public void Terminate()
 		{
 			if (_contextPtr == IntPtr.Zero)
@@ -259,19 +243,12 @@ namespace ZeroMQ
 			_contextPtr = IntPtr.Zero;
 		}
 
-		/// <summary>
-		/// Releases all resources used by the current instance of the <see cref="ZContext"/> class.
-		/// </summary>
 		public virtual void Dispose()
 		{
 			GC.SuppressFinalize(this);
 			Dispose(true);
 		}
 
-		/// <summary>
-		/// Releases the unmanaged resources used by the <see cref="ZContext"/>, and optionally disposes of the managed resources.
-		/// </summary>
-		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposing)
