@@ -13,7 +13,7 @@ namespace ZeroMQ
 		public override int ReadByte()
 		{
 			if (Position + 1 > Length)
-				return default(int);
+				return -1;
 
 			int byt = Marshal.ReadByte(DataPtr() + (int)Position);
 			++Position;
