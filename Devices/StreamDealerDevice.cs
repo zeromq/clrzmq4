@@ -60,7 +60,7 @@
 			// DEALER: forward
 			using (incoming)
 			{
-				if (0x00 == incoming[1].ReadByte())
+				if (incoming[1].Length == 0)
 				{
 					return true; // Ignore the Empty one
 				}
