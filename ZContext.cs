@@ -264,8 +264,8 @@ namespace ZeroMQ
 		/// </summary>
 		public virtual void Dispose()
 		{
-			Dispose(true);
 			GC.SuppressFinalize(this);
+			Dispose(true);
 		}
 
 		/// <summary>
