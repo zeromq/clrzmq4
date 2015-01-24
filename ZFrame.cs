@@ -13,7 +13,7 @@ namespace ZeroMQ
 	/// <summary>
 	/// A single or multi-part message sent or received via a <see cref="ZSocket"/>.
 	/// </summary>
-	public class ZFrame : System.IO.Stream, IDisposable
+	public class ZFrame : ZFrameBase, IDisposable
 	{
 		public static ZFrame CopyFrom(ZFrame frame)
 		{
@@ -78,6 +78,7 @@ namespace ZeroMQ
 		{ } */
 
 		protected ZFrame(DispoIntPtr framePtr, int size)
+			: base()
 		{
 			_framePtr = framePtr;
 			_capacity = size;
@@ -293,7 +294,7 @@ namespace ZeroMQ
 
 		public IntPtr Ptr { get { return _framePtr; } }
 
-		public IntPtr DataPtr()
+		public override IntPtr DataPtr()
 		{
 			if (_framePtr == IntPtr.Zero)
 			{
@@ -335,12 +336,12 @@ namespace ZeroMQ
 			return remaining;
 		}
 
-		public override int ReadByte()
+		public new virtual byte ReadByte()
 		{
 			if (Position + 1 > Length)
-				return -1;
+				return default(byte);
 
-			int byt = Marshal.ReadByte(DataPtr() + _position);
+			byte byt = Marshal.ReadByte(DataPtr() + _position);
 			++_position;
 			return byt;
 		}
