@@ -132,8 +132,18 @@ namespace ZeroMQ
 
 		unsafe internal void WriteStringNative(string str, Encoding encoding, bool createOnWrongLength)
 		{
-			if (string.IsNullOrEmpty(str))
+			if (str == null)
 			{
+				return;
+			}
+			if (str == string.Empty)
+			{
+				if (createOnWrongLength)
+				{
+					this._framePtr = CreateNative(0);
+					this._capacity = 0;
+					this._position = 0;
+				}
 				return;
 			}
 
@@ -147,11 +157,10 @@ namespace ZeroMQ
 				if (createOnWrongLength)
 				{
 					this._framePtr = CreateNative(byteCount);
-					this._position = 0;
 					this._capacity = byteCount;
+					this._position = 0;
 				}
-
-				if (this._position + byteCount > this.Length)
+				else if (this._position + byteCount > this.Length)
 				{
 					// fail if frame is too small
 					throw new InvalidOperationException();
