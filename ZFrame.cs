@@ -350,8 +350,8 @@ namespace ZeroMQ
 			if (Position + 1 > Length)
 				return -1;
 
-			int byt = Marshal.ReadByte(DataPtr() + (int)Position);
-			++Position;
+			int byt = Marshal.ReadByte(DataPtr() + (int)_position);
+			++_position;
 			return byt;
 		}
 
