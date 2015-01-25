@@ -231,7 +231,7 @@ namespace ZeroMQ
 			if (_contextPtr == IntPtr.Zero)
 				return true;
 
-			while (-1 == zmq.ctx_term(_contextPtr))
+			while (-1 == zmq.ctx_shutdown(_contextPtr))
 			{
 				error = ZError.GetLastErr();
 
@@ -245,6 +245,7 @@ namespace ZeroMQ
 
 				return false;
 			}
+			_contextPtr = IntPtr.Zero;
 			return true;
 		}
 
