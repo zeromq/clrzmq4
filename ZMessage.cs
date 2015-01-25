@@ -7,7 +7,7 @@ using System.Linq;
 namespace ZeroMQ
 {
 	/// <summary>
-	/// A single or multi-part message.
+	/// A single or multi-part message, sent or received via a <see cref="ZSocket"/>.
 	/// </summary>
 	public class ZMessage : IList<ZFrame>, IDisposable
 	{

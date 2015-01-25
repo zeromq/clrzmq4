@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Devices\ZDevice.cs" />
-    <Compile Include="ZFrameBase.cs" />
     <Compile Include="ZThread.cs" />
     <Compile Include="Devices\ZDeviceSocketSetup.cs" />
     <Compile Include="Devices\PubSubDevice.cs" />
