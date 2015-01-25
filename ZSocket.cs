@@ -421,7 +421,7 @@ namespace ZeroMQ
 
 		public ZFrame ReceiveFrame(ZSocketFlags flags, out ZError error)
 		{
-			IEnumerable<ZFrame> frames = ReceiveFrames(1, flags &= ZSocketFlags.More, out error);
+			IEnumerable<ZFrame> frames = ReceiveFrames(1, flags & ~ZSocketFlags.More, out error);
 			if (frames != null)
 			{
 				foreach (ZFrame frame in frames)
@@ -476,14 +476,14 @@ namespace ZeroMQ
 
 			error = default(ZError);
 			frames = new List<ZFrame>();
-			flags |= ZSocketFlags.More;
+			flags = flags | ZSocketFlags.More;
 
 			do {
 				var frame = ZFrame.CreateEmpty();
 
 				if (framesToReceive == 1) 
 				{
-					flags &= ~ZSocketFlags.More;
+					flags = flags & ~ZSocketFlags.More;
 				}
 
 				while (-1 == zmq.msg_recv(frame.Ptr, _socketPtr, (int)flags))
@@ -574,13 +574,13 @@ namespace ZeroMQ
 			error = ZError.None;
 
 			bool more = (flags & ZSocketFlags.More) == ZSocketFlags.More;
-			flags |= ZSocketFlags.More;
+			flags = flags | ZSocketFlags.More;
 
 			for (int i = 0, l = frames.Count(); i < l; ++i)
 			{
 				if (i == l - 1 && !more)
 				{
-					flags &= ~ZSocketFlags.More;
+					flags = flags & ~ZSocketFlags.More;
 				}
 				if (!Send(frames.ElementAt(i), flags, out error))
 				{
