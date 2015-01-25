@@ -245,8 +245,6 @@ namespace ZeroMQ
 
 				return false;
 			}
-
-			_contextPtr = IntPtr.Zero;
 			return true;
 		}
 
