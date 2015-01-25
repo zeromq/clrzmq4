@@ -213,6 +213,44 @@ namespace ZeroMQ
 		}
 
 		/// <summary>
+		/// Shutdown the ZeroMQ context.
+		/// </summary>
+		public void Shutdown()
+		{
+			ZError error;
+			Shutdown(out error);
+		}
+
+		/// <summary>
+		/// Shutdown the ZeroMQ context.
+		/// </summary>
+		public bool Shutdown(out ZError error)
+		{
+			error = default(ZError);
+
+			if (_contextPtr == IntPtr.Zero)
+				return true;
+
+			while (-1 == zmq.ctx_term(_contextPtr))
+			{
+				error = ZError.GetLastErr();
+
+				if (error == ZError.EINTR)
+				{
+					error = ZError.None;
+					continue;
+				}
+
+				// Maybe ZError.EFAULT
+
+				return false;
+			}
+
+			_contextPtr = IntPtr.Zero;
+			return true;
+		}
+
+		/// <summary>
 		/// Terminate the ZeroMQ context.
 		/// </summary>
 		public void Terminate()
