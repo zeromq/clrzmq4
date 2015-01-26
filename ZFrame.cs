@@ -13,7 +13,7 @@ namespace ZeroMQ
 	/// <summary>
 	/// A single part message, sent or received via a <see cref="ZSocket"/>.
 	/// </summary>
-	public class ZFrame : Stream, IDisposable
+	public class ZFrame : Stream, ICloneable, IDisposable
 	{
 		public static ZFrame CopyFrom(ZFrame frame)
 		{
@@ -58,6 +58,54 @@ namespace ZeroMQ
 			: this(CreateNative(count), count)
 		{
 			this.Write(buffer, offset, count);
+		}
+
+		public ZFrame(byte value)
+			: this(CreateNative(1), 1)
+		{ 
+			this.Write(value);
+		}
+
+		public ZFrame(Int16 value)
+			: this(CreateNative(2), 2)
+		{ 
+			this.Write(value);
+		}
+
+		public ZFrame(UInt16 value)
+			: this(CreateNative(2), 2)
+		{ 
+			this.Write(value);
+		}
+
+		public ZFrame(Char value)
+			: this(CreateNative(2), 2)
+		{ 
+			this.Write(value);
+		}
+
+		public ZFrame(Int32 value)
+			: this(CreateNative(4), 4)
+		{ 
+			this.Write(value);
+		}
+
+		public ZFrame(UInt32 value)
+			: this(CreateNative(4), 4)
+		{ 
+			this.Write(value);
+		}
+
+		public ZFrame(Int64 value)
+			: this(CreateNative(8), 8)
+		{ 
+			this.Write(value);
+		}
+
+		public ZFrame(UInt64 value)
+			: this(CreateNative(8), 8)
+		{ 
+			this.Write(value);
 		}
 
 		public ZFrame(string str)
@@ -700,5 +748,21 @@ namespace ZeroMQ
 			}
 			return result;
 		}
+
+		#region ICloneable implementation
+
+		public object Clone()
+		{
+			return Duplicate();
+		}
+
+		public ZFrame Duplicate()
+		{
+			var frame = ZFrame.CreateEmpty();
+			this.CopyZeroTo(frame);
+			return frame;
+		}
+
+		#endregion
 	}
 }

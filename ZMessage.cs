@@ -9,7 +9,7 @@ namespace ZeroMQ
 	/// <summary>
 	/// A single or multi-part message, sent or received via a <see cref="ZSocket"/>.
 	/// </summary>
-	public class ZMessage : IList<ZFrame>, IDisposable
+	public class ZMessage : IList<ZFrame>, ICloneable, IDisposable
 	{
 		private List<ZFrame> _frames;
 
@@ -231,6 +231,25 @@ namespace ZeroMQ
 		{
 			return GetEnumerator();
 		}
+		#endregion
+
+		#region ICloneable implementation
+
+		public object Clone()
+		{
+			return Duplicate();
+		}
+
+		public ZMessage Duplicate() 
+		{
+			var message = new ZMessage();
+			foreach (var frame in this)
+			{
+				message.Add(frame.Duplicate());
+			}
+			return message;
+		}
+
 		#endregion
 	}
 }
