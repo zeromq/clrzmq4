@@ -219,7 +219,9 @@ namespace ZeroMQ
 		{
 			ZError error;
 			if (!Shutdown(out error))
+			{
 				throw new ZException(error);
+			}
 		}
 
 		/// <summary>
@@ -256,7 +258,9 @@ namespace ZeroMQ
 		{
 			ZError error;
 			if (!Terminate(out error))
+			{
 				throw new ZException(error);
+			}
 		}
 
 		/// <summary>

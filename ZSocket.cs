@@ -90,7 +90,9 @@ namespace ZeroMQ
 		{
 			ZError error;
 			if (!Close(out error))
+			{
 				throw new ZException(error);
+			}
 		}
 
 		/// <summary>
