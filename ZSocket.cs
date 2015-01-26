@@ -78,19 +78,24 @@ namespace ZeroMQ
 		{
 			if (disposing)
 			{
-				Close();
+				ZError error;
+				Close(out error);
 			}
 		}
 
 		/// <summary>
 		/// Close the current socket.
 		/// </summary>
-		public bool Close()
+		public void Close()
 		{
 			ZError error;
-			return Close(out error);
+			if (!Close(out error))
+				throw new ZException(error);
 		}
 
+		/// <summary>
+		/// Close the current socket.
+		/// </summary>
 		public bool Close(out ZError error)
 		{
 			error = ZError.None;
@@ -120,6 +125,10 @@ namespace ZeroMQ
 		/// </summary>
 		public ZSocketType SocketType { get { return _socketType; } }
 
+		/// <summary>
+		/// Bind the specified endpoint.
+		/// </summary>
+		/// <param name="endpoint">A string consisting of a transport and an address, formatted as <c><em>transport</em>://<em>address</em></c>.</param>
 		public void Bind(string endpoint)
 		{
 			ZError error;

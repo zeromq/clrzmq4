@@ -218,7 +218,8 @@ namespace ZeroMQ
 		public void Shutdown()
 		{
 			ZError error;
-			Shutdown(out error);
+			if (!Shutdown(out error))
+				throw new ZException(error);
 		}
 
 		/// <summary>
@@ -245,7 +246,6 @@ namespace ZeroMQ
 
 				return false;
 			}
-			_contextPtr = IntPtr.Zero;
 			return true;
 		}
 
@@ -254,12 +254,20 @@ namespace ZeroMQ
 		/// </summary>
 		public void Terminate()
 		{
-			if (_contextPtr == IntPtr.Zero)
-			{
-				return;
-			}
-
 			ZError error;
+			if (!Terminate(out error))
+				throw new ZException(error);
+		}
+
+		/// <summary>
+		/// Terminate the ZeroMQ context.
+		/// </summary>
+		public bool Terminate(out ZError error)
+		{
+			error = ZError.None;
+			if (_contextPtr == IntPtr.Zero)
+				return true;
+
 			while (-1 == zmq.ctx_term(_contextPtr))
 			{
 				error = ZError.GetLastErr();
@@ -272,12 +280,11 @@ namespace ZeroMQ
 
 				// Maybe ZError.EFAULT
 
-				// Do not throw new ZExceptions:
-				// throw new ZException(error);
-				break;
+				return false;
 			}
 
 			_contextPtr = IntPtr.Zero;
+			return true;
 		}
 
 		public virtual void Dispose()
@@ -290,7 +297,8 @@ namespace ZeroMQ
 		{
 			if (disposing)
 			{
-				Terminate();
+				ZError error;
+				Terminate(out error);
 			}
 		}
 
