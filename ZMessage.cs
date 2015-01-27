@@ -101,11 +101,20 @@ namespace ZeroMQ
 			_frames.Insert(index, item);
 		}
 
+		/// <summary>
+		/// Removes ZFrames. Note: Disposes the ZFrame.
+		/// </summary>
+		/// <returns>The <see cref="ZeroMQ.ZFrame"/>.</returns>
 		public void RemoveAt(int index)
 		{
 			RemoveAt(index, true);
 		}
 
+		/// <summary>
+		/// Removes ZFrames.
+		/// </summary>
+		/// <returns>The <see cref="ZeroMQ.ZFrame"/>.</returns>
+		/// <param name="dispose">If set to <c>false</c>, do not dispose the ZFrame.</param>
 		public ZFrame RemoveAt(int index, bool dispose)
 		{
 			ZFrame frame = _frames[index];
@@ -117,6 +126,11 @@ namespace ZeroMQ
 				return null;
 			}
 			return frame;
+		}
+
+		public ZFrame Pop()
+		{
+			return RemoveAt(0, false);
 		}
 
 		public void Wrap(ZFrame frame) 
@@ -187,7 +201,7 @@ namespace ZeroMQ
 			return _frames.Contains(item);
 		}
 
-		public void CopyTo(ZFrame[] array, int arrayIndex)
+		void ICollection<ZFrame>.CopyTo(ZFrame[] array, int arrayIndex)
 		{
 			_frames.CopyTo(array, arrayIndex);
 		}

@@ -1,32 +1,12 @@
 ﻿namespace ZeroMQ
 {
 	using System;
-	using System.Threading;
 	using System.Collections.Generic;
+	using System.Threading;
 
 	public abstract class ZThread
 	{
-		public class DefaultZThread : ZThread
-		{
-			protected Action _action;
-
-			internal DefaultZThread(Action action)
-			{
-				_action = action;
-			}
-
-			protected override void Run()
-			{
-				_action();
-			}
-		}
-
-		public static ZThread Create(Action action)
-		{
-			return new DefaultZThread(action);
-		}
-
-		protected CancellationTokenSource _cancellor;
+		public CancellationTokenSource Cancellor { get; protected set; }
 
 		protected Thread _thread;
 
@@ -51,7 +31,7 @@
 		/// </summary>
 		public bool IsCancellationRequested
 		{
-			get { return _cancellor.IsCancellationRequested; }
+			get { return Cancellor.IsCancellationRequested; }
 		}
 
 		public virtual ZThread Start()
@@ -68,7 +48,7 @@
 		{
 			EnsureNotDisposed();
 
-			_cancellor = cancellor;
+			Cancellor = cancellor;
 
 			if (_thread == null)
 			{
@@ -123,7 +103,7 @@
 		{
 			EnsureNotDisposed();
 
-			_cancellor.Cancel();
+			Cancellor.Cancel();
 
 			return this;
 		}
