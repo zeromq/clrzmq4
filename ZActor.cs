@@ -4,7 +4,7 @@
 	using System.Threading;
 	using System.Collections.Generic;
 
-	public delegate void ZAction(CancellationTokenSource cancellus, object[] args, ZSocket backend);
+	public delegate void ZAction(CancellationToken cancellus, object[] args, ZSocket backend);
 
 	public class ZActor : ZThread
 	{
@@ -49,7 +49,7 @@
 			{
 				Backend.Bind(Endpoint);
 
-				Action(this.Cancellor, Arguments, Backend);
+				Action(Cancellor.Token, Arguments, Backend);
 			}
 		}
 
