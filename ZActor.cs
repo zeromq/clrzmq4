@@ -1,16 +1,16 @@
 ﻿namespace ZeroMQ
 {
 	using System;
-	// using System.Threading;
+	using System.Threading;
 	using System.Collections.Generic;
 
-	public delegate void ZAction(object[] args, ZSocket backend, ZActor actor);
+	public delegate void ZAction(CancellationTokenSource cancellus, object[] args, ZSocket backend);
 
 	public class ZActor : ZThread
 	{
-		public ZSocket Frontend { get; protected set; }
-
 		public ZSocket Backend { get; protected set; }
+
+		public ZSocket Frontend { get; protected set; }
 
 		public string Endpoint { get; protected set; }
 
@@ -33,8 +33,8 @@
 		{
 			var actor = new ZActor();
 
-			actor.Frontend = ZSocket.Create(context, ZSocketType.PAIR);
 			actor.Backend = ZSocket.Create(context, ZSocketType.PAIR);
+			actor.Frontend = ZSocket.Create(context, ZSocketType.PAIR);
 
 			actor.Endpoint = endpoint;
 			actor.Action = action;
@@ -45,15 +45,21 @@
 
 		protected override void Run()
 		{
-			Backend.Bind(string.Format("inproc://{0}", Endpoint));
-			Frontend.Connect(string.Format("inproc://{0}", Endpoint));
+			using (Backend)
+			{
+				Backend.Bind(Endpoint);
 
-			Action(Arguments, Backend, this);
+				Action(this.Cancellor, Arguments, Backend);
+			}
 		}
 
-		public virtual new ZActor Start()
+		public override ZThread Start()
 		{
-			return (ZActor)base.Start();
+			base.Start();
+
+			Frontend.Connect(Endpoint);
+
+			return this;
 		}
 	}
 }

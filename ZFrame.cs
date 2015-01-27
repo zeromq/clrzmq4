@@ -133,6 +133,11 @@ namespace ZeroMQ
 			_position = 0;
 		}
 
+		~ZFrame()
+		{
+			Dispose(false);
+		}
+
 		internal static DispoIntPtr CreateEmptyNative()
 		{
 			var msg = DispoIntPtr.Alloc(zmq.sizeof_zmq_msg_t);
