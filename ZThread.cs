@@ -34,17 +34,17 @@
 			get { return Cancellor.IsCancellationRequested; }
 		}
 
-		public virtual ZThread Start()
+		public virtual void Start()
 		{
 			var cancellor = new CancellationTokenSource();
-			return Start(cancellor);
+			Start(cancellor);
 		}
 
 		/// <summary>
 		/// Start the device in the current thread.
 		/// </summary>
 		/// <exception cref="ObjectDisposedException">The <see cref="ZThread"/> has already been disposed.</exception>
-		public virtual ZThread Start(CancellationTokenSource cancellor)
+		public virtual void Start(CancellationTokenSource cancellor)
 		{
 			EnsureNotDisposed();
 
@@ -55,8 +55,6 @@
 				_thread = new Thread(Run);
 			}
 			_thread.Start();
-
-			return this;
 		}
 
 		/// <summary>
@@ -99,13 +97,11 @@
 		/// <summary>
 		/// Stop the device in such a way that it can be restarted.
 		/// </summary>
-		public virtual ZThread Stop()
+		public virtual void Stop()
 		{
 			EnsureNotDisposed();
 
 			Cancellor.Cancel();
-
-			return this;
 		}
 
 		/// <summary>
@@ -115,10 +111,9 @@
 		{
 			EnsureNotDisposed();
 
-			if (_thread.IsAlive)
-			{
-				_thread.Abort();
-			}
+			Stop();
+
+			_thread.Join();	// TODO
 		}
 
 		/// <summary>
@@ -126,8 +121,8 @@
 		/// </summary>
 		public virtual void Dispose()
 		{
-			Dispose(true);
 			GC.SuppressFinalize(this);
+			Dispose(true);
 		}
 
 		protected abstract void Run();
@@ -138,17 +133,14 @@
 		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
 		protected virtual void Dispose(bool disposing)
 		{
-			if (_disposed)
+			if (!_disposed)
 			{
-				return;
+				if (disposing)
+				{
+					Close();
+				}
+				_disposed = true;
 			}
-
-			if (disposing)
-			{
-				Close();
-			}
-
-			_disposed = true;
 		}
 
 		protected void EnsureNotDisposed()

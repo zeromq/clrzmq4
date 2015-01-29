@@ -4,62 +4,77 @@
 	using System.Threading;
 	using System.Collections.Generic;
 
-	public delegate void ZAction(CancellationToken cancellus, object[] args, ZSocket backend);
+	public delegate void ZAction(ZContext context, ZSocket backend, CancellationToken cancellus, object[] args);
 
 	public class ZActor : ZThread
 	{
-		public ZSocket Backend { get; protected set; }
+		public ZContext Context { get; protected set; }
 
 		public ZSocket Frontend { get; protected set; }
 
 		public string Endpoint { get; protected set; }
 
-		public ZAction Action { get; protected set; }
+		protected ZSocket Backend { get; set; }
 
-		public object[] Arguments { get; protected set; }
+		protected ZAction Action { get; set; }
 
-		protected ZActor ()
-		{ }
+		protected object[] Arguments { get; set; }
 
-		public static ZActor Create(ZContext context, ZAction action, params object[] args)
+		public ZActor (ZContext context, ZAction action, params object[] args)
+			: this (context, default(string), action, args)
 		{
 			var rnd = new Random();
-			var endpoint = string.Format("inproc://{0}-{1}", rnd.Next(), rnd.Next());
-
-			return Create(context, endpoint, action, args);
+			this.Endpoint = string.Format("inproc://{0}-{1}", rnd.Next(), rnd.Next());
 		}
 
-		public static ZActor Create(ZContext context, string endpoint, ZAction action, params object[] args)
+		public ZActor(ZContext context, string endpoint, ZAction action, params object[] args)
+			: base ()
 		{
-			var actor = new ZActor();
+			this.Context = context;
 
-			actor.Backend = ZSocket.Create(context, ZSocketType.PAIR);
-			actor.Frontend = ZSocket.Create(context, ZSocketType.PAIR);
-
-			actor.Endpoint = endpoint;
-			actor.Action = action;
-			actor.Arguments = args;
-
-			return actor;
+			this.Endpoint = endpoint;
+			this.Action = action;
+			this.Arguments = args;
 		}
 
 		protected override void Run()
 		{
-			using (Backend)
+			using (Backend = ZSocket.Create(Context, ZSocketType.PAIR))
 			{
 				Backend.Bind(Endpoint);
 
-				Action(Cancellor.Token, Arguments, Backend);
+				Action(Context, Backend, Cancellor.Token, Arguments);
 			}
 		}
 
-		public override ZThread Start()
+		public override void Start()
 		{
 			base.Start();
 
-			Frontend.Connect(Endpoint);
+			if (Frontend == null)
+			{
+				Frontend = ZSocket.Create(Context, ZSocketType.PAIR);
+				Frontend.Connect(Endpoint);
+			}
+		}
 
-			return this;
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+
+			if (disposing)
+			{
+				if (Frontend != null)
+				{
+					Frontend.Dispose();
+					Frontend = null;
+				}
+				if (Backend != null)
+				{
+					Backend.Dispose();
+					Backend = null;
+				}
+			}
 		}
 	}
 }
