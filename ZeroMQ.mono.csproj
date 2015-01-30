@@ -67,7 +67,7 @@
     <Compile Include="Monitoring\ZMonitorEventArgs.cs" />
     <Compile Include="Monitoring\ZMonitorFileDescriptorEventArgs.cs" />
     <Compile Include="Monitoring\ZMonitorIntervalEventArgs.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="RouterMandatory.cs" />
     <Compile Include="TcpKeepaliveBehaviour.cs" />
     <Compile Include="ZContext.cs" />
