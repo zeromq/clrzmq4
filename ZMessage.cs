@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace ZeroMQ
 {
@@ -136,6 +137,107 @@ namespace ZeroMQ
 		public ZFrame Pop()
 		{
 			return RemoveAt(0, false);
+		}
+
+		public int PopBytes(byte[] buffer, int offset, int count)
+		{
+			using (var frame = Pop())
+			{
+				return frame.Read(buffer, offset, count);
+			}
+		}
+
+		public int PopByte()
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadByte();
+			}
+		}
+
+		public byte PopAsByte()
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadAsByte();
+			}
+		}
+
+		public Int16 PopInt16()
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadInt16();
+			}
+		}
+
+		public UInt16 PopUInt16()
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadUInt16();
+			}
+		}
+
+		public Char PopChar()
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadChar();
+			}
+		}
+
+		public Int32 PopInt32()
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadInt32();
+			}
+		}
+
+		public UInt32 PopUInt32()
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadUInt32();
+			}
+		}
+
+		public Int64 PopInt64()
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadInt64();
+			}
+		}
+
+		public UInt64 PopUInt64()
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadUInt64();
+			}
+		}
+
+		public String PopString()
+		{
+			return PopString(ZContext.Encoding);
+		}
+
+		public String PopString(Encoding encoding)
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadString((int)frame.Length, encoding);
+			}
+		}
+
+		public String PopString(int bytesCount, Encoding encoding)
+		{
+			using (var frame = Pop())
+			{
+				return frame.ReadString(bytesCount, encoding);
+			}
 		}
 
 		public void Wrap(ZFrame frame) 
