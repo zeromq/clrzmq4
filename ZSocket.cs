@@ -15,13 +15,7 @@ namespace ZeroMQ
 	{
 		public static ZSocket Create(ZContext context, ZSocketType socketType)
 		{
-			ZError error;
-			ZSocket socket;
-			if (null == (socket = Create(context, socketType, out error)))
-			{
-				throw new ZException(error);
-			}
-			return socket;
+			return new ZSocket(context, socketType);
 		}
 
 		/// <summary>
@@ -31,16 +25,19 @@ namespace ZeroMQ
 		/// <returns>A <see cref="ZSocket"/> instance with the current context and the specified socket type.</returns>
 		public static ZSocket Create(ZContext context, ZSocketType socketType, out ZError error)
 		{
-			error = ZError.None;
+			return new ZSocket(context, socketType, out error);
+		}
 
-			IntPtr socketPtr;
-			if (IntPtr.Zero == (socketPtr = zmq.socket(context.ContextPtr, socketType.Number)))
+		internal bool Initialize(out ZError error)
+		{
+			error = default(ZError);
+
+			if (IntPtr.Zero == (_socketPtr = zmq.socket(_context.ContextPtr, _socketType.Number)))
 			{
 				error = ZError.GetLastErr();
-				return default(ZSocket);
+				return false;
 			}
-
-			return new ZSocket(context, socketPtr, socketType);
+			return true;
 		}
 
 		private ZContext _context;
@@ -49,12 +46,32 @@ namespace ZeroMQ
 
 		private ZSocketType _socketType;
 
-		protected ZSocket(ZContext context, IntPtr socketPtr, ZSocketType socketType)
+		public ZSocket(ZContext context, ZSocketType socketType)
+		{
+			_context = context;
+			_socketType = socketType;
+
+			ZError error;
+			if (!Initialize(out error))
+			{
+				throw new ZException(error);
+			}
+		}
+
+		public ZSocket(ZContext context, ZSocketType socketType, out ZError error)
+		{
+			_context = context;
+			_socketType = socketType;
+
+			Initialize(out error);
+		}
+
+		/* protected ZSocket(ZContext context, IntPtr socketPtr, ZSocketType socketType)
 		{
 			_context = context;
 			_socketPtr = socketPtr;
 			_socketType = socketType;
-		}
+		} */
 
 		/// <summary>
 		/// Finalizes an instance of the <see cref="ZSocket"/> class.

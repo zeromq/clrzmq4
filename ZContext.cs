@@ -114,7 +114,7 @@ namespace ZeroMQ
 
 		private IntPtr _contextPtr;
 
-		internal ZContext()
+		public ZContext()
 		{
 			_contextPtr = zmq.ctx_new();
 
