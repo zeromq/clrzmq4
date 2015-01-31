@@ -302,9 +302,15 @@ namespace ZeroMQ
 			var pin = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 			IntPtr pinPtr = pin.AddrOfPinnedObject() + offset;
 
-			if (-1 == zmq.recv(this.SocketPtr, pinPtr, count, (int)flags))
+			while (-1 == zmq.recv(this.SocketPtr, pinPtr, count, (int)flags))
 			{
 				error = ZError.GetLastErr();
+
+				if (error == ZError.EINTR)
+				{
+					error = default(ZError);
+					continue;
+				}
 
 				pin.Free();
 				return false;
@@ -334,9 +340,15 @@ namespace ZeroMQ
 			var pin = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 			IntPtr pinPtr = pin.AddrOfPinnedObject() + offset;
 
-			if (-1 == zmq.send(SocketPtr, pinPtr, count, (int)flags))
+			while (-1 == zmq.send(SocketPtr, pinPtr, count, (int)flags))
 			{
 				error = ZError.GetLastErr();
+
+				if (error == ZError.EINTR)
+				{
+					error = default(ZError);
+					continue;
+				}
 
 				pin.Free();
 				return false;
