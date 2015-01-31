@@ -114,6 +114,10 @@ namespace ZeroMQ
 
 		private IntPtr _contextPtr;
 
+		/// <summary>
+		/// Create a <see cref="ZContext"/> instance.
+		/// </summary>
+		/// <returns><see cref="ZContext"/></returns>
 		public ZContext()
 		{
 			_contextPtr = zmq.ctx_new();

@@ -13,16 +13,19 @@ namespace ZeroMQ
 	/// </summary>
 	public class ZSocket : IDisposable
 	{
+		/// <summary>
+		/// Create a <see cref="ZSocket"/> instance.
+		/// </summary>
+		/// <returns><see cref="ZSocket"/></returns>
 		public static ZSocket Create(ZContext context, ZSocketType socketType)
 		{
 			return new ZSocket(context, socketType);
 		}
 
 		/// <summary>
-		/// Create a socket with the current context and the specified socket type.
+		/// Create a <see cref="ZSocket"/> instance.
 		/// </summary>
-		/// <param name="socketType">A <see cref="ZSocketType"/> value for the socket.</param>
-		/// <returns>A <see cref="ZSocket"/> instance with the current context and the specified socket type.</returns>
+		/// <returns><see cref="ZSocket"/></returns>
 		public static ZSocket Create(ZContext context, ZSocketType socketType, out ZError error)
 		{
 			return new ZSocket(context, socketType, out error);
@@ -46,6 +49,10 @@ namespace ZeroMQ
 
 		private ZSocketType _socketType;
 
+		/// <summary>
+		/// Create a <see cref="ZSocket"/> instance.
+		/// </summary>
+		/// <returns><see cref="ZSocket"/></returns>
 		public ZSocket(ZContext context, ZSocketType socketType)
 		{
 			_context = context;
@@ -58,6 +65,10 @@ namespace ZeroMQ
 			}
 		}
 
+		/// <summary>
+		/// Create a <see cref="ZSocket"/> instance.
+		/// </summary>
+		/// <returns><see cref="ZSocket"/></returns>
 		public ZSocket(ZContext context, ZSocketType socketType, out ZError error)
 		{
 			_context = context;
@@ -65,13 +76,6 @@ namespace ZeroMQ
 
 			Initialize(out error);
 		}
-
-		/* protected ZSocket(ZContext context, IntPtr socketPtr, ZSocketType socketType)
-		{
-			_context = context;
-			_socketPtr = socketPtr;
-			_socketType = socketType;
-		} */
 
 		/// <summary>
 		/// Finalizes an instance of the <see cref="ZSocket"/> class.
