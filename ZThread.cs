@@ -4,7 +4,7 @@
 	using System.Collections.Generic;
 	using System.Threading;
 
-	public abstract class ZThread
+	public abstract class ZThread : IDisposable
 	{
 		public CancellationTokenSource Cancellor { get; protected set; }
 
