@@ -31,18 +31,6 @@ namespace ZeroMQ
 			return new ZSocket(context, socketType, out error);
 		}
 
-		internal bool Initialize(out ZError error)
-		{
-			error = default(ZError);
-
-			if (IntPtr.Zero == (_socketPtr = zmq.socket(_context.ContextPtr, _socketType.Number)))
-			{
-				error = ZError.GetLastErr();
-				return false;
-			}
-			return true;
-		}
-
 		private ZContext _context;
 
 		private IntPtr _socketPtr;
@@ -61,6 +49,9 @@ namespace ZeroMQ
 			ZError error;
 			if (!Initialize(out error))
 			{
+				// Show as Disposed
+				_socketPtr = IntPtr.Zero;
+
 				throw new ZException(error);
 			}
 		}
@@ -74,7 +65,23 @@ namespace ZeroMQ
 			_context = context;
 			_socketType = socketType;
 
-			Initialize(out error);
+			if (!Initialize(out error))
+			{
+				// Show as Disposed
+				_socketPtr = IntPtr.Zero;
+			}
+		}
+
+		private bool Initialize(out ZError error)
+		{
+			error = default(ZError);
+
+			if (IntPtr.Zero == (_socketPtr = zmq.socket(_context.ContextPtr, _socketType.Number)))
+			{
+				error = ZError.GetLastErr();
+				return false;
+			}
+			return true;
 		}
 
 		/// <summary>
