@@ -28,7 +28,15 @@ namespace ZeroMQ
 		/// <returns><see cref="ZSocket"/></returns>
 		public static ZSocket Create(ZContext context, ZSocketType socketType, out ZError error)
 		{
-			return new ZSocket(context, socketType, out error);
+			var socket = new ZSocket();
+			socket._context = context;
+			socket._socketType = socketType;
+
+			if (!socket.Initialize(out error))
+			{
+				return default(ZSocket);
+			}
+			return socket;
 		}
 
 		private ZContext _context;
@@ -49,30 +57,14 @@ namespace ZeroMQ
 			ZError error;
 			if (!Initialize(out error))
 			{
-				// Show as Disposed
-				_socketPtr = IntPtr.Zero;
-
 				throw new ZException(error);
 			}
 		}
 
-		/// <summary>
-		/// Create a <see cref="ZSocket"/> instance.
-		/// </summary>
-		/// <returns><see cref="ZSocket"/></returns>
-		public ZSocket(ZContext context, ZSocketType socketType, out ZError error)
-		{
-			_context = context;
-			_socketType = socketType;
+		protected ZSocket()
+		{ }
 
-			if (!Initialize(out error))
-			{
-				// Show as Disposed
-				_socketPtr = IntPtr.Zero;
-			}
-		}
-
-		private bool Initialize(out ZError error)
+		protected bool Initialize(out ZError error)
 		{
 			error = default(ZError);
 
