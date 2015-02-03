@@ -6,7 +6,7 @@ Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 3+.
 Also read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
 
 - ZeroMQ - [The Guide Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
-- ZeroMQ [C# Projects](http://github.com/metadings/clrzmq-test)
+- ZeroMQ - [C# Projects](http://github.com/metadings/clrzmq-test)
 
 **Simple REQ connect to REP bind**
 
@@ -28,42 +28,40 @@ namespace ZeroMQ.Test
 		static void Main(string[] args)
 		{
 			// Setup the ZContext
-			context = ZContext.Create();
-
-			// Start the "Server"
-			var cancellor = new CancellationTokenSource();
-			new Thread(() => Server(cancellor.Token)).Start();
-
-			if (args == null || args.Length < 1)
+			using (context = new ZContext())
 			{
-				// say here were some arguments...
-				args = new string[] { "World" };
-			}
+				// Start the "Server"
+				var cancellor = new CancellationTokenSource();
+				new Thread(() => Server(cancellor.Token)).Start();
 
-			// foreach arg we are the Client, asking the Server
-			foreach (string arg in args)
-			{
-				Console.WriteLine( Client(arg) );
-			}
+				if (args == null || args.Length < 1)
+				{
+					args = new string[] { "World" };
+				}
 
-			// Cancel the Server
-			cancellor.Cancel();
-			
-			// we could have done here context.Terminate()
+				// Now we are the Client, asking the Server
+				foreach (string arg in args)
+				{
+					Client(arg);
+				}
+
+				// Cancel the Server
+				cancellor.Cancel();
+			}
 		}
 
 		static void Server(CancellationToken cancellus)
 		{
-			using (var socket = ZSocket.Create(context, ZSocketType.REP))
+			using (var socket = new ZSocket(context, ZSocketType.REP))
 			{
 				socket.Bind("inproc://helloworld");
 
+				ZFrame request;
 				ZError error;
-				ZMessage request;
 
 				while (!cancellus.IsCancellationRequested)
 				{
-					if (null == (request = socket.ReceiveMessage(ZSocketFlags.DontWait, out error)))
+					if (null == (request = socket.ReceiveFrame(ZSocketFlags.DontWait, out error)))
 					{
 						if (error == ZError.EAGAIN) {
 							error = ZError.None;
@@ -71,48 +69,37 @@ namespace ZeroMQ.Test
 
 							continue;
 						}
-
+						if (error = ZError.ETERM)
+							break;	// Interrupted
 						throw new ZException(error);
 					}
 
+					// Let the response be "Hello " + input
 					using (request)
-					using (var response = new ZMessage())
+					using (var response = new ZFrame("Hello " + request.ReadString()))
 					{
-						// Let the response be "Hello " + input
-						response.Add(new ZFrame("Hello " + request[0].ReadString()));
-						
 						socket.Send(response);
 					}
 				}
-				
-				socket.Unbind("inproc://helloworld");
 			}
 		}
 
-		static string Client(string name)
+		static void Client(string name)
 		{
-			string output = null;
-
-			using (var socket = ZSocket.Create(context, ZSocketType.REQ))
+			using (var socket = new ZSocket(context, ZSocketType.REQ))
 			{
 				socket.Connect("inproc://helloworld");
 				
-				using (var request = new ZMessage())
+				using (var request = new ZFrame(name))
 				{
-					request.Add(new ZFrame(name));
-					
 					socket.Send(request);
 				}
 
-				using (ZMessage response = socket.ReceiveMessage())
+				using (ZFrame response = socket.ReceiveFrame())
 				{
-					output = response[0].ReadString();
+					Console.WriteLine( response.ReadString() );
 				}
-				
-				socket.Disconnect("inproc://helloworld");
 			}
-
-			return output;
 		}
 	}
 }
