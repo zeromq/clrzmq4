@@ -27,10 +27,7 @@
 			: this (context, default(string), action, args)
 		{
 			var rnd0 = new byte[16];
-			using (var rng = new RNGCryptoServiceProvider())
-			{
-				rng.GetBytes(rnd0);
-			}
+			using (var rng = new RNGCryptoServiceProvider()) rng.GetBytes(rnd0);
 			this.Endpoint = string.Format("inproc://{0}", ZContext.Encoding.GetString(rnd0));
 		}
 
