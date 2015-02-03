@@ -20,10 +20,11 @@
 
 		protected object[] Arguments { get; set; }
 
+		static readonly Random rnd = new Random();
+
 		public ZActor (ZContext context, ZAction action, params object[] args)
 			: this (context, default(string), action, args)
 		{
-			var rnd = new Random();
 			this.Endpoint = string.Format("inproc://{0}-{1}", rnd.Next(), rnd.Next());
 		}
 
