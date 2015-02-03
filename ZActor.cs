@@ -21,8 +21,6 @@
 
 		protected object[] Arguments { get; set; }
 
-		static readonly Random rnd = new Random();
-
 		public ZActor (ZContext context, ZAction action, params object[] args)
 			: this (context, default(string), action, args)
 		{
