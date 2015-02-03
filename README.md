@@ -27,17 +27,19 @@ namespace ZeroMQ.Test
 
 		static void Main(string[] args)
 		{
+			if (args == null || args.Length < 1)
+			{
+				args = new string[] { "World" };
+			}
+
 			// Setup the ZContext
 			using (context = new ZContext())
 			{
-				// Start the "Server"
+				// Create a cancellor
 				var cancellor = new CancellationTokenSource();
-				new Thread(() => Server(cancellor.Token)).Start();
 
-				if (args == null || args.Length < 1)
-				{
-					args = new string[] { "World" };
-				}
+				// Start the "Server"
+				new Thread(() => Server(cancellor.Token)).Start();
 
 				// Now we are the Client, asking the Server
 				foreach (string arg in args)
