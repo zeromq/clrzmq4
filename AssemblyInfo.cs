@@ -1,7 +1,27 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
+// Information about this assembly is defined by the following attributes.
+// Change them to the values specific to your project.
+
 [assembly: AssemblyTitle("ZeroMQ")]
-[assembly: AssemblyDescription("ZeroMQ .NET bindings")]
+[assembly: AssemblyDescription("ZeroMQ CLR namespace")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("ØMQ")]
+[assembly: AssemblyProduct("ZeroMQ")]
+[assembly: AssemblyCopyright("metadings")]
+[assembly: AssemblyTrademark("")]
+// [assembly: AssemblyCulture("")]
+
+// The assembly version has the format "{Major}.{Minor}.{Build}.{Revision}".
+// The form "{Major}.{Minor}.*" will automatically update the build and revision,
+// and "{Major}.{Minor}.{Build}.*" will update just the revision.
+
+[assembly: AssemblyVersion("1.0.*")]
+
+// The following attributes are used to specify the signing key for the assembly,
+// if desired. See the Mono documentation for more information about signing.
+
+// [assembly: AssemblyDelaySign(false)]
+// [assembly: AssemblyKeyFile("ZeroMQ.snk")]
+
