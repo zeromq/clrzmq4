@@ -364,7 +364,7 @@ namespace ZeroMQ
 		public ZMessage Duplicate() 
 		{
 			var message = new ZMessage();
-			foreach (var frame in this)
+			foreach (ZFrame frame in this)
 			{
 				message.Add(frame.Duplicate());
 			}
