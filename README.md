@@ -36,7 +36,6 @@ namespace ZeroMQ.Test
 
 				if (args == null || args.Length < 1)
 				{
-					// say there were some arguments...
 					args = new string[] { "World" };
 				}
 
@@ -57,12 +56,12 @@ namespace ZeroMQ.Test
 			{
 				socket.Bind("inproc://helloworld");
 
+				ZFrame request;
 				ZError error;
-				ZMessage request;
 
 				while (!cancellus.IsCancellationRequested)
 				{
-					if (null == (request = socket.ReceiveMessage(ZSocketFlags.DontWait, out error)))
+					if (null == (request = socket.ReceiveFrame(ZSocketFlags.DontWait, out error)))
 					{
 						if (error == ZError.EAGAIN) {
 							error = ZError.None;
@@ -70,13 +69,14 @@ namespace ZeroMQ.Test
 
 							continue;
 						}
-
+						if (error = ZError.ETERM)
+							break;	// Interrupted
 						throw new ZException(error);
 					}
 
 					// Let the response be "Hello " + input
 					using (request)
-					using (var response = new ZFrame("Hello " + request[0].ReadString()))
+					using (var response = new ZFrame("Hello " + request.ReadString()))
 					{
 						socket.Send(response);
 					}
@@ -95,9 +95,9 @@ namespace ZeroMQ.Test
 					socket.Send(request);
 				}
 
-				using (ZMessage response = socket.ReceiveMessage())
+				using (ZFrame response = socket.ReceiveFrame())
 				{
-					Console.WriteLine( response[0].ReadString() );
+					Console.WriteLine( response.ReadString() );
 				}
 			}
 		}
