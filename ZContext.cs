@@ -23,11 +23,6 @@ namespace ZeroMQ
 			protected set { _encoding = value; }
 		}
 
-		static ZContext()
-		{
-			// System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(zmq).TypeHandle);
-		}
-
 		public static bool Has(string capability)
 		{
 			using (var capabilityPtr = DispoIntPtr.AllocString(capability))
@@ -80,12 +75,12 @@ namespace ZeroMQ
 		{
 			ProxySteerable(frontend, backend, null, control);
 		}
-		
+
 		public static bool ProxySteerable(ZSocket frontend, ZSocket backend, ZSocket control, out ZError error)
 		{
 			return ProxySteerable(frontend, backend, null, control, out error);
 		}
-		
+
 		public static void ProxySteerable(ZSocket frontend, ZSocket backend, ZSocket capture, ZSocket control)
 		{
 			ZError error;
@@ -154,7 +149,7 @@ namespace ZeroMQ
 		{
 			EnsureNotDisposed();
 
-			int rc = zmq.ctx_set(_contextPtr, option.Number, optionValue);
+			int rc = zmq.ctx_set(_contextPtr, (Int32)option, optionValue);
 			if (rc == -1)
 			{
 				var error = ZError.GetLastErr();
@@ -173,7 +168,7 @@ namespace ZeroMQ
 		{
 			EnsureNotDisposed();
 
-			int rc = zmq.ctx_get(_contextPtr, option.Number);
+			int rc = zmq.ctx_get(_contextPtr, (Int32)option);
 			if (rc == -1)
 			{
 				var error = ZError.GetLastErr();

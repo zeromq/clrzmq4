@@ -68,7 +68,7 @@ namespace ZeroMQ
 		{
 			error = default(ZError);
 
-			if (IntPtr.Zero == (_socketPtr = zmq.socket(_context.ContextPtr, _socketType.Number)))
+			if (IntPtr.Zero == (_socketPtr = zmq.socket(_context.ContextPtr, (Int32)_socketType)))
 			{
 				error = ZError.GetLastErr();
 				return false;

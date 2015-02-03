@@ -66,8 +66,6 @@
 			var symbols = new HashSet<ZSymbol>();
 
 			PickupConstantSymbols<ZError>(ref symbols, true);
-			PickupConstantSymbols<ZContextOption>(ref symbols);
-			PickupConstantSymbols<ZSocketType>(ref symbols);
 
 			_allSymbols = symbols.ToArray();
 		}
