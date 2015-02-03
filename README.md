@@ -48,8 +48,6 @@ namespace ZeroMQ.Test
 
 				// Cancel the Server
 				cancellor.Cancel();
-			
-				// could have done here context.Terminate()
 			}
 		}
 
