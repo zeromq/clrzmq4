@@ -7,7 +7,7 @@ ZeroMQ.dll is built AnyCPU, running on Windows (VC2010) and on Linux (GNU C 4.8.
 
 You can get it
 - by [downloading the Release](https://github.com/zeromq/clrzmq4/releases/tag/master00),
-- using nuget `PM> Install-Package ZeroMQ`, or by [downloading the nupkg](https://packages.nuget.org/api/v1/package/ZeroMQ/),
+- using nuget `PM> Install-Package [ZeroMQ](https://www.nuget.org/packages/ZeroMQ/)`, or by [downloading the nupkg](https://packages.nuget.org/api/v1/package/ZeroMQ/),
 - or using `git clone https://github.com/zeromq/clrzmq4`
 
 Also read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
