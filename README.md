@@ -3,12 +3,12 @@
 
 Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 3+.
 
-ZeroMQ.dll is built AnyCPU, running on Windows (VC2010) and on Linux (GNU C 4.8.2).
+ZeroMQ.dll is built AnyCPU, running on Windows (VC2010) and on Linux (GNU C 4.8.2), i386 and amd64.
 
 You can get it
 - by [downloading the Release](https://github.com/zeromq/clrzmq4/releases/tag/master00),
-- using [nuget](https://www.nuget.org/packages/ZeroMQ/) `PM> Install-Package ZeroMQ`, or by [downloading the nupkg](https://packages.nuget.org/api/v1/package/ZeroMQ/),
-- or using `git clone https://github.com/zeromq/clrzmq4`
+- using [nuget](https://www.nuget.org/packages/ZeroMQ/) `PM> Install-Package ZeroMQ` or by [downloading the nupkg](https://packages.nuget.org/api/v1/package/ZeroMQ/),
+- using `git clone https://github.com/zeromq/clrzmq4`
 
 Also read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
 - ZeroMQ - [The Guide Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
