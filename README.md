@@ -11,7 +11,6 @@ You can get it
 - or using `git clone https://github.com/zeromq/clrzmq4`
 
 Also read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
-
 - ZeroMQ - [The Guide Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
 - ZeroMQ - [C# Projects](http://github.com/metadings/clrzmq-test)
 
