@@ -3,6 +3,12 @@
 
 Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 3+.
 
+You can get the ZeroMQ.dll
+
+- by [downloading the Release](https://github.com/zeromq/clrzmq4/releases/tag/master00),
+- using nuget `PM> Install-Package ZeroMQ`, or by [downloading the nupkg](https://packages.nuget.org/api/v1/package/ZeroMQ/),
+- or using `git clone https://github.com/zeromq/clrzmq4`
+
 Also read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
 
 - ZeroMQ - [The Guide Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
