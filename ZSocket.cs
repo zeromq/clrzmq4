@@ -729,7 +729,6 @@ namespace ZeroMQ
 
 						if (error == ZError.EINTR)
 						{
-							error = null;
 							continue;
 						}
 
@@ -746,7 +745,6 @@ namespace ZeroMQ
 
 						if (error == ZError.EINTR)
 						{
-							error = null;
 							continue;
 						}
 
