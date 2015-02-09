@@ -155,8 +155,7 @@ namespace ZeroMQ
 				if (error == ZError.EINVAL)
 				{
 					throw new ArgumentOutOfRangeException(
-						string.Format("The requested option optionName \"{0}\" is invalid.",
-							option));
+						string.Format("The requested option optionName \"{0}\" is invalid.", option));
 				}
 				throw new ZException(error);
 			}
@@ -174,8 +173,7 @@ namespace ZeroMQ
 				if (error == ZError.EINVAL)
 				{
 					throw new ArgumentOutOfRangeException(
-						string.Format("The requested option optionName \"{0}\" is invalid.",
-								  option));
+						string.Format("The requested option optionName \"{0}\" is invalid.", option));
 				}
 				throw new ZException(error);
 			}
