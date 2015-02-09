@@ -63,7 +63,6 @@ namespace ZeroMQ
 				error = ZError.GetLastErr();
 				if (error == ZError.EINTR)
 				{
-					error = ZError.None;
 					continue;
 				}
 				return false;
@@ -99,7 +98,6 @@ namespace ZeroMQ
 				error = ZError.GetLastErr();
 				if (error == ZError.EINTR)
 				{
-					error = ZError.None;
 					continue;
 				}
 				return false;
@@ -239,7 +237,6 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
-					error = ZError.None;
 					continue;
 				}
 
@@ -277,7 +274,6 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
-					error = ZError.None;
 					continue;
 				}
 

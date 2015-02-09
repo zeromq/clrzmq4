@@ -42,7 +42,6 @@
 
 					if (error == ZError.EINTR)
 					{
-						error = default(ZError);
 						continue;
 					}
 					break;
@@ -82,7 +81,6 @@
 
 					if (error == ZError.EINTR)
 					{
-						error = default(ZError);
 						continue;
 					}
 					break;

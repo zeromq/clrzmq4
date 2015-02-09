@@ -95,10 +95,7 @@
 					error = ZError.GetLastErr();
 
 					if (error == ZError.EINTR)
-					{
-						error = default(ZError);
 						continue;
-					}
 
 					frame.Dispose();
 
@@ -173,12 +170,10 @@
 
 					if (error == ZError.EINTR)
 					{
-						error = ZError.None;
 						continue;
 					}
 					/* if (error == ZError.EAGAIN)
 					{
-						error = ZError.None;
 						Thread.Sleep(1);
 
 						continue;

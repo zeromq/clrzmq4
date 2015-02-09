@@ -81,7 +81,6 @@ namespace ZeroMQ.Monitoring
 
 					if (error == ZError.EINTR)
 					{
-						error = ZError.None;
 						continue;
 					}
 

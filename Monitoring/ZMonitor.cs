@@ -165,9 +165,7 @@ namespace ZeroMQ.Monitoring
 				{
 					if (error == ZError.EAGAIN)
 					{
-						error = ZError.None;
 						Thread.Sleep(1);
-
 						continue;
 					}
 

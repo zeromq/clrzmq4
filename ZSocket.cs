@@ -328,7 +328,6 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
-					error = default(ZError);
 					continue;
 				}
 
@@ -366,7 +365,6 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
-					error = default(ZError);
 					continue;
 				}
 
@@ -535,7 +533,6 @@ namespace ZeroMQ
 
 					if (error == ZError.EINTR)
 					{
-						error = default(ZError);
 						continue;
 					}
 					if (error == ZError.EAGAIN && ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait))
@@ -691,7 +688,6 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
-					error = default(ZError);
 					continue;
 				}
 				if (error == ZError.EAGAIN)
@@ -701,9 +697,7 @@ namespace ZeroMQ
 						return false;
 					}
 
-					error = default(ZError);
 					Thread.Sleep(1);
-
 					continue;
 				}
 
@@ -788,7 +782,6 @@ namespace ZeroMQ
 
 					if (error == ZError.EINTR)
 					{
-						error = ZError.None;
 						continue;
 					}
 
@@ -961,7 +954,6 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
-					error = ZError.None;
 					continue;
 				}
 
