@@ -112,7 +112,6 @@ namespace Examples
 				}
 			}
 		}
-
 	}
 }
 ```
