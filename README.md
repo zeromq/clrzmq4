@@ -66,12 +66,13 @@ namespace Examples
 
 		static void Server(ZContext ctx, CancellationToken cancellus)
 		{
+			ZError error;
+
 			using (var socket = new ZSocket(ctx, ZSocketType.REP))
 			{
 				socket.Bind("inproc://helloworld");
 
 				ZFrame request;
-				ZError error;
 
 				while (!cancellus.IsCancellationRequested)
 				{
