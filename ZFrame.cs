@@ -290,9 +290,10 @@ namespace ZeroMQ
 			if (_framePtr == null)
 				return;
 
-			GC.SuppressFinalize(this);
 			_framePtr.Dispose();
 			_framePtr = null;
+
+			Dispose();
 		}
 
 		public bool IsDismissed
