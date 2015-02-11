@@ -14,7 +14,7 @@ Read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
 - ZeroMQ - [The Guide Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
 - ZeroMQ - [C# Projects](http://github.com/metadings/clrzmq-test)
 
-**[Simple REQ <=> REP](https://github.com/metadings/zguide/blob/master/examples/C%23/Beispiel.cs)**
+**[Simple REQ-REP](https://github.com/metadings/zguide/blob/master/examples/C%23/Beispiel.cs)**
 
 ```csharp
 using System;
@@ -30,7 +30,7 @@ namespace Examples
 		public static void Main(string[] args)
 		{
 			//
-			// Simple REQ <=> REP
+			// Simple REQ-REP
 			//
 			// Author: metadings
 			//
