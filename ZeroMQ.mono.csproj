@@ -62,7 +62,6 @@
     <Compile Include="lib\zmq_pollitem_windows_t.cs" />
     <Compile Include="Monitoring\ZMonitorEventData.cs" />
     <Compile Include="Monitoring\ZMonitorEvents.cs" />
-    <Compile Include="Monitoring\ZMonitorSocketExtensions.cs" />
     <Compile Include="Monitoring\ZMonitor.cs" />
     <Compile Include="Monitoring\ZMonitorEventArgs.cs" />
     <Compile Include="Monitoring\ZMonitorFileDescriptorEventArgs.cs" />
@@ -89,6 +88,7 @@
     <Compile Include="ZThread.cs" />
     <Compile Include="Devices\ZDeviceSocketSetup.cs" />
     <Compile Include="ZActor.cs" />
+    <Compile Include="Monitoring\ZMonitors.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

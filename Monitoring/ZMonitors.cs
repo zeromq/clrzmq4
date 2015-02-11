@@ -9,7 +9,7 @@ namespace ZeroMQ.Monitoring
 	/// <summary>
 	/// Defines extension methods related to monitoring for <see cref="ZmqSocket"/> instances.
 	/// </summary>
-	public static class ZMonitorSocketExtensions
+	public static class ZMonitors
 	{
 		public static bool Monitor(this ZSocket socket, string endpoint)
 		{
