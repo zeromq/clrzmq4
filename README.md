@@ -47,7 +47,8 @@ namespace Examples
 				var cancellor = new CancellationTokenSource();
 
 				// Start the "Server"
-				new Thread( () => Server(ctx, cancellor.Token) ).Start();
+				var server = new Thread( () => Server(ctx, cancellor.Token) );
+				server.Start();
 
 				// Now we are the Client, asking the Server
 				foreach (string arg in args)
