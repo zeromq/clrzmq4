@@ -98,6 +98,7 @@
   <Target Name="AfterBuild" />
   <ItemGroup>
     <None Include="ZeroMQ.snk" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="amd64\libsodium.dll">
