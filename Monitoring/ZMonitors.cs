@@ -27,7 +27,7 @@ namespace ZeroMQ.Monitoring
 		/// </summary>
 		/// <remarks>
 		/// It is recommended to connect via a <see cref="ZSocketType.PAIR"/> socket in another thread
-		/// to handle incoming monitoring events. The <see cref="ZmqMonitor"/> class provides an event-driven
+		/// to handle incoming monitoring events. The <see cref="ZMonitor"/> class provides an event-driven
 		/// abstraction over event processing.
 		/// </remarks>
 		/// <param name="socket">The <see cref="ZSocket"/> instance to monitor for state changes.</param>
