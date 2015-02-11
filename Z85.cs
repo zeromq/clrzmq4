@@ -81,7 +81,7 @@ namespace ZeroMQ
 				throw new InvalidOperationException("encoded.Length must be divisible by 5");
 			}
 
-			int destLen = (Int32)(encoded.Length * .8) + 1;
+			int destLen = (Int32)(encoded.Length * .8);
 
 			using (var data = DispoIntPtr.Alloc(dataLen))
 			using (var dest = DispoIntPtr.Alloc(destLen))
@@ -93,7 +93,7 @@ namespace ZeroMQ
 					throw new InvalidOperationException();
 				}
 
-				var decoded = new byte[destLen - 1];
+				var decoded = new byte[destLen];
 				Marshal.Copy(dest, decoded, 0, decoded.Length);
 				return decoded;
 			}
