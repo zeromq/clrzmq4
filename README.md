@@ -57,10 +57,11 @@ namespace Examples
 
 				// Shutdown the ZContext
 				// ctx.Shutdown();
-				// Thread.Sleep(1);
+				// server.Join();
 
 				// Cancel the Server
 				cancellor.Cancel();
+				server.Join();
 			}
 		}
 
