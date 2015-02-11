@@ -10,7 +10,7 @@ You can get it
 - using [nuget](https://www.nuget.org/packages/ZeroMQ/) `PM> Install-Package ZeroMQ` or by [downloading the nupkg](https://packages.nuget.org/api/v1/package/ZeroMQ/),
 - using `git clone https://github.com/zeromq/clrzmq4`
 
-Also read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
+Read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
 - ZeroMQ - [The Guide Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
 - ZeroMQ - [C# Projects](http://github.com/metadings/clrzmq-test)
 
