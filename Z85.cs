@@ -13,7 +13,7 @@ namespace ZeroMQ
 			int dataLen = decoded.Length;
 			if (dataLen % 4 > 0)
 			{
-				throw new InvalidOperationException("decoded.Length must be divisable by 4");
+				throw new InvalidOperationException("decoded.Length must be divisible by 4");
 			}
 
 			int destLen = (Int32)(decoded.Length * 1.25) + 1;
@@ -78,7 +78,7 @@ namespace ZeroMQ
 			int dataLen = encoded.Length;
 			if (dataLen % 5 > 0)
 			{
-				throw new InvalidOperationException("encoded.Length must be divisable by 5");
+				throw new InvalidOperationException("encoded.Length must be divisible by 5");
 			}
 
 			int destLen = (Int32)(encoded.Length * .8) + 1;
