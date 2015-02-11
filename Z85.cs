@@ -18,15 +18,15 @@ namespace ZeroMQ
 
 			int destLen = (Int32)(decoded.Length * 1.25) + 1;
 
-			using (var data = DispoIntPtr.Alloc(dataLen))
+			var data = GCHandle.Alloc(decoded, GCHandleType.Pinned);
 			using (var dest = DispoIntPtr.Alloc(destLen))
 			{
-				Marshal.Copy(decoded, 0, data, decoded.Length);
-
-				if (IntPtr.Zero == zmq.z85_encode(dest, data, dataLen))
+				if (IntPtr.Zero == zmq.z85_encode(dest, data.AddrOfPinnedObject(), dataLen))
 				{
+					data.Free();
 					throw new InvalidOperationException();
 				}
+				data.Free();
 
 				var bytes = new byte[destLen]; 
 				Marshal.Copy(dest, bytes, 0, destLen);
@@ -83,15 +83,15 @@ namespace ZeroMQ
 
 			int destLen = (Int32)(encoded.Length * .8);
 
-			using (var data = DispoIntPtr.Alloc(dataLen))
+			var data = GCHandle.Alloc(encoded, GCHandleType.Pinned);
 			using (var dest = DispoIntPtr.Alloc(destLen))
 			{
-				Marshal.Copy(encoded, 0, data, encoded.Length);
-
-				if (IntPtr.Zero == zmq.z85_decode(dest, data))
+				if (IntPtr.Zero == zmq.z85_decode(dest, data.AddrOfPinnedObject()))
 				{
+					data.Free();
 					throw new InvalidOperationException();
 				}
+				data.Free();
 
 				var decoded = new byte[destLen];
 				Marshal.Copy(dest, decoded, 0, decoded.Length);
