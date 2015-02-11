@@ -48,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Devices\ZDevice.cs" />
+    <Compile Include="Monitoring\ZMonitors.cs" />
+    <Compile Include="Z85.cs" />
     <Compile Include="ZActor.cs" />
     <Compile Include="ZThread.cs" />
     <Compile Include="Devices\ZDeviceSocketSetup.cs" />
@@ -67,7 +69,6 @@
     <Compile Include="lib\zmq_pollitem_windows_t.cs" />
     <Compile Include="Monitoring\ZMonitorEventData.cs" />
     <Compile Include="Monitoring\ZMonitorEvents.cs" />
-    <Compile Include="Monitoring\ZMonitorSocketExtensions.cs" />
     <Compile Include="Monitoring\ZMonitor.cs" />
     <Compile Include="Monitoring\ZMonitorEventArgs.cs" />
     <Compile Include="Monitoring\ZMonitorFileDescriptorEventArgs.cs" />
@@ -123,6 +124,7 @@
     <None Include="amd64\libzmq.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="README.md" />
     <None Include="ZeroMQ.snk" />
   </ItemGroup>
 </Project>
