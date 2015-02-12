@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>ZeroMQ</id>
-    <version>4.1.0.4</version>
+    <version>4.1.0.5</version>
     <authors>Pieter Hintjens, metadings</authors>
     <projectUrl>https://github.com/zeromq/clrzmq4/</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/zeromq/clrzmq4/master/ZeroMQ.ico</iconUrl>
