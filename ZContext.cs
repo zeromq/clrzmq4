@@ -64,7 +64,7 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
-					error == default(ZError);
+					error = default(ZError);
 					continue;
 				}
 				return false;
@@ -101,7 +101,7 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
-					error == default(ZError);
+					error = default(ZError);
 					continue;
 				}
 				return false;
@@ -239,7 +239,7 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
-					error == default(ZError);
+					error = default(ZError);
 					continue;
 				}
 
@@ -277,7 +277,7 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
-					error == default(ZError);
+					error = default(ZError);
 					continue;
 				}
 

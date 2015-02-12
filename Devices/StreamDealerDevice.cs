@@ -96,7 +96,7 @@
 
 					if (error == ZError.EINTR) 
 					{
-						error == default(ZError);
+						error = default(ZError);
 						continue;
 					}
 
@@ -173,7 +173,7 @@
 
 					if (error == ZError.EINTR)
 					{
-						error == default(ZError);
+						error = default(ZError);
 						continue;
 					}
 					/* if (error == ZError.EAGAIN)
