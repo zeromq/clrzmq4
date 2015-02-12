@@ -142,9 +142,10 @@ namespace ZeroMQ
 		{
 			var msg = DispoIntPtr.Alloc(zmq.sizeof_zmq_msg_t);
 
+			ZError error;
 			while (-1 == zmq.msg_init(msg))
 			{
-				var error = ZError.GetLastErr();
+				error = ZError.GetLastErr();
 
 				if (error == ZError.EINTR)
 				{
