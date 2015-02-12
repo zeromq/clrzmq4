@@ -123,9 +123,6 @@
 			if (Name != null)
 				hash ^= Name.GetHashCode();
 
-			if (Text != null)
-				hash ^= Text.GetHashCode();
-
 			return hash;
 		}
 
