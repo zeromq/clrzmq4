@@ -549,9 +549,7 @@ namespace ZeroMQ
 
 				frames.Add(frame);
 
-				--framesToReceive;
-
-			} while (framesToReceive > 0 && (framesToReceive > 1 ? this.ReceiveMore : false));
+			} while (--framesToReceive > 0 && (framesToReceive > 1 ? this.ReceiveMore : false));
 
 			return true;
 		}
