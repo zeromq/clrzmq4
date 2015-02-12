@@ -15,10 +15,10 @@ namespace ZeroMQ
 			{
 				throw new InvalidOperationException("decoded.Length must be divisible by 4");
 			}
-
 			int destLen = (Int32)(decoded.Length * 1.25) + 1;
 
 			var data = GCHandle.Alloc(decoded, GCHandleType.Pinned);
+
 			using (var dest = DispoIntPtr.Alloc(destLen))
 			{
 				if (IntPtr.Zero == zmq.z85_encode(dest, data.AddrOfPinnedObject(), dataLen))
@@ -28,8 +28,10 @@ namespace ZeroMQ
 				}
 				data.Free();
 
-				var bytes = new byte[destLen]; 
+				var bytes = new byte[destLen];
+
 				Marshal.Copy(dest, bytes, 0, destLen);
+
 				return bytes;
 			}
 		}
@@ -57,7 +59,9 @@ namespace ZeroMQ
 		public static string Encode(string strg, Encoding encoding)
 		{
 			byte[] bytes = encoding.GetBytes(strg);
+
 			byte[] encoded = Encode(bytes);
+
 			return encoding.GetString(encoded);
 		}
 
@@ -80,10 +84,10 @@ namespace ZeroMQ
 			{
 				throw new InvalidOperationException("encoded.Length must be divisible by 5");
 			}
-
 			int destLen = (Int32)(encoded.Length * .8);
 
 			var data = GCHandle.Alloc(encoded, GCHandleType.Pinned);
+
 			using (var dest = DispoIntPtr.Alloc(destLen))
 			{
 				if (IntPtr.Zero == zmq.z85_decode(dest, data.AddrOfPinnedObject()))
@@ -94,7 +98,9 @@ namespace ZeroMQ
 				data.Free();
 
 				var decoded = new byte[destLen];
+
 				Marshal.Copy(dest, decoded, 0, decoded.Length);
+
 				return decoded;
 			}
 		}
