@@ -178,6 +178,7 @@
 					}
 					/* if (error == ZError.EAGAIN)
 					{
+						error = default(ZError);
 						Thread.Sleep(1);
 
 						continue;
