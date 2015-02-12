@@ -148,6 +148,7 @@ namespace ZeroMQ
 
 				if (error == ZError.EINTR)
 				{
+					error == default(ZError);
 					continue;
 				}
 
@@ -163,12 +164,14 @@ namespace ZeroMQ
 		{
 			var msg = DispoIntPtr.Alloc(zmq.sizeof_zmq_msg_t);
 
+			ZError error;
 			while (-1 == zmq.msg_init_size(msg, size))
 			{
-				var error = ZError.GetLastErr();
+				error = ZError.GetLastErr();
 
 				if (error == ZError.EINTR)
 				{
+					error == default(ZError);
 					continue;
 				}
 
@@ -255,19 +258,20 @@ namespace ZeroMQ
 		{
 			var msg = DispoIntPtr.Alloc(zmq.sizeof_zmq_msg_t);
 
+			ZError error;
 			while (-1 == zmq.msg_init_data(msg, data, size, /* msg_free_delegate null, /* hint IntPtr.Zero)) {
-				ZmqError error = ZmqContext.GetLastError();
+				error = ZError.GetLastError();
 
-				if (error == ZmqError.EINTR) {
+				if (error == ZError.EINTR) {
 					continue;
 				}
 
 				msg.Dispose();
 
-				if (error == ZmqError.ENOMEM) {
+				if (error == ZError.ENOMEM) {
 					throw new OutOfMemoryException ("zmq_msg_init_size");
 				}
-				throw new ZmqException (error, "zmq_msg_init_size");
+				throw new ZException (error, "zmq_msg_init_size");
 			}
 			return msg;
 		} */
@@ -635,12 +639,14 @@ namespace ZeroMQ
 				return;
 			}
 
+			ZError error;
 			while (-1 == zmq.msg_close(_framePtr))
 			{
-				var error = ZError.GetLastErr();
+				error = ZError.GetLastErr();
 
 				if (error == ZError.EINTR)
 				{
+					error == default(ZError);
 					continue;
 				}
 				if (error == ZError.EFAULT)
@@ -657,14 +663,15 @@ namespace ZeroMQ
 
 		public void CopyZeroTo(ZFrame other)
 		{
-
 			// zmq.msg_copy(dest, src)
+			ZError error;
 			while (-1 == zmq.msg_copy(other._framePtr, _framePtr))
 			{
-				var error = ZError.GetLastErr();
+				error = ZError.GetLastErr();
 
 				if (error == ZError.EINTR)
 				{
+					error == default(ZError);
 					continue;
 				}
 				if (error == ZError.EFAULT)
@@ -677,14 +684,15 @@ namespace ZeroMQ
 
 		public void MoveZeroTo(ZFrame other)
 		{
-
 			// zmq.msg_copy(dest, src)
+			ZError error;
 			while (-1 == zmq.msg_move(other._framePtr, _framePtr))
 			{
-				var error = ZError.GetLastErr();
+				error = ZError.GetLastErr();
 
 				if (error == ZError.EINTR)
 				{
+					error == default(ZError);
 					continue;
 				}
 				if (error == ZError.EFAULT)
