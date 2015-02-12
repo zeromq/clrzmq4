@@ -11,6 +11,10 @@ namespace ZeroMQ.Monitoring
 	/// </summary>
 	public static class ZMonitors
 	{
+		/// <summary>
+		/// Spawns a <see cref="ZSocketType.PAIR"/> socket that publishes all events for
+		/// the specified socket over the inproc transport at the given endpoint.
+		/// </summary>
 		public static bool Monitor(this ZSocket socket, string endpoint)
 		{
 			ZError error;
@@ -22,24 +26,18 @@ namespace ZeroMQ.Monitoring
 		}
 
 		/// <summary>
-		/// Spawns a <see cref="ZSocketType.PAIR"/> socket that publishes all state changes (events) for
+		/// Spawns a <see cref="ZSocketType.PAIR"/> socket that publishes all events for
 		/// the specified socket over the inproc transport at the given endpoint.
 		/// </summary>
-		/// <remarks>
-		/// It is recommended to connect via a <see cref="ZSocketType.PAIR"/> socket in another thread
-		/// to handle incoming monitoring events. The <see cref="ZMonitor"/> class provides an event-driven
-		/// abstraction over event processing.
-		/// </remarks>
-		/// <param name="socket">The <see cref="ZSocket"/> instance to monitor for state changes.</param>
-		/// <param name="endpoint">The inproc endpoint on which state changes will be published.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="socket"/> or <see cref="endpoint"/> is null.</exception>
-		/// <exception cref="ArgumentException"><see cref="endpoint"/> is an empty string.</exception>
-		/// <exception cref="ZException">An error occurred initiating socket monitoring.</exception>
 		public static bool Monitor(this ZSocket socket, string endpoint, out ZError error)
 		{
 			return Monitor(socket, endpoint, ZMonitorEvents.AllEvents, out error);
 		}
 
+		/// <summary>
+		/// Spawns a <see cref="ZSocketType.PAIR"/> socket that publishes all events for
+		/// the specified socket over the inproc transport at the given endpoint.
+		/// </summary>
 		public static bool Monitor(this ZSocket socket, string endpoint, ZMonitorEvents eventsToMonitor)
 		{
 			ZError error;
@@ -51,7 +49,7 @@ namespace ZeroMQ.Monitoring
 		}
 
 		/// <summary>
-		/// Spawns a <see cref="ZSocketType.PAIR"/> socket that publishes the specified state changes (events) for
+		/// Spawns a <see cref="ZSocketType.PAIR"/> socket that publishes all events for
 		/// the specified socket over the inproc transport at the given endpoint.
 		/// </summary>
 		public static bool Monitor(this ZSocket socket, string endpoint, ZMonitorEvents eventsToMonitor, out ZError error)
