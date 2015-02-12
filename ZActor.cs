@@ -9,17 +9,17 @@
 
 	public class ZActor : ZThread
 	{
-		public ZContext Context { get; protected set; }
-
-		public ZSocket Frontend { get; protected set; }
-
 		public string Endpoint { get; protected set; }
+
+		public ZContext Context { get; protected set; }
 
 		protected ZSocket Backend { get; set; }
 
 		protected ZAction Action { get; set; }
 
 		protected object[] Arguments { get; set; }
+
+		public ZSocket Frontend { get; protected set; }
 
 		public ZActor (ZContext context, ZAction action, params object[] args)
 			: this (context, default(string), action, args)
