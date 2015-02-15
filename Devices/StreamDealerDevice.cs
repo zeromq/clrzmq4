@@ -69,7 +69,15 @@
 				incoming.Insert(1, new ZFrame());
 
 				// Prepend Z_LAST_ENDPOINT
-				// incoming.Insert(2, new ZFrame(incoming[0].GetOption("Peer-Address")));
+				string endpoint;
+				if (null != (endpoint = incoming[1].GetOption("Peer-Address", out error)))
+				{
+					incoming.Insert(2, new ZFrame(endpoint));
+				}
+				else
+				{
+					incoming.Insert(2, new ZFrame());
+				}
 
 				while (!BackendSocket.Send(incoming, ZSocketFlags.DontWait, out error))
 				{
