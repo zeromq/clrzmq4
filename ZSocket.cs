@@ -692,23 +692,12 @@ namespace ZeroMQ
 					error = default(ZError);
 					continue;
 				}
-				if (error == ZError.EAGAIN)
-				{
-					if ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait)
-					{
-						return false;
-					}
-
-					Thread.Sleep(1);
-					continue;
-				}
 
 				return false;
 			}
 
 			// Tell IDisposable to not unallocate zmq_msg
 			frame.Dismiss();
-
 			return true;
 		}
 
