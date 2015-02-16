@@ -1,6 +1,7 @@
 ﻿namespace ZeroMQ.Devices
 {
 	using lib;
+	using lib.sys;
 
 	using System;
 	using System.Threading;
@@ -69,17 +70,9 @@
 				incoming.Insert(1, new ZFrame());
 
 				// Prepend Z_LAST_ENDPOINT
-				string endpoint;
-				if (null != (endpoint = incoming[1].GetOption("Peer-Address", out error)))
-				{
-					incoming.Insert(2, new ZFrame(endpoint));
-				}
-				else
-				{
-					incoming.Insert(2, new ZFrame());
-				}
+				incoming.Insert(2, new ZFrame(incoming[0].GetPeerName().ToString()));
 
-				while (!BackendSocket.Send(incoming, ZSocketFlags.DontWait, out error))
+				while (!BackendSocket.Send(incoming, /* ZSocketFlags.DontWait, */ out error))
 				{
 					return false;
 				}
@@ -98,7 +91,7 @@
 			{
 				var frame = ZFrame.CreateEmpty();
 
-				while (-1 == zmq.msg_recv(frame.Ptr, sock.SocketPtr, (int)(ZSocketFlags.DontWait | ZSocketFlags.More)))
+				while (-1 == zmq.msg_recv(frame.Ptr, sock.SocketPtr, (int)(/* ZSocketFlags.DontWait | */ ZSocketFlags.More)))
 				{
 					error = ZError.GetLastErr();
 
@@ -137,7 +130,7 @@
 			// receiving scope
 			// DEALER: normal movemsg
 			ZMessage incoming = null;
-			if (!sock.ReceiveMessage(ZSocketFlags.DontWait, ref incoming, out error))
+			if (!sock.ReceiveMessage(/* ZSocketFlags.DontWait */ ZSocketFlags.None, ref incoming, out error))
 			{
 				return false;
 			}
@@ -175,7 +168,7 @@
 
 			foreach (ZFrame frame in msg)
 			{
-				while (-1 == zmq.msg_send(frame.Ptr, sock.SocketPtr, (int)(ZSocketFlags.DontWait | ZSocketFlags.More)))
+				while (-1 == zmq.msg_send(frame.Ptr, sock.SocketPtr, (int)(/* ZSocketFlags.DontWait | */ ZSocketFlags.More)))
 				{
 					error = ZError.GetLastErr();
 
