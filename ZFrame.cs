@@ -707,10 +707,10 @@ namespace ZeroMQ
 			Close();
 		}
 
-		public int GetOption(int property)
+		public Int32 GetOption(ZFrameOption property)
 		{
+			Int32 result;
 			ZError error;
-			int result;
 			if (-1 == (result = GetOption(property, out error)))
 			{
 				throw new ZException(error);
@@ -718,12 +718,12 @@ namespace ZeroMQ
 			return result;
 		}
 
-		public int GetOption(int property, out ZError error)
+		public Int32 GetOption(ZFrameOption property, out ZError error)
 		{
 			error = ZError.None;
 
 			int result;
-			if (-1 == (result = zmq.msg_get(this._framePtr, property)))
+			if (-1 == (result = zmq.msg_get(this._framePtr, (Int32)property)))
 			{
 				error = ZError.GetLastErr();
 				return -1;

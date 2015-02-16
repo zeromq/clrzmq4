@@ -310,7 +310,13 @@ namespace ZeroMQ
 
 		void ICollection<ZFrame>.CopyTo(ZFrame[] array, int arrayIndex)
 		{
-			_frames.CopyTo(array, arrayIndex);
+			int i = 0, count = this.Count;
+			foreach (ZFrame frame in this)
+			{
+				array[arrayIndex + i] = ZFrame.CopyFrom(frame);
+
+				i++; if (i >= count) break;
+			}
 		}
 
 		public bool Remove(ZFrame item)
