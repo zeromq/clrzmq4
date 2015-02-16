@@ -89,8 +89,28 @@ namespace ZeroMQ
 
 			public static class Posix
 			{
+				// source: http://www.virtsync.com/c-error-codes-include-errno
+
 				public static readonly int
-					EADDRINUSE = 98;
+					// ENOTSUP = HAUSNUMERO + 1,
+					EPROTONOSUPPORT = 93,
+					ENOBUFS = 105,
+					ENETDOWN = 100,
+					EADDRINUSE = 98,
+					EADDRNOTAVAIL = 99,
+					ECONNREFUSED = 111,
+					EINPROGRESS = 115,
+					ENOTSOCK = 88,
+					EMSGSIZE = 90,
+					EAFNOSUPPORT = 97,
+					ENETUNREACH = 101,
+					ECONNABORTED = 103,
+					ECONNRESET = 104,
+					ENOTCONN = 107,
+					ETIMEDOUT = 110,
+					EHOSTUNREACH = 113,
+					ENETRESET = 102
+				;
 			}
 		}
 
