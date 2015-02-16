@@ -6,7 +6,7 @@
 	using System.Runtime.CompilerServices;
 	using System.Runtime.InteropServices;
 
-	public enum sockaddr_family : UInt16
+	public enum sockaddr_family : ushort
 	{
 		inet = 2,
 		inet6 = 23
@@ -67,7 +67,7 @@
 
 	public static class socket
 	{
-		private const string LibraryName = "libc";
+		// private const string LibraryName = "libc";
 
 		// private static readonly UnmanagedLibrary NativeLib;
 
@@ -99,7 +99,9 @@
 
 		static class Posix 
 		{
-			[DllImport(socket.LibraryName, EntryPoint = "getpeername")]
+			const string LibraryName = "libc";
+
+			[DllImport(Posix.LibraryName, EntryPoint = "getpeername")]
 			static extern Int32 getpeername(Int32 sock, ref sockaddr addr, ref Int32 addrLen);
 
 			static IPAddress GetPeerNameNative(Int32 sock)
