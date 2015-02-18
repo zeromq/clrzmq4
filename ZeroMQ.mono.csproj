@@ -90,7 +90,6 @@
     <Compile Include="ZActor.cs" />
     <Compile Include="Monitoring\ZMonitors.cs" />
     <Compile Include="Z85.cs" />
-    <Compile Include="lib\sys\socket.cs" />
     <Compile Include="ZFrameOption.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -128,8 +127,5 @@
     <Content Include="i386\libzmq.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="lib\sys\" />
   </ItemGroup>
 </Project>
