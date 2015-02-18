@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Devices\ZDevice.cs" />
-    <Compile Include="lib\sys\socket.cs" />
     <Compile Include="Monitoring\ZMonitors.cs" />
     <Compile Include="Z85.cs" />
     <Compile Include="ZActor.cs" />
