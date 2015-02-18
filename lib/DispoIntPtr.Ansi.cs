@@ -18,7 +18,7 @@ namespace ZeroMQ.lib
 				dispPtr._ptr = Marshal.StringToHGlobalAnsi(str);
 				dispPtr.isAllocated = true;
 
-				byteCount = Encoding.Default.GetByteCount(str);
+				byteCount = ZContext.Encoding.GetByteCount(str);
 				return dispPtr;  /**/
 
 				/* use encoding or Encoding.Default ( system codepage of ANSI )
