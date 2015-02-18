@@ -51,7 +51,7 @@
 			ZMessage incoming = null;
 			// IPAddress address = null;
 			string address;
-			if (!ReceiveMsg(sock, 2, ref incoming, out address, out error))
+			if (!ReceiveMsg(sock, ref incoming, out address, out error))
 			{
 				return false;
 			}
@@ -86,11 +86,13 @@
 			return true;
 		}
 
-		static bool ReceiveMsg(ZSocket sock, int receiveCount, ref ZMessage message, out string address, out ZError error)
+		static bool ReceiveMsg(ZSocket sock, ref ZMessage message, out string address, out ZError error)
 		{
 			error = ZError.None;
 			// address = IPAddress.None;
 			address = string.Empty;
+
+			int receiveCount = 2;
 
 			do
 			{
