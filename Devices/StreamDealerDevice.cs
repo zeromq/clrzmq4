@@ -50,7 +50,8 @@
 			// STREAM: get 2 frames, identity and body
 			ZMessage incoming = null;
 			// IPAddress address = null;
-			if (!ReceiveMsg(sock, 2, ref incoming, /* out address, */ out error))
+			string address;
+			if (!ReceiveMsg(sock, 2, ref incoming, out address, out error))
 			{
 				return false;
 			}
@@ -72,9 +73,9 @@
 				incoming.Insert(1, new ZFrame());
 
 				// Prepend Z_LAST_ENDPOINT
-				incoming.Insert(2, new ZFrame()); //address.ToString()));
+				incoming.Insert(2, new ZFrame(address));
 
-				while (!BackendSocket.Send(incoming, /* ZSocketFlags.DontWait, */ out error))
+				if (!BackendSocket.Send(incoming, /* ZSocketFlags.DontWait, */ out error))
 				{
 					return false;
 				}
@@ -85,10 +86,11 @@
 			return true;
 		}
 
-		static bool ReceiveMsg(ZSocket sock, int receiveCount, ref ZMessage message, /* out IPAddress address, */ out ZError error)
+		static bool ReceiveMsg(ZSocket sock, int receiveCount, ref ZMessage message, out string address, out ZError error)
 		{
 			error = ZError.None;
 			// address = IPAddress.None;
+			address = string.Empty;
 
 			do
 			{
@@ -105,7 +107,6 @@
 					}
 
 					frame.Dispose();
-
 					return false;
 				}
 
@@ -115,10 +116,15 @@
 				}
 				message.Add(frame);
 
-				/* if (receiveCount == 1)
+				if (receiveCount == 2)
 				{
-					address = frame.GetPeerName();
-				} */
+					if (default(string) == (address = frame.GetOption("Peer-Address", out error)))
+					{
+						// just ignore
+						error = default(ZError);
+						address = string.Empty;
+					}
+				}
 
 			} while (--receiveCount > 0);
 
@@ -143,28 +149,28 @@
 				return false;
 			}
 
-			// STREAM: write frames: identity, body, identity, empty
-			// Read identity
-			int ic = (int)incoming[0].Length;
-			var identityBytes = new byte[ic];
-			incoming[0].Read(identityBytes, 0, ic); 
-
-			// Remove DEALER's delimiter
-			using (ZFrame delim = incoming[1])
+			using (incoming)
 			{
+				// STREAM: write frames: identity, body, identity, empty
+				// Read identity
+				int ic = (int)incoming[0].Length;
+				var identityBytes = new byte[ic];
+				incoming[0].Read(identityBytes, 0, ic); 
+
+				// Remove DEALER's delimiter
 				incoming.RemoveAt(1);
-			}
 
-			// Append Identity frame
-			var identity0 = new ZFrame(identityBytes);
-			incoming.Add(identity0);
+				// Append Identity frame
+				var identity0 = new ZFrame(identityBytes);
+				incoming.Add(identity0);
 
-			// Append STREAM's empty delimiter frame
-			incoming.Add(new ZFrame());
+				// Append STREAM's empty delimiter frame
+				incoming.Add(new ZFrame());
 
-			if (!SendMsg(FrontendSocket, incoming, out error))
-			{
-				return false;
+				if (!SendMsg(FrontendSocket, incoming, out error))
+				{
+					return false;
+				}
 			}
 
 			return true;
