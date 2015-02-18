@@ -1,9 +1,10 @@
 ﻿namespace ZeroMQ.Devices
 {
 	using lib;
-	using lib.sys;
+	// using lib.sys;
 
 	using System;
+	using System.Net;
 	using System.Threading;
 
 	/// <summary>
@@ -48,7 +49,8 @@
 			// receiving scope
 			// STREAM: get 2 frames, identity and body
 			ZMessage incoming = null;
-			if (!ReceiveMsg(sock, 2, ref incoming, out error))
+			// IPAddress address = null;
+			if (!ReceiveMsg(sock, 2, ref incoming, /* out address, */ out error))
 			{
 				return false;
 			}
@@ -70,7 +72,7 @@
 				incoming.Insert(1, new ZFrame());
 
 				// Prepend Z_LAST_ENDPOINT
-				incoming.Insert(2, new ZFrame(incoming[0].GetPeerName().ToString()));
+				incoming.Insert(2, new ZFrame()); //address.ToString()));
 
 				while (!BackendSocket.Send(incoming, /* ZSocketFlags.DontWait, */ out error))
 				{
@@ -83,9 +85,10 @@
 			return true;
 		}
 
-		static bool ReceiveMsg(ZSocket sock, int receiveCount, ref ZMessage message, out ZError error)
+		static bool ReceiveMsg(ZSocket sock, int receiveCount, ref ZMessage message, /* out IPAddress address, */ out ZError error)
 		{
 			error = ZError.None;
+			// address = IPAddress.None;
 
 			do
 			{
@@ -111,6 +114,11 @@
 					message = new ZMessage();
 				}
 				message.Add(frame);
+
+				/* if (receiveCount == 1)
+				{
+					address = frame.GetPeerName();
+				} */
 
 			} while (--receiveCount > 0);
 
