@@ -17,9 +17,7 @@ namespace ZeroMQ
 	{
 		public static ZFrame CopyFrom(ZFrame frame)
 		{
-			var copy = ZFrame.CreateEmpty();
-			frame.CopyZeroTo(copy);
-			return copy;
+			return frame.Duplicate();
 		}
 
 		public static ZFrame Create(int size) 
