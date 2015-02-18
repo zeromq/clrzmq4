@@ -72,7 +72,7 @@
 
 				// Search ManifestResources/fileName.arch.ext
 				path = Path.Combine(Path.GetTempPath(), fileName);
-				string resourceName = string.Format(string.Format("{0}.{1}{2}", libraryName, arch, LibraryFileExtension));
+				string resourceName = string.Format(string.Format("ZeroMQ.{0}.{1}{2}", libraryName, arch, LibraryFileExtension));
 
 				if (ExtractManifestResource(resourceName, path))
 				{
