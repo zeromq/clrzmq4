@@ -187,15 +187,15 @@ namespace ZeroMQ
 			return msg;
 		}
 
-		unsafe internal void WriteStringNative(string str, Encoding encoding, bool createOnWrongLength)
+		unsafe internal void WriteStringNative(string str, Encoding encoding, bool create)
 		{
 			if (str == null)
 			{
-				return;
+				throw new ArgumentNullException("str");
 			}
 			if (str == string.Empty)
 			{
-				if (createOnWrongLength)
+				if (create)
 				{
 					this._framePtr = CreateNative(0);
 					this._capacity = 0;
@@ -211,7 +211,7 @@ namespace ZeroMQ
 			{
 				int byteCount = enc.GetByteCount(strP, charCount, false);
 
-				if (createOnWrongLength)
+				if (create)
 				{
 					this._framePtr = CreateNative(byteCount);
 					this._capacity = byteCount;
