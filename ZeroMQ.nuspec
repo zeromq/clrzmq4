@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>ZeroMQ</id>
-    <version>4.1.0.5</version>
+    <version>4.1.0.6</version>
     <authors>Pieter Hintjens, metadings</authors>
     <projectUrl>https://github.com/zeromq/clrzmq4/</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/zeromq/clrzmq4/master/ZeroMQ.ico</iconUrl>
@@ -11,9 +11,15 @@
     <description>ZeroMQ CLR namespace</description>
     <copyright>ZeroMQ</copyright>
     <tags>clrzmq4 ZeroMQ ZMQ 0MQ ØMQ Messaging</tags>
+	<dependencies>
+		<dependency id="Baseclass.Contrib.Nuget.Output" />
+	</dependencies>
+	<references>
+		<reference file="ZeroMQ.dll" />
+	</references>
   </metadata>
 	<files>
-		<file src="**" target="content\net40\" exclude="bin\**\*.*;obj\**\*.*;amd64\v*\*.*;i386\v*\*.*;*.user;ZeroMQ.*.zip" />
-		<file src="\bin\Release\**\*.*" target="lib\net40\" />
+		<file src="\bin\Release\**\*.*" exclude="bin\ZeroMQ.*" target="output\" />
+		<file src="\bin\Release\*.*" target="lib\net40\" />
 	</files>
 </package>
