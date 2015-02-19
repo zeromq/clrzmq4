@@ -14,105 +14,206 @@ Read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
 - ZeroMQ - [The Guide Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
 - ZeroMQ - [C# Projects](http://github.com/metadings/clrzmq-test)
 
-**[Simple REQ-REP](https://github.com/metadings/zguide/blob/master/examples/C%23/Beispiel.cs)**
-
+**[HWClient](https://github.com/metadings/zguide/blob/master/examples/C%23/hwclient.cs)**
 ```csharp
-using System;
-using System.Collections.Generic;
-using System.Threading;
-
-using ZeroMQ;
-
-namespace Examples
-{
-	public class Program
+	public static void HWClient(IDictionary<string, string> dict, string[] args)
 	{
-		public static void Main(string[] args)
+		//
+		// Hello World client
+		//
+		// Author: metadings
+		//
+
+		// Create
+		using (var context = new ZContext())
+		using (var requester = new ZSocket(context, ZSocketType.REQ))
 		{
-			//
-			// Simple REQ-REP
-			//
-			// Author: metadings
-			//
+			// Connect
+			requester.Connect("tcp://127.0.0.1:5555");
 
-			if (args == null || args.Length < 1)
+			for (int n = 0; n < 10; ++n)
 			{
-				args = new string[] { "World", "You" };
-			}
+				string requestText = "Hello";
+				Console.Write("Sending {0}...", requestText);
 
-			// Setup the ZContext
-			using (var ctx = new ZContext())
-			{
-				// Create a cancellor
-				var cancellor = new CancellationTokenSource();
-
-				// Start the "Server"
-				var server = new Thread( () => Server(ctx, cancellor.Token) );
-				server.Start();
-
-				// Now we are the Client, asking the Server
-				foreach (string arg in args)
+				// Send
+				using (var request = new ZFrame(requestText)) 
 				{
-					Console.WriteLine( Client(ctx, arg) );
+					requester.Send(request);
 				}
 
-				// Shutdown the ZContext
-				// ctx.Shutdown();
-				// server.Join();
-
-				// Cancel the Server
-				cancellor.Cancel();
-				server.Join();
-			}
-		}
-
-		static void Server(ZContext ctx, CancellationToken cancellus)
-		{
-			ZError error;
-
-			using (var socket = new ZSocket(ctx, ZSocketType.REP))
-			{
-				socket.Bind("inproc://helloworld");
-
-				ZFrame request;
-
-				while (!cancellus.IsCancellationRequested)
+				// Receive
+				using (ZFrame reply = requester.ReceiveFrame()) 
 				{
-					if (null == (request = socket.ReceiveFrame(ZSocketFlags.DontWait, out error)))
-					{
-						if (error == ZError.EAGAIN)
-						{
-							Thread.Sleep(1);
-							continue;
-						}
-						if (error == ZError.ETERM)
-							break;  // Interrupted
-						throw new ZException(error);
-					}
-
-					using (request)
-					{
-						// Let the response be "Hello " + input
-						socket.Send(new ZFrame("Hello " + request.ReadString()));
-					}
-				}
-			}
-		}
-
-		static string Client(ZContext ctx, string name)
-		{
-			using (var socket = new ZSocket(ctx, ZSocketType.REQ))
-			{
-				socket.Connect("inproc://helloworld");
-
-				socket.Send(new ZFrame(name));
-
-				using (ZFrame response = socket.ReceiveFrame())
-				{
-					return response.ReadString();
+					Console.WriteLine(" Received: {0} {1}!", requestText, reply.ReadString());
 				}
 			}
 		}
 	}
-}
 ```
+**[HWServer](https://github.com/metadings/zguide/blob/master/examples/C%23/hwserver.cs)**
+```csharp
+	public static void HWServer(IDictionary<string, string> dict, string[] args)
+	{
+		//
+		// Hello World server
+		//
+		// Author: metadings
+		//
+
+		if (args == null || args.Length < 1)
+		{
+			Console.WriteLine();
+			Console.WriteLine("Usage: ./{0} HWServer [Name]", AppDomain.CurrentDomain.FriendlyName);
+			Console.WriteLine();
+			Console.WriteLine("    Name   Your name. Default: World");
+			Console.WriteLine();
+			args = new string[] { "World" };
+		}
+
+		string name = args[0];
+
+		// Create
+		using (var context = new ZContext())
+		using (var responder = new ZSocket(context, ZSocketType.REP))
+		{
+			// Bind
+			responder.Bind("tcp://*:5555");
+
+			while (true)
+			{
+				// Receive
+				using (ZFrame request = responder.ReceiveFrame())
+				{
+					Console.WriteLine("Received {0}", request.ReadString());
+
+					// Do some work
+					Thread.Sleep(1);
+
+					// Send
+					responder.Send(new ZFrame(name));
+				}
+			}
+		}
+	}
+```
+**[WUClient](https://github.com/metadings/zguide/blob/master/examples/C%23/wuclient.cs)**
+```csharp
+	public static void WUClient(IDictionary<string, string> dict, string[] args)
+	{
+		//
+		// Weather update client
+		// Connects SUB socket to tcp://localhost:5556
+		// Collects weather updates and finds avg temp in zipcode
+		//
+		// Author: metadings
+		//
+
+		if (args == null || args.Length < 2)
+		{
+			Console.WriteLine();
+			Console.WriteLine("Usage: ./{0} WUClient [ZipCode] [Endpoint]", AppDomain.CurrentDomain.FriendlyName);
+			Console.WriteLine();
+			Console.WriteLine("    ZipCode   The zip code to subscribe. Default is 72622 Nürtingen");
+			Console.WriteLine("    Endpoint  Where WUClient should connect to.");
+			Console.WriteLine("              Default is tcp://127.0.0.1:5556");
+			Console.WriteLine();
+			if (args.Length < 1)
+				args = new string[] { "72622", "tcp://127.0.0.1:5556" };
+			else
+				args = new string[] { args[0], "tcp://127.0.0.1:5556" };
+		}
+
+		// Socket to talk to server
+		using (var context = new ZContext())
+		using (var subscriber = new ZSocket(context, ZSocketType.SUB))
+		{
+			string connect_to = args[1];
+			Console.WriteLine("I: Connecting to {0}...", connect_to);
+			subscriber.Connect(connect_to);
+
+			foreach (IPAddress address in WUProxy_GetPublicIPs())
+			{
+				var epgmAddress = string.Format("epgm://{0};239.192.1.1:8100", address);
+				Console.WriteLine("I: Connecting to {0}...", epgmAddress);
+				subscriber.Connect(epgmAddress);
+			}
+
+			// Subscribe to zipcode
+			string zipCode = args[0];
+			Console.WriteLine("I: Subscribing to zip code {0}...", zipCode);
+			subscriber.Subscribe(zipCode);
+
+			// Process 10 updates
+			int i = 0;
+			long total_temperature = 0;
+			for (; i < 20; ++i)
+			{
+				using (var replyFrame = subscriber.ReceiveFrame())
+				{
+					string reply = replyFrame.ReadString();
+
+					Console.WriteLine(reply);
+					total_temperature += Convert.ToInt64(reply.Split(' ')[1]);
+				}
+			}
+			Console.WriteLine("Average temperature for zipcode '{0}' was {1}°", zipCode, (total_temperature / i));
+		}
+	}
+```
+**[WUServer](https://github.com/metadings/zguide/blob/master/examples/C%23/wuserver.cs)**
+```csharp
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading;
+
+	using ZeroMQ;
+
+	namespace Examples
+	{
+		static partial class Program
+		{
+			public static void WUServer(IDictionary<string, string> dict, string[] args)
+			{
+				//
+				// Weather update server
+				// Binds PUB socket to tcp://*:5556
+				// Publishes random weather updates
+				//
+				// Author: metadings
+				//
+
+				// Prepare our context and publisher
+				using (var context = new ZContext())
+				using (var publisher = new ZSocket(context, ZSocketType.PUB))
+				{
+					string address = "tcp://*:5556";
+					Console.WriteLine("I: Publisher.Bind'ing on {0}", address);
+					publisher.Bind(address);
+
+					// Initialize random number generator
+					var rnd = new Random();
+
+					while (true)
+					{
+						// Get values that will fool the boss
+						int zipcode = rnd.Next(99999);
+						int temperature = rnd.Next(-55, +45);
+
+						// Send message to all subscribers
+						var update = string.Format("{0:D5} {1}", zipcode, temperature);
+						using (var updateFrame = new ZFrame(update))
+						{
+							publisher.Send(updateFrame);
+						}
+					}
+				}
+			}
+		}
+	}
+```
+Also look: [WUProxy](https://github.com/metadings/zguide/blob/master/examples/C%23/wuproxy.cs)
+
+Learn more: ZeroMQ - [The Guide Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
