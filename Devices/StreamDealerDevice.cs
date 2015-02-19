@@ -118,7 +118,7 @@
 				}
 				message.Add(frame);
 
-				if (receiveCount == 1)
+				if (receiveCount == 2)
 				{
 					if (default(string) == (address = frame.GetOption("Peer-Address", out error)))
 					{
