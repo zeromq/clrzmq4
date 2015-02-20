@@ -19,7 +19,7 @@ namespace ZeroMQ
 		/// Creates an empty message.
 		/// </summary>
 		public ZMessage()
-			: this(Enumerable.Empty<ZFrame>())
+			: this(null)
 		{ }
 
 		/// <summary>
@@ -30,12 +30,14 @@ namespace ZeroMQ
 		/// <exception cref="ArgumentNullException"><paramref name="frames"/> is null.</exception>
 		public ZMessage(IEnumerable<ZFrame> frames)
 		{
-			if (frames == null)
+			if (frames != null)
 			{
-				throw new ArgumentNullException("frames");
+				_frames = new List<ZFrame>(frames);
 			}
-
-			_frames = new List<ZFrame>(frames);
+			else
+			{
+				_frames = new List<ZFrame>();
+			}
 		}
 
 		~ZMessage() 
