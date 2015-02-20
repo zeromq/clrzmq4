@@ -16,7 +16,7 @@ Read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
 
 Example **[HWClient](https://github.com/metadings/zguide/blob/master/examples/C%23/hwclient.cs)**
 ```csharp
-public static void HWClient(IDictionary<string, string> dict, string[] args)
+public static void HWClient(string[] args)
 {
 	//
 	// Hello World client
@@ -53,7 +53,7 @@ public static void HWClient(IDictionary<string, string> dict, string[] args)
 ```
 Example **[HWServer](https://github.com/metadings/zguide/blob/master/examples/C%23/hwserver.cs)**
 ```csharp
-public static void HWServer(IDictionary<string, string> dict, string[] args)
+public static void HWServer(string[] args)
 {
 	//
 	// Hello World server
@@ -99,7 +99,7 @@ public static void HWServer(IDictionary<string, string> dict, string[] args)
 ```
 Example **[WUClient](https://github.com/metadings/zguide/blob/master/examples/C%23/wuclient.cs)**
 ```csharp
-public static void WUClient(IDictionary<string, string> dict, string[] args)
+public static void WUClient(string[] args)
 {
 	//
 	// Weather update client
@@ -163,7 +163,7 @@ public static void WUClient(IDictionary<string, string> dict, string[] args)
 ```
 Example **[WUServer](https://github.com/metadings/zguide/blob/master/examples/C%23/wuserver.cs)**
 ```csharp
-public static void WUServer(IDictionary<string, string> dict, string[] args)
+public static void WUServer(string[] args)
 {
 	//
 	// Weather update server
