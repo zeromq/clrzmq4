@@ -617,16 +617,27 @@ namespace ZeroMQ
 			bool more = (flags & ZSocketFlags.More) == ZSocketFlags.More;
 			flags = flags | ZSocketFlags.More;
 
-			for (int i = 0, l = frames.Count(); i < l; ++i)
+			var _frames = frames.ToList();
+
+			for (int i = 0, l = _frames.Count(); i < l; ++i)
 			{
+				ZFrame frame = _frames.ElementAt(i);
+
 				if (i == l - 1 && !more)
 				{
 					flags = flags & ~ZSocketFlags.More;
 				}
-				if (!Send(frames.ElementAt(i), flags, out error))
+
+				if (!Send(frame, flags, out error))
 				{
 					return false;
 				}
+
+				if (frames is IList<ZFrame>)
+				{
+					((IList<ZFrame>)frames).Remove(frame);
+				}
+
 				++sent;
 			}
 
