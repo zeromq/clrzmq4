@@ -1,4 +1,4 @@
-﻿namespace ZeroMQ.Devices
+﻿namespace ZeroMQ
 {
 	using System;
 	using System.Threading;
@@ -53,19 +53,19 @@
 			FrontendSocket = ZSocket.Create(context, frontendType, out error);
 			BackendSocket = ZSocket.Create(context, backendType, out error);
 
-			FrontendSetup = new ZDeviceSocketSetup(FrontendSocket);
-			BackendSetup = new ZDeviceSocketSetup(BackendSocket);
+			FrontendSetup = new ZSocketSetup(FrontendSocket);
+			BackendSetup = new ZSocketSetup(BackendSocket);
 		}
 
 		/// <summary>
-		/// Gets a <see cref="ZDeviceSocketSetup"/> for configuring the frontend socket.
+		/// Gets a <see cref="ZSocketSetup"/> for configuring the frontend socket.
 		/// </summary>
-		public ZDeviceSocketSetup BackendSetup { get; private set; }
+		public ZSocketSetup BackendSetup { get; private set; }
 
 		/// <summary>
-		/// Gets a <see cref="ZDeviceSocketSetup"/> for configuring the backend socket.
+		/// Gets a <see cref="ZSocketSetup"/> for configuring the backend socket.
 		/// </summary>
-		public ZDeviceSocketSetup FrontendSetup { get; private set; }
+		public ZSocketSetup FrontendSetup { get; private set; }
 
 		/*/ <summary>
 		/// Gets a <see cref="ManualResetEvent"/> that can be used to block while the device is running.

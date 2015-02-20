@@ -1,52 +1,52 @@
-﻿namespace ZeroMQ.Devices
+﻿namespace ZeroMQ
 {
+	using System;
+
 	/// <summary>
-	/// A shared queue that collects requests from a set of clients and distributes
-	/// these fairly among a set of services.
+	/// Collects messages from a set of publishers and forwards these to a set of subscribers.
 	/// </summary>
 	/// <remarks>
-	/// Requests are fair-queued from frontend connections and load-balanced between
-	/// backend connections. Replies automatically return to the client that made the
-	/// original request. This device is part of the request-reply pattern. The frontend
-	/// speaks to clients and the backend speaks to services.
+	/// Generally used to bridge networks. E.g. read on TCP unicast and forward on multicast.
+	/// This device is part of the publish-subscribe pattern. The frontend speaks to publishers
+	/// and the backend speaks to subscribers.
 	/// </remarks>
-	public class RouterDealerDevice : ZDevice
+	public class PubSubDevice : ZDevice
 	{
 		/// <summary>
-		/// The frontend <see cref="ZSocketType"/> for a queue device.
+		/// The frontend <see cref="ZSocketType"/> for a forwarder device.
 		/// </summary>
-		public static readonly ZSocketType FrontendType = ZSocketType.ROUTER;
+		public static readonly ZSocketType FrontendType = ZSocketType.XSUB;
 
 		/// <summary>
-		/// The backend <see cref="ZSocketType"/> for a queue device.
+		/// The backend <see cref="ZSocketType"/> for a forwarder device.
 		/// </summary>
-		public static readonly ZSocketType BackendType = ZSocketType.DEALER;
-
+		public static readonly ZSocketType BackendType = ZSocketType.XPUB;
 		/// <summary>
-		/// Initializes a new instance of the <see cref="QueueDevice"/> class that will run in a
-		/// self-managed thread.
+		/// Initializes a new instance of the <see cref="ForwarderDevice"/> class.
 		/// </summary>
 		/// <param name="context">The <see cref="ZContext"/> to use when creating the sockets.</param>
 		/// <param name="frontendBindAddr">The endpoint used to bind the frontend socket.</param>
 		/// <param name="backendBindAddr">The endpoint used to bind the backend socket.</param>
-		public RouterDealerDevice(ZContext context, string frontendBindAddr, string backendBindAddr)
+		/// <param name="mode">The <see cref="DeviceMode"/> for the current device.</param>
+		public PubSubDevice(ZContext context, string frontendBindAddr, string backendBindAddr)
 			: base(context, FrontendType, BackendType)
 		{
 			FrontendSetup.Bind(frontendBindAddr);
 			BackendSetup.Bind(backendBindAddr);
+			BackendSetup.SubscribeAll();
 		}
 
 		/// <summary>
 		/// Forwards requests from the frontend socket to the backend socket.
 		/// </summary>
 		/// <param name="args">A <see cref="SocketEventArgs"/> object containing the poll event args.</param>
-		protected override bool FrontendHandler(ZSocket args, out ZMessage message, out ZError error)
+		protected override bool FrontendHandler(ZSocket socket, out ZMessage message, out ZError error)
 		{
 			return FrontendSocket.Forward(BackendSocket, out message, out error);
 		}
 
 		/// <summary>
-		/// Forwards replies from the backend socket to the frontend socket.
+		/// Not implemented for the <see cref="ForwarderDevice"/>.
 		/// </summary>
 		/// <param name="args">A <see cref="SocketEventArgs"/> object containing the poll event args.</param>
 		protected override bool BackendHandler(ZSocket args, out ZMessage message, out ZError error)
