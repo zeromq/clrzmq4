@@ -45,6 +45,10 @@
 				// "Compatability" is done by "disabling" old methods, or "redirecting" to new methods,
 				// so the developer is forced to work against the latest API
 
+				if (minor == 0)
+				{
+					sizeof_zmq_msg_t = sizeof_zmq_msg_t_v3;
+				}
 			}
 			else // if (major >= 3)
 			{
