@@ -202,4 +202,4 @@ public static void WUServer(string[] args)
 ```
 Also look into the [WUProxy](https://github.com/metadings/zguide/blob/master/examples/C%23/wuproxy.cs) Example.
 
-Learn more: ZeroMQ - [The Guide Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
+Learn more: ZeroMQ - [The Guide](http://zguide.zeromq.org/page:all) and [the Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
