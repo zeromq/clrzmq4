@@ -10,14 +10,14 @@
 	/// </summary>
 	public class ZSocketSetup
 	{
-		private readonly ZSocket _socket;
-		private readonly List<Action<ZSocket>> _socketInitializers;
-		private readonly List<string> _bindings;
-		private readonly List<string> _connections;
+		readonly ZSocket _socket;
+		readonly List<Action<ZSocket>> _socketInitializers;
+		readonly List<string> _bindings;
+		readonly List<string> _connections;
 
-		private bool _isConfigured;
+		bool _isConfigured;
 
-		internal ZSocketSetup(ZSocket socket)
+		public ZSocketSetup(ZSocket socket)
 		{
 			if (socket == null)
 			{
@@ -228,7 +228,7 @@
 
 			if (propertyInfo == null)
 			{
-				throw new InvalidOperationException("The specified ZmqSocket member is not a property: " + property.Body);
+				throw new InvalidOperationException("The specified ZSocket member is not a property: " + property.Body);
 			}
 
 			_socketInitializers.Add(s => propertyInfo.SetValue(s, value, null));
