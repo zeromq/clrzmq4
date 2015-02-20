@@ -16,7 +16,7 @@ Read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
 
 
 **[HWClient](https://github.com/metadings/zguide/blob/master/examples/C%23/hwclient.cs) Example**
----
+-
 ```csharp
 public static void HWClient(string[] args)
 {
@@ -52,7 +52,7 @@ public static void HWClient(string[] args)
 ```
 
 **[HWServer](https://github.com/metadings/zguide/blob/master/examples/C%23/hwserver.cs)** Example
----
+-
 ```csharp
 public static void HWServer(string[] args)
 {
@@ -100,7 +100,7 @@ public static void HWServer(string[] args)
 ```
 
 **[WUClient](https://github.com/metadings/zguide/blob/master/examples/C%23/wuclient.cs)** Example
----
+-
 ```csharp
 public static void WUClient(string[] args)
 {
@@ -166,7 +166,7 @@ public static void WUClient(string[] args)
 ```
 
 **[WUServer](https://github.com/metadings/zguide/blob/master/examples/C%23/wuserver.cs)** Example
----
+-
 ```csharp
 public static void WUServer(string[] args)
 {
