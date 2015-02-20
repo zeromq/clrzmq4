@@ -92,8 +92,11 @@
 			// address = IPAddress.None;
 			address = string.Empty;
 
-			int receiveCount = 2;
+			// STREAM: read frames: identity, body
 
+			// read the ip4 address from (ZFrame)frame.GetOption("Peer-Address")
+
+			int receiveCount = 2;
 			do
 			{
 				var frame = ZFrame.CreateEmpty();
