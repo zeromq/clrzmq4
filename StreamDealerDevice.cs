@@ -51,10 +51,6 @@
 				return false;
 			}
 
-			// string ip = incoming[0].GetOption("RemoteAddress");
-
-			// always more = ReceiveMore;
-
 			// sending scope
 			// DEALER: forward
 			using (incoming)
@@ -67,7 +63,7 @@
 				// Prepend empty delimiter between Identity frame and Data frame
 				incoming.Insert(1, new ZFrame());
 
-				// Prepend Z_LAST_ENDPOINT
+				// Prepend Peer-Address
 				incoming.Insert(2, new ZFrame(address));
 
 				if (!BackendSocket.Send(incoming, /* ZSocketFlags.DontWait, */ out error))
