@@ -45,11 +45,6 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Devices\ZDevice.cs" />
-    <Compile Include="Devices\PubSubDevice.cs" />
-    <Compile Include="Devices\PushPullDevice.cs" />
-    <Compile Include="Devices\RouterDealerDevice.cs" />
-    <Compile Include="Devices\StreamDealerDevice.cs" />
     <Compile Include="lib\DispoIntPtr.cs" />
     <Compile Include="lib\DispoIntPtr.Ansi.cs" />
     <Compile Include="lib\Platform.cs" />
@@ -86,11 +81,16 @@
     <Compile Include="ZPoll.cs" />
     <Compile Include="ZPollItem.cs" />
     <Compile Include="ZThread.cs" />
-    <Compile Include="Devices\ZDeviceSocketSetup.cs" />
     <Compile Include="ZActor.cs" />
     <Compile Include="Monitoring\ZMonitors.cs" />
     <Compile Include="Z85.cs" />
     <Compile Include="ZFrameOption.cs" />
+    <Compile Include="PubSubDevice.cs" />
+    <Compile Include="PushPullDevice.cs" />
+    <Compile Include="RouterDealerDevice.cs" />
+    <Compile Include="StreamDealerDevice.cs" />
+    <Compile Include="ZDevice.cs" />
+    <Compile Include="ZSocketSetup.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
