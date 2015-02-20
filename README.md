@@ -11,7 +11,7 @@ You can get it
 - using `git clone https://github.com/zeromq/clrzmq4`
 
 Read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
-- ZeroMQ - [The Guide Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
+- ZeroMQ - The Guide [Examples in C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
 - ZeroMQ - [C# Projects](http://github.com/metadings/clrzmq-test)
 
 Example **[HWClient](https://github.com/metadings/zguide/blob/master/examples/C%23/hwclient.cs)**
@@ -202,4 +202,4 @@ public static void WUServer(string[] args)
 ```
 Also look into the [WUProxy](https://github.com/metadings/zguide/blob/master/examples/C%23/wuproxy.cs) Example.
 
-Learn more: ZeroMQ - [The Guide](http://zguide.zeromq.org/page:all) and [the Examples for C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
+Learn more: ZeroMQ - [The Guide](http://zguide.zeromq.org/page:all) and [the Examples in C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
