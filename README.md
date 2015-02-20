@@ -37,10 +37,7 @@ public static void HWClient(string[] args)
 			Console.Write("Sending {0}...", requestText);
 
 			// Send
-			using (var request = new ZFrame(requestText)) 
-			{
-				requester.Send(request);
-			}
+			requester.Send(new ZFrame(requestText));
 
 			// Receive
 			using (ZFrame reply = requester.ReceiveFrame()) 
