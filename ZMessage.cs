@@ -25,7 +25,7 @@ namespace ZeroMQ
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ZMessage"/> class.
-		/// Creates a message that contains the given <see cref="Frame"/> objects.
+		/// Creates a message that contains the given <see cref="ZFrame"/> objects.
 		/// </summary>
 		/// <param name="frames">A collection of <see cref="ZFrame"/> objects to be stored by this <see cref="ZMessage"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="frames"/> is null.</exception>
