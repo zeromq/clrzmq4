@@ -14,7 +14,9 @@ Read: [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
 - ZeroMQ - The Guide [Examples in C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
 - ZeroMQ - [C# Projects](http://github.com/metadings/clrzmq-test)
 
-Example **[HWClient](https://github.com/metadings/zguide/blob/master/examples/C%23/hwclient.cs)**
+
+**[HWClient](https://github.com/metadings/zguide/blob/master/examples/C%23/hwclient.cs) Example**
+---
 ```csharp
 public static void HWClient(string[] args)
 {
@@ -48,7 +50,9 @@ public static void HWClient(string[] args)
 	}
 }
 ```
-Example **[HWServer](https://github.com/metadings/zguide/blob/master/examples/C%23/hwserver.cs)**
+
+**[HWServer](https://github.com/metadings/zguide/blob/master/examples/C%23/hwserver.cs)** Example
+---
 ```csharp
 public static void HWServer(string[] args)
 {
@@ -94,7 +98,9 @@ public static void HWServer(string[] args)
 	}
 }
 ```
-Example **[WUClient](https://github.com/metadings/zguide/blob/master/examples/C%23/wuclient.cs)**
+
+**[WUClient](https://github.com/metadings/zguide/blob/master/examples/C%23/wuclient.cs)** Example
+---
 ```csharp
 public static void WUClient(string[] args)
 {
@@ -158,7 +164,9 @@ public static void WUClient(string[] args)
 	}
 }
 ```
-Example **[WUServer](https://github.com/metadings/zguide/blob/master/examples/C%23/wuserver.cs)**
+
+**[WUServer](https://github.com/metadings/zguide/blob/master/examples/C%23/wuserver.cs)** Example
+---
 ```csharp
 public static void WUServer(string[] args)
 {
@@ -197,6 +205,7 @@ public static void WUServer(string[] args)
 	}
 }
 ```
+
 Also look into the [WUProxy](https://github.com/metadings/zguide/blob/master/examples/C%23/wuproxy.cs) Example.
 
 Learn more: ZeroMQ - [The Guide](http://zguide.zeromq.org/page:all) and [the Examples in C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
