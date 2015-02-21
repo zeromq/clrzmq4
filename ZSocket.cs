@@ -402,10 +402,7 @@ namespace ZeroMQ
 		public ZMessage ReceiveMessage(ZSocketFlags flags, out ZError error)
 		{
 			ZMessage message = null;
-			if (!ReceiveMessage(ref message, flags, out error))
-			{
-				return default(ZMessage);
-			}
+			ReceiveMessage(ref message, flags, out error);
 			return message;
 		}
 
@@ -419,12 +416,7 @@ namespace ZeroMQ
 			EnsureNotDisposed();
 
 			int count = int.MaxValue;
-
-			if (!ReceiveFrames(ref count, ref message, flags, out error))
-			{
-				return false;
-			}
-			return true;
+			return ReceiveFrames(ref count, ref message, flags, out error);
 		}
 
 		public ZFrame ReceiveFrame()
@@ -486,7 +478,6 @@ namespace ZeroMQ
 				{
 					break;
 				}
-
 				return null;
 			}
 			return frames;
@@ -526,10 +517,7 @@ namespace ZeroMQ
 				{
 					frames = new ListT();
 				}
-				else 
-				{
-					frames.Add(frame);
-				}
+				frames.Add(frame);
 
 			} while (--framesToReceive > 0 && this.ReceiveMore);
 
