@@ -401,8 +401,8 @@ namespace ZeroMQ
 
 		public ZMessage ReceiveMessage(ZSocketFlags flags, out ZError error)
 		{
-			var message = new ZMessage();
-			if (!ReceiveMessage(flags, ref message, out error))
+			ZMessage message = null;
+			if (!ReceiveMessage(ref message, flags, out error))
 			{
 				return default(ZMessage);
 			}
@@ -411,21 +411,17 @@ namespace ZeroMQ
 
 		public bool ReceiveMessage(ref ZMessage message, out ZError error)
 		{
-			return ReceiveMessage(ZSocketFlags.None, ref message, out error);
+			return ReceiveMessage(ref message, ZSocketFlags.None, out error);
 		}
 
-		public bool ReceiveMessage(ZSocketFlags flags, ref ZMessage message, out ZError error)
+		public bool ReceiveMessage(ref ZMessage message, ZSocketFlags flags, out ZError error)
 		{
 			EnsureNotDisposed();
 
 			int count = int.MaxValue;
 
-			while (!ReceiveFrames(ref count, ref message, flags, out error))
+			if (!ReceiveFrames(ref count, ref message, flags, out error))
 			{
-				if (error == ZError.EAGAIN && ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait))
-				{
-					return true;
-				}
 				return false;
 			}
 			return true;
@@ -484,11 +480,11 @@ namespace ZeroMQ
 		public IEnumerable<ZFrame> ReceiveFrames(int framesToReceive, ZSocketFlags flags, out ZError error)
 		{
 			List<ZFrame> frames = null;
-			if (!ReceiveFrames(ref framesToReceive, ref frames, flags, out error)) {
-
+			while (!ReceiveFrames(ref framesToReceive, ref frames, flags, out error))
+			{
 				if (error == ZError.EAGAIN && ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait))
 				{
-					return frames;
+					break;
 				}
 
 				return null;
@@ -521,10 +517,6 @@ namespace ZeroMQ
 						error = default(ZError);
 						continue;
 					}
-					if (error == ZError.EAGAIN && ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait))
-					{
-						return false;
-					}
 
 					frame.Dispose();
 					return false;
@@ -534,7 +526,10 @@ namespace ZeroMQ
 				{
 					frames = new ListT();
 				}
-				frames.Add(frame);
+				else 
+				{
+					frames.Add(frame);
+				}
 
 			} while (--framesToReceive > 0 && this.ReceiveMore);
 
@@ -675,12 +670,12 @@ namespace ZeroMQ
 		{
 			EnsureNotDisposed();
 
-			error = default(ZError);
-
 			if (frame.IsDismissed)
 			{
 				throw new ObjectDisposedException("frame");
 			}
+
+			error = default(ZError);
 
 			while (-1 == zmq.msg_send(frame.Ptr, _socketPtr, (int)flags))
 			{
