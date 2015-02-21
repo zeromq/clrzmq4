@@ -406,7 +406,6 @@ namespace ZeroMQ
 			{
 				return default(ZMessage);
 			}
-
 			return message;
 		}
 
@@ -420,30 +419,16 @@ namespace ZeroMQ
 			EnsureNotDisposed();
 
 			int count = int.MaxValue;
-			List<ZFrame> frames;
-			bool good = true;
 
-			while (!ReceiveFrames(ref count, out frames, flags, out error))
+			while (!ReceiveFrames(ref count, ref message, flags, out error))
 			{
 				if (error == ZError.EAGAIN && ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait))
 				{
-					good = false;
-					break;
+					return true;
 				}
-
 				return false;
 			}
-
-			if (message == null)
-			{
-				message = new ZMessage(frames);
-			}
-			else
-			{
-				message.AddRange(frames);
-			}
-				
-			return good;
+			return true;
 		}
 
 		public ZFrame ReceiveFrame()
@@ -498,9 +483,8 @@ namespace ZeroMQ
 
 		public IEnumerable<ZFrame> ReceiveFrames(int framesToReceive, ZSocketFlags flags, out ZError error)
 		{
-			List<ZFrame> frames;
-			
-			if (!ReceiveFrames(ref framesToReceive, out frames, flags, out error)) {
+			List<ZFrame> frames = null;
+			if (!ReceiveFrames(ref framesToReceive, ref frames, flags, out error)) {
 
 				if (error == ZError.EAGAIN && ((flags & ZSocketFlags.DontWait) == ZSocketFlags.DontWait))
 				{
@@ -509,16 +493,15 @@ namespace ZeroMQ
 
 				return null;
 			}
-
 			return frames;
 		}
 
-		public bool ReceiveFrames(ref int framesToReceive, out List<ZFrame> frames, ZSocketFlags flags, out ZError error)
+		public bool ReceiveFrames<ListT>(ref int framesToReceive, ref ListT frames, ZSocketFlags flags, out ZError error)
+			where ListT : IList<ZFrame>, new()
 		{
 			EnsureNotDisposed();
 
 			error = default(ZError);
-			frames = new List<ZFrame>();
 			flags = flags | ZSocketFlags.More;
 
 			do {
@@ -547,6 +530,10 @@ namespace ZeroMQ
 					return false;
 				}
 
+				if (frames == null)
+				{
+					frames = new ListT();
+				}
 				frames.Add(frame);
 
 			} while (--framesToReceive > 0 && this.ReceiveMore);
@@ -617,11 +604,12 @@ namespace ZeroMQ
 			bool more = (flags & ZSocketFlags.More) == ZSocketFlags.More;
 			flags = flags | ZSocketFlags.More;
 
-			var _frames = frames.ToList();
+			bool framesIsList = frames is IList<ZFrame>;
+			ZFrame[] _frames = frames.ToArray();
 
-			for (int i = 0, l = _frames.Count(); i < l; ++i)
+			for (int i = 0, l = _frames.Length; i < l; ++i)
 			{
-				ZFrame frame = _frames.ElementAt(i);
+				ZFrame frame = _frames[i];
 
 				if (i == l - 1 && !more)
 				{
@@ -633,7 +621,7 @@ namespace ZeroMQ
 					return false;
 				}
 
-				if (frames is IList<ZFrame>)
+				if (framesIsList)
 				{
 					((IList<ZFrame>)frames).Remove(frame);
 				}
