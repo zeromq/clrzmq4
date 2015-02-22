@@ -139,7 +139,7 @@
 			// receiving scope
 			// DEALER: normal movemsg
 			ZMessage incoming = null;
-			if (!sock.ReceiveMessage(/* ZSocketFlags.DontWait */ ZSocketFlags.None, ref incoming, out error))
+			if (!sock.ReceiveMessage(ref incoming, /* ZSocketFlags.DontWait */ ZSocketFlags.None, out error))
 			{
 				return false;
 			}
