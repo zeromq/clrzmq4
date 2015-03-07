@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ZeroMQ</id>
-		<version>4.1.0.7</version>
-		<authors>Pieter Hintjens, metadings</authors>
+		<version>4.1.0.12</version>
+		<authors>metadings, Pieter Hintjens</authors>
 		<projectUrl>https://github.com/zeromq/clrzmq4/</projectUrl>
 		<iconUrl>https://raw.githubusercontent.com/zeromq/clrzmq4/master/ZeroMQ.ico</iconUrl>
 		<licenseUrl>https://raw.githubusercontent.com/zeromq/clrzmq4/master/LICENSE.txt</licenseUrl>
@@ -11,9 +11,14 @@
 		<description>ZeroMQ CLR namespace</description>
 		<copyright>ZeroMQ</copyright>
 		<tags>clrzmq4 ZeroMQ ZMQ 0MQ ØMQ Messaging</tags>
+		<references>
+			<reference file="ZeroMQ.dll" />
+		</references>
 	</metadata>
 	<files>
-		<file src="**" target="output\" exclude="bin\**\*.*;obj\**\*.*;amd64\v*\*.*;i386\v*\*.*;*.user;ZeroMQ.*.zip" />
+		<!-- file src="**" target="content\" exclude="bin\**\*.*;obj\**\*.*;amd64\v*\*.*;i386\v*\*.*;*.user;ZeroMQ.*.zip" / -->
+		<file src="\bin\Release\i386\*.*" target="content\i386\" />
+		<file src="\bin\Release\amd64\*.*" target="content\amd64\" />
 		<file src="\bin\Release\**\*.*" target="lib\net40\" />
 	</files>
 </package>
