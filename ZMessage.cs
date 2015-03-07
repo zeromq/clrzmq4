@@ -19,25 +19,24 @@ namespace ZeroMQ
 		/// Creates an empty message.
 		/// </summary>
 		public ZMessage()
-			: this(null)
-		{ }
+		{ 
+			_frames = new List<ZFrame>();
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ZMessage"/> class.
-		/// Creates a message that contains the given <see cref="Frame"/> objects.
+		/// Creates a message that contains the given <see cref="ZFrame"/> objects.
 		/// </summary>
-		/// <param name="frames">A collection of <see cref="Frame"/> objects to be stored by this <see cref="ZMessage"/>.</param>
+		/// <param name="frames">A collection of <see cref="ZFrame"/> objects to be stored by this <see cref="ZMessage"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="frames"/> is null.</exception>
 		public ZMessage(IEnumerable<ZFrame> frames)
 		{
-			if (frames != null)
+			if (frames == null)
 			{
-				_frames = new List<ZFrame>(frames);
+				throw new ArgumentNullException("frames");
 			}
-			else
-			{
-				_frames = new List<ZFrame>();
-			}
+
+			_frames = new List<ZFrame>(frames);
 		}
 
 		~ZMessage() 
