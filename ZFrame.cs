@@ -279,29 +279,33 @@ namespace ZeroMQ
 		{
 			if (_framePtr != null)
 			{
-				if (_framePtr.Ptr != IntPtr.Zero)
+				try
 				{
-					Close();
+					if (_framePtr.Ptr != IntPtr.Zero)
+					{
+						Close();
+					}
 				}
-				Dismiss();
+				finally 
+				{
+					Dismiss();
+				}
 			}
 			base.Dispose(disposing);
 		}
 
 		public void Dismiss()
 		{
-			if (_framePtr == null)
-				return;
-
-			_framePtr.Dispose();
-			_framePtr = null;
-
-			Dispose();
+			if (_framePtr != null)
+			{
+				_framePtr.Dispose();
+				_framePtr = null;
+			}
 		}
 
 		public bool IsDismissed
 		{
-			get { return _framePtr == null || _framePtr == IntPtr.Zero; }
+			get { return _framePtr == null; }
 		}
 
 		public override bool CanRead { get { return true; } }
@@ -634,30 +638,35 @@ namespace ZeroMQ
 
 			if (_framePtr.Ptr == IntPtr.Zero)
 			{
-				_framePtr = null;
+				Dismiss();
 				return;
 			}
 
 			ZError error;
-			while (-1 == zmq.msg_close(_framePtr))
+			try
 			{
-				error = ZError.GetLastErr();
+				while (-1 == zmq.msg_close(_framePtr))
+				{
+					error = ZError.GetLastErr();
 
-				if (error == ZError.EINTR)
-				{
-					error = default(ZError);
-					continue;
+					if (error == ZError.EINTR)
+					{
+						error = default(ZError);
+						continue;
+					}
+					if (error == ZError.EFAULT)
+					{
+						// Ignore: Invalid message.
+						break;
+					}
+					throw new ZException(error, "zmq_msg_close");
 				}
-				if (error == ZError.EFAULT)
-				{
-					// Ignore: Invalid message.
-					break;
-				}
-				throw new ZException(error, "zmq_msg_close");
 			}
-
-			// Go unallocating the HGlobal
-			Dismiss();
+			finally
+			{
+				// Go unallocating the HGlobal
+				Dismiss();
+			}
 		}
 
 		public void CopyZeroTo(ZFrame other)

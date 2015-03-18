@@ -66,12 +66,16 @@
 				// Prepend Peer-Address
 				incoming.Insert(2, new ZFrame(address));
 
-				if (!BackendSocket.Send(incoming, /* ZSocketFlags.DontWait, */ out error))
+				try
 				{
-					return false;
+					if (!BackendSocket.Send(incoming, /* ZSocketFlags.DontWait, */ out error))
+					{
+						return false;
+					}
 				}
-
-				incoming.Dismiss();
+				finally {
+					incoming.Dismiss();
+				}
 			}
 
 			return true;
@@ -175,30 +179,35 @@
 		{
 			error = ZError.None;
 
-			foreach (ZFrame frame in msg)
+			try
 			{
-				while (-1 == zmq.msg_send(frame.Ptr, sock.SocketPtr, (int)(/* ZSocketFlags.DontWait | */ ZSocketFlags.More)))
+				foreach (ZFrame frame in msg)
 				{
-					error = ZError.GetLastErr();
-
-					if (error == ZError.EINTR)
+					while (-1 == zmq.msg_send(frame.Ptr, sock.SocketPtr, (int)(/* ZSocketFlags.DontWait | */ ZSocketFlags.More)))
 					{
-						error = default(ZError);
-						continue;
+						error = ZError.GetLastErr();
+
+						if (error == ZError.EINTR)
+						{
+							error = default(ZError);
+							continue;
+						}
+						/* if (error == ZError.EAGAIN)
+						{
+							error = default(ZError);
+							Thread.Sleep(1);
+
+							continue;
+						} */
+
+						return false;
 					}
-					/* if (error == ZError.EAGAIN)
-					{
-						error = default(ZError);
-						Thread.Sleep(1);
-
-						continue;
-					} */
-
-					return false;
 				}
 			}
-
-			msg.Dismiss();
+			finally
+			{
+				msg.Dismiss();
+			}
 
 			return true;
 		}

@@ -39,14 +39,8 @@ namespace ZeroMQ
 			_frames = new List<ZFrame>(frames);
 		}
 
-		~ZMessage() 
-		{
-			Dispose(false);
-		}
-
 		public void Dispose()
 		{
-			GC.SuppressFinalize(this);
 			Dispose(true);
 		}
 
