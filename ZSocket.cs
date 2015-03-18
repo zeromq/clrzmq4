@@ -340,16 +340,16 @@ namespace ZeroMQ
 			return true;
 		}
 
-		public void Send(byte[] buffer, int offset, int count)
+		public void SendBytes(byte[] buffer, int offset, int count)
 		{
 			ZError error;
-			if (!Send(buffer, offset, count, ZSocketFlags.None, out error))
+			if (!SendBytes(buffer, offset, count, ZSocketFlags.None, out error))
 			{
 				throw new ZException(error);
 			}
 		}
 
-		public bool Send(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
+		public bool SendBytes(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
 		{
 			EnsureNotDisposed();
 
@@ -377,6 +377,13 @@ namespace ZeroMQ
 			pin.Free();
 			return true;
 		}
+
+		public void Send(byte[] buffer, int offset, int count) {
+			SendBytes(buffer, offset, count);
+		} // just Send*
+		public bool Send(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error) {
+			return SendBytes(buffer, offset, count, flags, out error);
+		} // just Send*
 
 		public ZMessage ReceiveMessage()
 		{
