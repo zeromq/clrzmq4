@@ -524,61 +524,113 @@ namespace ZeroMQ
 			return true;
 		}
 
-		public virtual void Send(ZMessage msg)
+		public virtual void Send(ZMessage msg) {
+			SendMessage(msg);
+		} // just Send*
+		public virtual bool Send(ZMessage msg, out ZError error) {
+			return SendMessage(msg, out error);
+		} // just Send*
+		public virtual void Send(ZMessage msg, ZSocketFlags flags) {
+			SendMessage(msg, flags);
+		} // just Send*
+		public virtual bool Send(ZMessage msg, ZSocketFlags flags, out ZError error) {
+			return SendMessage(msg, flags, out error);
+		} // just Send*
+		public virtual void Send(IEnumerable<ZFrame> frames) {
+			SendFrames(frames);
+		} // just Send*
+		public virtual bool Send(IEnumerable<ZFrame> frames, out ZError error) {
+			return SendFrames(frames, out error);
+		} // just Send*
+		public virtual void Send(IEnumerable<ZFrame> frames, ZSocketFlags flags) {
+			SendFrames(frames, flags);
+		} // just Send*
+		public virtual bool Send(IEnumerable<ZFrame> frames, ZSocketFlags flags, out ZError error) {
+			return SendFrames(frames, flags, out error);
+		} // just Send*
+		public virtual bool Send(IEnumerable<ZFrame> frames, ref int sent, ZSocketFlags flags, out ZError error) {
+			return SendFrames(frames, ref sent, flags, out error);
+		} // just Send*
+		public virtual void Send(ZFrame frame) {
+			SendFrame(frame);
+		} // just Send*
+		public virtual bool Send(ZFrame msg, out ZError error) {
+			return SendFrame(msg, out error);
+		} // just Send*
+		public virtual void SendMore(ZFrame frame) {
+			SendFrameMore(frame);
+		} // just Send*
+		public virtual bool SendMore(ZFrame msg, out ZError error) {
+			return SendFrameMore(msg, out error);
+		} // just Send*
+		public virtual void SendMore(ZFrame frame, ZSocketFlags flags) {
+			SendFrameMore(frame, flags);
+		} // just Send*
+		public virtual bool SendMore(ZFrame msg, ZSocketFlags flags, out ZError error) {
+			return SendFrameMore(msg, flags, out error);
+		} // just Send*
+		public virtual void Send(ZFrame frame, ZSocketFlags flags) {
+			SendFrame(frame, flags);
+		} // just Send*
+		public virtual bool Send(ZFrame frame, ZSocketFlags flags, out ZError error) {
+			return SendFrame(frame, flags, out error);
+		} // just Send*
+
+		public virtual void SendMessage(ZMessage msg)
 		{
-			Send(msg, ZSocketFlags.None);
+			SendMessage(msg, ZSocketFlags.None);
 		}
 
-		public virtual bool Send(ZMessage msg, out ZError error)
+		public virtual bool SendMessage(ZMessage msg, out ZError error)
 		{
-			return Send(msg, ZSocketFlags.None, out error);
+			return SendMessage(msg, ZSocketFlags.None, out error);
 		}
 
-		public virtual void Send(ZMessage msg, ZSocketFlags flags)
+		public virtual void SendMessage(ZMessage msg, ZSocketFlags flags)
 		{
 			ZError error;
-			if (!Send(msg, flags, out error))
+			if (!SendMessage(msg, flags, out error))
 			{
 				throw new ZException(error);
 			}
 		}
 
-		public virtual bool Send(ZMessage msg, ZSocketFlags flags, out ZError error)
+		public virtual bool SendMessage(ZMessage msg, ZSocketFlags flags, out ZError error)
 		{
-			return Send((IEnumerable<ZFrame>)msg, flags, out error);
+			return SendFrames((IEnumerable<ZFrame>)msg, flags, out error);
 		}
 
-		public virtual void Send(IEnumerable<ZFrame> frames)
+		public virtual void SendFrames(IEnumerable<ZFrame> frames)
 		{
-			Send(frames, ZSocketFlags.None);
+			SendFrames(frames, ZSocketFlags.None);
 		}
 
-		public virtual bool Send(IEnumerable<ZFrame> frames, out ZError error)
+		public virtual bool SendFrames(IEnumerable<ZFrame> frames, out ZError error)
 		{
-			return Send(frames, ZSocketFlags.None, out error);
+			return SendFrames(frames, ZSocketFlags.None, out error);
 		}
 
-		public virtual void Send(IEnumerable<ZFrame> frames, ZSocketFlags flags)
+		public virtual void SendFrames(IEnumerable<ZFrame> frames, ZSocketFlags flags)
 		{
 			ZError error;
 			int sent = 0;
-			if (!Send(frames, ref sent, flags, out error))
+			if (!SendFrames(frames, ref sent, flags, out error))
 			{
 				throw new ZException(error);
 			}
 		}
 
-		public virtual bool Send(IEnumerable<ZFrame> frames, ZSocketFlags flags, out ZError error)
+		public virtual bool SendFrames(IEnumerable<ZFrame> frames, ZSocketFlags flags, out ZError error)
 		{
 			int sent = 0;
-			if (!Send(frames, ref sent, flags, out error))
+			if (!SendFrames(frames, ref sent, flags, out error))
 			{
 				return false;
 			}
 			return true;
 		}
 
-		public virtual bool Send(IEnumerable<ZFrame> frames, ref int sent, ZSocketFlags flags, out ZError error)
+		public virtual bool SendFrames(IEnumerable<ZFrame> frames, ref int sent, ZSocketFlags flags, out ZError error)
 		{
 			EnsureNotDisposed();
 
@@ -599,7 +651,7 @@ namespace ZeroMQ
 					flags = flags & ~ZSocketFlags.More;
 				}
 
-				if (!Send(frame, flags, out error))
+				if (!SendFrame(frame, flags, out error))
 				{
 					return false;
 				}
@@ -615,46 +667,46 @@ namespace ZeroMQ
 			return true;
 		}
 
-		public virtual void Send(ZFrame frame)
+		public virtual void SendFrame(ZFrame frame)
 		{
-			Send(frame, ZSocketFlags.None);
+			SendFrame(frame, ZSocketFlags.None);
 		}
 
-		public virtual bool Send(ZFrame msg, out ZError error)
+		public virtual bool SendFrame(ZFrame msg, out ZError error)
 		{
-			return Send(msg, ZSocketFlags.None, out error);
+			return SendFrame(msg, ZSocketFlags.None, out error);
 		}
 
-		public virtual void SendMore(ZFrame frame)
+		public virtual void SendFrameMore(ZFrame frame)
 		{
-			Send(frame, ZSocketFlags.More);
+			SendFrame(frame, ZSocketFlags.More);
 		}
 
-		public virtual bool SendMore(ZFrame msg, out ZError error)
+		public virtual bool SendFrameMore(ZFrame msg, out ZError error)
 		{
-			return Send(msg, ZSocketFlags.More, out error);
+			return SendFrame(msg, ZSocketFlags.More, out error);
 		}
 
-		public virtual void SendMore(ZFrame frame, ZSocketFlags flags)
+		public virtual void SendFrameMore(ZFrame frame, ZSocketFlags flags)
 		{
-			Send(frame, flags | ZSocketFlags.More);
+			SendFrame(frame, flags | ZSocketFlags.More);
 		}
 
-		public virtual bool SendMore(ZFrame msg, ZSocketFlags flags, out ZError error)
+		public virtual bool SendFrameMore(ZFrame msg, ZSocketFlags flags, out ZError error)
 		{
-			return Send(msg, flags | ZSocketFlags.More, out error);
+			return SendFrame(msg, flags | ZSocketFlags.More, out error);
 		}
 
-		public virtual void Send(ZFrame frame, ZSocketFlags flags)
+		public virtual void SendFrame(ZFrame frame, ZSocketFlags flags)
 		{
 			ZError error;
-			if (!Send(frame, flags, out error))
+			if (!SendFrame(frame, flags, out error))
 			{
 				throw new ZException(error);
 			}
 		}
 
-		public virtual bool Send(ZFrame frame, ZSocketFlags flags, out ZError error)
+		public virtual bool SendFrame(ZFrame frame, ZSocketFlags flags, out ZError error)
 		{
 			EnsureNotDisposed();
 
