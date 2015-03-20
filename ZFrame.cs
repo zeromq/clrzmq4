@@ -244,13 +244,12 @@ namespace ZeroMQ
 			int charCount = dec.GetCharCount(bytes, remaining, false);
 
 			var resultChars = new char[charCount];
-			string resultString;
 			fixed (char* chars = resultChars)
 			{
 				charCount = dec.GetChars(bytes, remaining, chars, charCount, true);
-				resultString = new string(chars, 0, charCount);
+				this._position += remaining;
+				return new string(chars, 0, charCount);
 			}
-			return resultString;
 		}
 
 		/* internal static DispoIntPtr Alloc(IntPtr data, int size) 
@@ -539,6 +538,51 @@ namespace ZeroMQ
 
 			int byteCount = encoding.GetMaxByteCount(length);
 			return ReadStringNative(byteCount, encoding);
+		}
+
+		public string ReadLine()
+		{
+			long start = Position;
+			long length = Length;
+			long end = length - this._position;
+
+			byte byt = 0x00, lastByt = 0x00;
+
+			while (this._position < length)
+			{
+				byt = ReadAsByte();
+
+				if (byt == 0x0A) // Line Feed
+				{
+					if (lastByt == 0x0D) // Carriage Return
+					{
+						end = this._position - 2;
+					}
+					else
+					{
+						end = this._position - 1;
+					}
+
+					break;
+				}
+
+				lastByt = byt;
+			}
+
+			this._position = (int)start;
+
+			string strg = ReadString((int)(end - start), ZContext.Encoding);
+
+			if (lastByt == 0x0D) // Carriage Return
+			{
+				this._position += 2;
+			}
+			else if (byt == 0x0A) // Line Feed
+			{
+				this._position += 1;
+			}
+
+			return strg;
 		}
 
 		public override void Write(byte[] buffer, int offset, int count)
