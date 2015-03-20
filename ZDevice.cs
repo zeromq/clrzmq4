@@ -27,12 +27,18 @@
 		/// <summary>
 		/// The frontend socket that will normally pass messages to <see cref="BackendSocket"/>.
 		/// </summary>
-		protected readonly ZSocket FrontendSocket;
+		protected ZSocket FrontendSocket;
 
 		/// <summary>
 		/// The backend socket that will normally receive messages from (and possibly send replies to) <see cref="FrontendSocket"/>.
 		/// </summary>
-		protected readonly ZSocket BackendSocket;
+		protected ZSocket BackendSocket;
+
+		protected ZDevice(ZContext context)
+			: base()
+		{
+			Context = context;
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ZDevice"/> class.
@@ -50,11 +56,27 @@
 			Context = context;
 
 			ZError error;
-			FrontendSocket = ZSocket.Create(context, frontendType, out error);
-			BackendSocket = ZSocket.Create(context, backendType, out error);
+			if (!Initialize(frontendType, backendType, out error))
+			{
+				throw new ZException(error);
+			}
+		}
 
+		protected virtual bool Initialize(ZSocketType frontendType, ZSocketType backendType, out ZError error)
+		{
+			if (null == (FrontendSocket = ZSocket.Create(Context, frontendType, out error)))
+			{
+				return false;
+			}
 			FrontendSetup = new ZSocketSetup(FrontendSocket);
+
+			if (null == (BackendSocket = ZSocket.Create(Context, backendType, out error)))
+			{
+				return false;
+			}
 			BackendSetup = new ZSocketSetup(BackendSocket);
+
+			return true;
 		}
 
 		/// <summary>
