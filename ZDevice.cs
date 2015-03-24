@@ -64,17 +64,30 @@
 
 		protected virtual bool Initialize(ZSocketType frontendType, ZSocketType backendType, out ZError error)
 		{
-			if (null == (FrontendSocket = ZSocket.Create(Context, frontendType, out error)))
-			{
-				return false;
-			}
-			FrontendSetup = new ZSocketSetup(FrontendSocket);
+			error = default(ZError);
 
-			if (null == (BackendSocket = ZSocket.Create(Context, backendType, out error)))
+			if (frontendType == ZSocketType.None && backendType == ZSocketType.None)
 			{
-				return false;
+				throw new InvalidOperationException();
 			}
-			BackendSetup = new ZSocketSetup(BackendSocket);
+
+			if (frontendType != ZSocketType.None)
+			{
+				if (null == (FrontendSocket = ZSocket.Create(Context, frontendType, out error)))
+				{
+					return false;
+				}
+				FrontendSetup = new ZSocketSetup(FrontendSocket);
+			}
+
+			if (backendType != ZSocketType.None)
+			{
+				if (null == (BackendSocket = ZSocket.Create(Context, backendType, out error)))
+				{
+					return false;
+				}
+				BackendSetup = new ZSocketSetup(BackendSocket);
+			}
 
 			return true;
 		}
@@ -110,8 +123,8 @@
 		{
 			EnsureNotDisposed();
 
-			FrontendSetup.Configure();
-			BackendSetup.Configure();
+			if (FrontendSetup != null) FrontendSetup.Configure();
+			if (BackendSetup != null) BackendSetup.Configure();
 		}
 
 		/// <summary>
@@ -126,16 +139,37 @@
 
 			Initialize();
 
-			var sockets = new ZSocket[]
+			ZSocket[] sockets;
+			ZPollItem[] polls;
+			if (FrontendSocket != null && BackendSocket != null)
 			{
-				FrontendSocket,
-				BackendSocket
-			};
-
-			var polls = new ZPollItem[] {
-				ZPollItem.Create(FrontendHandler),
-				ZPollItem.Create(BackendHandler)
-			};
+				sockets = new ZSocket[] {
+					FrontendSocket,
+					BackendSocket
+				};
+				polls = new ZPollItem[] {
+					ZPollItem.Create(FrontendHandler),
+					ZPollItem.Create(BackendHandler)
+				};
+			}
+			else if (FrontendSocket != null)
+			{
+				sockets = new ZSocket[] {
+					FrontendSocket
+				}; 
+				polls = new ZPollItem[] {
+					ZPollItem.Create(FrontendHandler)
+				};
+			}
+			else
+			{
+				sockets = new ZSocket[] {
+					BackendSocket
+				};
+				polls = new ZPollItem[] {
+					ZPollItem.Create(BackendHandler)
+				};
+			}
 
 			/* ZPollItem[] polls;
 			{
@@ -170,8 +204,8 @@
 			// Because of using ZmqSocket.Forward, this field will always be null
 			ZMessage[] lastMessageFrames = null;
 
-			FrontendSetup.BindConnect();
-			BackendSetup.BindConnect();
+			if (FrontendSetup != null) FrontendSetup.BindConnect();
+			if (BackendSetup != null) BackendSetup.BindConnect();
 
 			bool isValid = false;
 			var error = default(ZError);
@@ -207,8 +241,8 @@
 				}
 			}
 
-			FrontendSetup.UnbindDisconnect();
-			BackendSetup.UnbindDisconnect();
+			if (FrontendSetup != null) FrontendSetup.UnbindDisconnect();
+			if (BackendSetup != null) BackendSetup.UnbindDisconnect();
 
 			if (error == ZError.ETERM)
 			{
@@ -236,8 +270,8 @@
 		{
 			if (disposing)
 			{
-				FrontendSocket.Dispose();
-				BackendSocket.Dispose();
+				if (FrontendSocket != null) FrontendSocket.Dispose();
+				if (BackendSocket != null) BackendSocket.Dispose();
 			}
 
 			base.Dispose(disposing);
