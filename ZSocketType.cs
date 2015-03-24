@@ -8,6 +8,8 @@ namespace ZeroMQ
 {
 	public enum ZSocketType : int
 	{
+		None = -1,
+
 		/// <summary>
 		/// Exclusive Pair
 		/// </summary>
