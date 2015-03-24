@@ -246,7 +246,7 @@ namespace ZeroMQ
 			var resultChars = new char[charCount];
 			fixed (char* chars = resultChars)
 			{
-				charCount = dec.GetChars(bytes, remaining, chars, charCount, true);
+				charCount = dec.GetChars(bytes, charCount > remaining ? remaining : charCount, chars, charCount, true);
 				this._position += remaining;
 				return new string(chars, 0, charCount);
 			}
@@ -536,15 +536,15 @@ namespace ZeroMQ
 				return string.Empty;
 			}
 
-			int byteCount = encoding.GetMaxByteCount(length);
-			return ReadStringNative(byteCount, encoding);
+			// int byteCount = encoding.GetMaxByteCount(length);
+			return ReadStringNative(length, encoding);
 		}
 
 		public string ReadLine()
 		{
 			long start = Position;
 			long length = Length;
-			long end = length - this._position;
+			long lengthToRead = 0;
 
 			byte byt = 0x00, lastByt = 0x00;
 
@@ -556,33 +556,35 @@ namespace ZeroMQ
 				{
 					if (lastByt == 0x0D) // Carriage Return
 					{
-						end = this._position - 2;
-					}
-					else
-					{
-						end = this._position - 1;
+						--lengthToRead;
 					}
 
 					break;
 				}
 
+				++lengthToRead;
 				lastByt = byt;
 			}
 
-			this._position = (int)start;
+			string strg = null;
 
-			string strg = ReadString((int)(end - start), ZContext.Encoding);
-
-			if (lastByt == 0x0D) // Carriage Return
+			if (lengthToRead > 0)
 			{
-				this._position += 2;
-			}
-			else if (byt == 0x0A) // Line Feed
-			{
-				this._position += 1;
+				this._position = (int)start;
+
+				strg = ReadString((int)lengthToRead, ZContext.Encoding);
+
+				if (lastByt == 0x0D) // Carriage Return
+				{
+					this._position += 2;
+				}
+				else if (byt == 0x0A) // Line Feed
+				{
+					this._position += 1;
+				}
 			}
 
-			return strg;
+			return strg ?? string.Empty;
 		}
 
 		public override void Write(byte[] buffer, int offset, int count)
