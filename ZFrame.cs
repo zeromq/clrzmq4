@@ -242,6 +242,11 @@ namespace ZeroMQ
 
 			Decoder dec = encoding.GetDecoder();
 			int charCount = dec.GetCharCount(bytes, remaining, false);
+			if (charCount == 0)
+			{
+				return string.Empty;
+			}
+
 			remaining = charCount > remaining ? remaining : charCount;
 
 			var resultChars = new char[charCount];
