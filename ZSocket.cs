@@ -323,7 +323,7 @@ namespace ZeroMQ
 			IntPtr pinPtr = pin.AddrOfPinnedObject() + offset;
 
 			int read;
-			while ( (read = zmq.recv(this.SocketPtr, pinPtr, count, (int)flags)) == -1)
+			while (-1 == (read = zmq.recv(this.SocketPtr, pinPtr, count, (int)flags)))
 			{
 				error = ZError.GetLastErr();
 				if (error == ZError.EINTR)
