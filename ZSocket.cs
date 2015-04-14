@@ -305,13 +305,13 @@ namespace ZeroMQ
 		public void ReceiveBytes(byte[] buffer, int offset, int count)
 		{
 			ZError error;
-			if (!ReceiveBytes(buffer, offset, count, ZSocketFlags.None, out error))
+			if (ReceiveBytes(buffer, offset, count, ZSocketFlags.None, out error) <= 0)
 			{
 				throw new ZException(error);
 			}
 		}
 
-		public bool ReceiveBytes(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
+		public int ReceiveBytes(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
 		{
 			EnsureNotDisposed();
 
@@ -322,22 +322,22 @@ namespace ZeroMQ
 			var pin = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 			IntPtr pinPtr = pin.AddrOfPinnedObject() + offset;
 
-			while (-1 == zmq.recv(this.SocketPtr, pinPtr, count, (int)flags))
+			int read;
+			while ( (read = zmq.recv(this.SocketPtr, pinPtr, count, (int)flags)) == -1)
 			{
 				error = ZError.GetLastErr();
-
 				if (error == ZError.EINTR)
 				{
 					error = default(ZError);
 					continue;
 				}
-
+				
 				pin.Free();
-				return false;
+				return read;
 			}
 
 			pin.Free();
-			return true;
+			return read;
 		}
 
 		public void SendBytes(byte[] buffer, int offset, int count)
