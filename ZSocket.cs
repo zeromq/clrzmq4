@@ -19,6 +19,7 @@ namespace ZeroMQ
 		/// <returns><see cref="ZSocket"/></returns>
 		public static ZSocket Create(ZContext context, ZSocketType socketType)
 		{
+
 			return new ZSocket(context, socketType);
 		}
 
@@ -305,7 +306,7 @@ namespace ZeroMQ
 		public void ReceiveBytes(byte[] buffer, int offset, int count)
 		{
 			ZError error;
-			if (-1 == ReceiveBytes(buffer, offset, count, ZSocketFlags.None, out error))
+			if (0 > ReceiveBytes(buffer, offset, count, ZSocketFlags.None, out error))
 			{
 				throw new ZException(error);
 			}
