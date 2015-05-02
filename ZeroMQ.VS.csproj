@@ -54,10 +54,10 @@
     <Compile Include="ZFrameOption.cs" />
     <Compile Include="ZThread.cs" />
     <Compile Include="ZSocketSetup.cs" />
-    <Compile Include="PubSubDevice.cs" />
-    <Compile Include="PushPullDevice.cs" />
-    <Compile Include="RouterDealerDevice.cs" />
-    <Compile Include="StreamDealerDevice.cs" />
+    <Compile Include="Devices\PubSubDevice.cs" />
+    <Compile Include="Devices\PushPullDevice.cs" />
+    <Compile Include="Devices\RouterDealerDevice.cs" />
+    <Compile Include="Devices\StreamDealerDevice.cs" />
     <Compile Include="lib\DispoIntPtr.cs" />
     <Compile Include="lib\DispoIntPtr.Ansi.cs" />
     <Compile Include="lib\Platform.cs" />
@@ -128,4 +128,5 @@
     <None Include="README.md" />
     <None Include="ZeroMQ.snk" />
   </ItemGroup>
+  <ItemGroup />
 </Project>

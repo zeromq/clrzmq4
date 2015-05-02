@@ -1,4 +1,4 @@
-﻿namespace ZeroMQ
+﻿namespace ZeroMQ.Devices
 {
 	using lib;
 	// using lib.sys;

@@ -1,11 +1,6 @@
 ﻿namespace ZeroMQ
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Security.Cryptography;
-	using System.Threading;
-
-	public delegate void ZAction(ZContext context, ZSocket backend, CancellationTokenSource cancellor, object[] args);
+	public delegate void ZAction(ZContext context, ZSocket backend, System.Threading.CancellationTokenSource cancellor, object[] args);
 
 	public class ZActor : ZThread
 	{
@@ -25,7 +20,7 @@
 			: this (context, default(string), action, args)
 		{
 			var rnd0 = new byte[8];
-			using (var rng = new RNGCryptoServiceProvider()) rng.GetBytes(rnd0);
+			using (var rng = new System.Security.Cryptography.RNGCryptoServiceProvider()) rng.GetBytes(rnd0);
 			this.Endpoint = string.Format("inproc://{0}", ZContext.Encoding.GetString(rnd0));
 		}
 
