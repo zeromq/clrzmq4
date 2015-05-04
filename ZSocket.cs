@@ -303,13 +303,15 @@ namespace ZeroMQ
 			return true;
 		}
 
-		public void ReceiveBytes(byte[] buffer, int offset, int count)
+		public int ReceiveBytes(byte[] buffer, int offset, int count)
 		{
 			ZError error;
-			if (0 > ReceiveBytes(buffer, offset, count, ZSocketFlags.None, out error))
+			int length;
+			if (0 > (length = ReceiveBytes(buffer, offset, count, ZSocketFlags.None, out error)))
 			{
 				throw new ZException(error);
 			}
+			return length;
 		}
 
 		public int ReceiveBytes(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
@@ -323,8 +325,8 @@ namespace ZeroMQ
 			var pin = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 			IntPtr pinPtr = pin.AddrOfPinnedObject() + offset;
 
-			int read;
-			while (-1 == (read = zmq.recv(this.SocketPtr, pinPtr, count, (int)flags)))
+			int length;
+			while (0 > (length = zmq.recv(this.SocketPtr, pinPtr, count, (int)flags)))
 			{
 				error = ZError.GetLastErr();
 				if (error == ZError.EINTR)
@@ -333,24 +335,25 @@ namespace ZeroMQ
 					continue;
 				}
 				
-				pin.Free();
-				return read;
+				break;
 			}
 
 			pin.Free();
-			return read;
+			return length;
 		}
 
-		public void SendBytes(byte[] buffer, int offset, int count)
+		public int SendBytes(byte[] buffer, int offset, int count)
 		{
 			ZError error;
-			if (!SendBytes(buffer, offset, count, ZSocketFlags.None, out error))
+			int length;
+			if (0 > (length = SendBytes(buffer, offset, count, ZSocketFlags.None, out error)))
 			{
 				throw new ZException(error);
 			}
+			return length;
 		}
 
-		public bool SendBytes(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
+		public int SendBytes(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
 		{
 			EnsureNotDisposed();
 
@@ -361,7 +364,8 @@ namespace ZeroMQ
 			var pin = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 			IntPtr pinPtr = pin.AddrOfPinnedObject() + offset;
 
-			while (-1 == zmq.send(SocketPtr, pinPtr, count, (int)flags))
+			int length;
+			while (0 > (length = zmq.send(SocketPtr, pinPtr, count, (int)flags)))
 			{
 				error = ZError.GetLastErr();
 
@@ -371,18 +375,17 @@ namespace ZeroMQ
 					continue;
 				}
 
-				pin.Free();
-				return false;
+				break;
 			}
 
 			pin.Free();
-			return true;
+			return length;
 		}
 
-		public void Send(byte[] buffer, int offset, int count) {
-			SendBytes(buffer, offset, count);
+		public int Send(byte[] buffer, int offset, int count) {
+			return SendBytes(buffer, offset, count);
 		} // just Send*
-		public bool Send(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error) {
+		public int Send(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error) {
 			return SendBytes(buffer, offset, count, flags, out error);
 		} // just Send*
 
