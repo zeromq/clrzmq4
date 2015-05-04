@@ -131,13 +131,6 @@ public static void WUClient(string[] args)
 		Console.WriteLine("I: Connecting to {0}...", connect_to);
 		subscriber.Connect(connect_to);
 
-		foreach (IPAddress address in WUProxy_GetPublicIPs())
-		{
-			var epgmAddress = string.Format("epgm://{0};239.192.1.1:8100", address);
-			Console.WriteLine("I: Connecting to {0}...", epgmAddress);
-			subscriber.Connect(epgmAddress);
-		}
-
 		// Subscribe to zipcode
 		string zipCode = args[0];
 		Console.WriteLine("I: Subscribing to zip code {0}...", zipCode);
