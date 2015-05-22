@@ -85,12 +85,12 @@
     <Compile Include="Monitoring\ZMonitors.cs" />
     <Compile Include="Z85.cs" />
     <Compile Include="ZFrameOption.cs" />
-    <Compile Include="PubSubDevice.cs" />
-    <Compile Include="PushPullDevice.cs" />
-    <Compile Include="RouterDealerDevice.cs" />
-    <Compile Include="StreamDealerDevice.cs" />
     <Compile Include="ZDevice.cs" />
     <Compile Include="ZSocketSetup.cs" />
+    <Compile Include="Devices\PubSubDevice.cs" />
+    <Compile Include="Devices\PushPullDevice.cs" />
+    <Compile Include="Devices\RouterDealerDevice.cs" />
+    <Compile Include="Devices\StreamDealerDevice.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
