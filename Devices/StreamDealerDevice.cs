@@ -22,6 +22,13 @@
 		/// The backend <see cref="ZSocketType"/> for a queue device.
 		/// </summary>
 		public static readonly ZSocketType BackendType = ZSocketType.DEALER;
+		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="StreamDealerDevice"/> class.
+		/// </summary>
+		public StreamDealerDevice(ZContext context)
+			: base(context, FrontendType, BackendType)
+		{ }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="StreamDealerDevice"/> class.

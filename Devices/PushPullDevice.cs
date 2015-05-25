@@ -16,6 +16,13 @@
 		/// The backend <see cref="ZSocketType"/> for a streamer device.
 		/// </summary>
 		public static readonly ZSocketType BackendType = ZSocketType.PUSH;
+		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PushPullDevice"/> class.
+		/// </summary>
+		public PushPullDevice(ZContext context)
+			: base(context, FrontendType, BackendType)
+		{ }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="StreamerDevice"/> class.

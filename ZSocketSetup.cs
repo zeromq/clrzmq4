@@ -64,59 +64,27 @@
 			return this;
 		}
 
-		/// <summary>
-		/// Set an int-based socket option.
-		/// </summary>
-		/// <param name="property">The <see cref="ZSocket"/> property to set.</param>
-		/// <param name="value">The int value to assign.</param>
-		/// <returns>The current <see cref="ZSocketSetup"/> object.</returns>
-		public ZSocketSetup SetSocketOption(Expression<Func<ZSocket, int>> property, int value)
+		public ZSocketSetup SetSocketOption<T>(Expression<Func<ZSocket, T>> property, T value)
 		{
-			return SetSocketOption<int>(property, value);
-		}
+			PropertyInfo propertyInfo;
 
-		/// <summary>
-		/// Set a long-based socket option.
-		/// </summary>
-		/// <param name="property">The <see cref="ZSocket"/> property to set.</param>
-		/// <param name="value">The long value to assign.</param>
-		/// <returns>The current <see cref="ZSocketSetup"/> object.</returns>
-		public ZSocketSetup SetSocketOption(Expression<Func<ZSocket, long>> property, long value)
-		{
-			return SetSocketOption<long>(property, value);
-		}
+			if (property.Body is MemberExpression)
+			{
+				propertyInfo = ((MemberExpression)property.Body).Member as PropertyInfo;
+			}
+			else
+			{
+				propertyInfo = ((MemberExpression)((UnaryExpression)property.Body).Operand).Member as PropertyInfo;
+			}
 
-		/// <summary>
-		/// Set a ulong-based socket option.
-		/// </summary>
-		/// <param name="property">The <see cref="ZSocket"/> property to set.</param>
-		/// <param name="value">The ulong value to assign.</param>
-		/// <returns>The current <see cref="ZSocketSetup"/> object.</returns>
-		public ZSocketSetup SetSocketOption(Expression<Func<ZSocket, ulong>> property, ulong value)
-		{
-			return SetSocketOption<ulong>(property, value);
-		}
+			if (propertyInfo == null)
+			{
+				throw new InvalidOperationException("The specified ZSocket member is not a property: " + property.Body);
+			}
 
-		/// <summary>
-		/// Set a byte array-based socket option.
-		/// </summary>
-		/// <param name="property">The <see cref="ZSocket"/> property to set.</param>
-		/// <param name="value">The byte array value to assign.</param>
-		/// <returns>The current <see cref="ZSocketSetup"/> object.</returns>
-		public ZSocketSetup SetSocketOption(Expression<Func<ZSocket, byte[]>> property, byte[] value)
-		{
-			return SetSocketOption<byte[]>(property, value);
-		}
+			_socketInitializers.Add(s => propertyInfo.SetValue(s, value, null));
 
-		/// <summary>
-		/// Set a <see cref="TimeSpan"/>-based socket option.
-		/// </summary>
-		/// <param name="property">The <see cref="ZSocket"/> property to set.</param>
-		/// <param name="value">The <see cref="TimeSpan"/> value to assign.</param>
-		/// <returns>The current <see cref="ZSocketSetup"/> object.</returns>
-		public ZSocketSetup SetSocketOption(Expression<Func<ZSocket, TimeSpan>> property, TimeSpan value)
-		{
-			return SetSocketOption<TimeSpan>(property, value);
+			return this;
 		}
 
 		private byte[] _subscription;
@@ -142,23 +110,11 @@
 			return this;
 		}
 
-		internal ZSocketSetup AddSocketInitializer(Action<ZSocket> setupMethod)
-		{
-			_socketInitializers.Add(setupMethod);
-
-			return this;
-		}
-
 		internal void Configure()
 		{
 			if (_isConfigured)
 			{
 				return;
-			}
-
-			if (_bindings.Count == 0 && _connections.Count == 0)
-			{
-				throw new InvalidOperationException("Device sockets must bind or connect to at least one endpoint.");
 			}
 
 			foreach (Action<ZSocket> initializer in _socketInitializers)
@@ -211,29 +167,6 @@
 			{
 				_socket.Disconnect(endpoint, out error);
 			}
-		}
-
-		private ZSocketSetup SetSocketOption<T>(Expression<Func<ZSocket, T>> property, T value)
-		{
-			PropertyInfo propertyInfo;
-
-			if (property.Body is MemberExpression)
-			{
-				propertyInfo = ((MemberExpression)property.Body).Member as PropertyInfo;
-			}
-			else
-			{
-				propertyInfo = ((MemberExpression)((UnaryExpression)property.Body).Operand).Member as PropertyInfo;
-			}
-
-			if (propertyInfo == null)
-			{
-				throw new InvalidOperationException("The specified ZSocket member is not a property: " + property.Body);
-			}
-
-			_socketInitializers.Add(s => propertyInfo.SetValue(s, value, null));
-
-			return this;
 		}
 	}
 }

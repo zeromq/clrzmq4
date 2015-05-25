@@ -27,12 +27,12 @@
 		/// <summary>
 		/// The frontend socket that will normally pass messages to <see cref="BackendSocket"/>.
 		/// </summary>
-		protected ZSocket FrontendSocket;
+		public ZSocket FrontendSocket;
 
 		/// <summary>
 		/// The backend socket that will normally receive messages from (and possibly send replies to) <see cref="FrontendSocket"/>.
 		/// </summary>
-		protected ZSocket BackendSocket;
+		public ZSocket BackendSocket;
 
 		protected ZDevice(ZContext context)
 			: base()

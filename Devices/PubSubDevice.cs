@@ -16,6 +16,15 @@
 		/// The backend <see cref="ZSocketType"/> for a forwarder device.
 		/// </summary>
 		public static readonly ZSocketType BackendType = ZSocketType.XPUB;
+		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PubSubDevice"/> class.
+		/// </summary>
+		public PubSubDevice(ZContext context)
+			: base(context, FrontendType, BackendType)
+		{
+			BackendSetup.SubscribeAll();
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ForwarderDevice"/> class.

@@ -16,8 +16,15 @@
 		public static readonly ZSocketType BackendType = ZSocketType.DEALER;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="RouterDealerDevice"/> class that will run in a
-		/// self-managed thread.
+		/// Initializes a new instance of the <see cref="RouterDealerDevice"/> class.
+		/// </summary>
+		public RouterDealerDevice(ZContext context)
+			: base(context, FrontendType, BackendType)
+		{ }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="RouterDealerDevice"/> class
+		/// and binds to the specified Frontend and Backend address.
 		/// </summary>
 		public RouterDealerDevice(ZContext context, string frontendBindAddr, string backendBindAddr)
 			: base(context, FrontendType, BackendType)
