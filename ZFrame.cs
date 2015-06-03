@@ -839,5 +839,15 @@ namespace ZeroMQ
 		}
 
 		#endregion
+
+		public override string ToString()
+		{
+			if (Length > -1)
+			{
+				Position = 0;
+				return ReadString();
+			}
+			return base.ToString();
+		}
 	}
 }
