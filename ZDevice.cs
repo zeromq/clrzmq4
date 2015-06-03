@@ -66,10 +66,10 @@
 		{
 			error = default(ZError);
 
-			if (frontendType == ZSocketType.None && backendType == ZSocketType.None)
+			/* if (frontendType == ZSocketType.None && backendType == ZSocketType.None)
 			{
 				throw new InvalidOperationException();
-			}
+			} /**/
 
 			if (frontendType != ZSocketType.None)
 			{
@@ -95,12 +95,12 @@
 		/// <summary>
 		/// Gets a <see cref="ZSocketSetup"/> for configuring the frontend socket.
 		/// </summary>
-		public ZSocketSetup BackendSetup { get; private set; }
+		public ZSocketSetup BackendSetup { get; protected set; }
 
 		/// <summary>
 		/// Gets a <see cref="ZSocketSetup"/> for configuring the backend socket.
 		/// </summary>
-		public ZSocketSetup FrontendSetup { get; private set; }
+		public ZSocketSetup FrontendSetup { get; protected set; }
 
 		/*/ <summary>
 		/// Gets a <see cref="ManualResetEvent"/> that can be used to block while the device is running.
@@ -119,7 +119,7 @@
 		/// Initializes the frontend and backend sockets. Called automatically when starting the device.
 		/// If called multiple times, will only execute once.
 		/// </summary>
-		public void Initialize()
+		public virtual void Initialize()
 		{
 			EnsureNotDisposed();
 
