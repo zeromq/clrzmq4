@@ -110,7 +110,7 @@
 			return this;
 		}
 
-		internal void Configure()
+		public void Configure()
 		{
 			if (_isConfigured)
 			{
@@ -125,7 +125,7 @@
 			_isConfigured = true;
 		}
 
-		internal void BindConnect()
+		public void BindConnect()
 		{
 			foreach (string endpoint in _bindings)
 			{
@@ -148,7 +148,7 @@
 			}
 		}
 
-		internal void UnbindDisconnect()
+		public void UnbindDisconnect()
 		{
 
 			/* if (_subscription != null)
