@@ -765,7 +765,7 @@ namespace ZeroMQ
 			{
 				do
 				{
-					while (-1 == zmq.msg_recv(msg.Ptr, this.SocketPtr, (int)ZSocketFlags.DontWait))
+					while (-1 == zmq.msg_recv(msg.Ptr, this.SocketPtr, (int)ZSocketFlags.None))
 					{
 						error = ZError.GetLastErr();
 
@@ -782,7 +782,7 @@ namespace ZeroMQ
 					more = ReceiveMore;
 
 					// sending scope
-					while (-1 != zmq.msg_send(msg.Ptr, destination.SocketPtr, more ? (int)(ZSocketFlags.More | ZSocketFlags.DontWait) : (int)ZSocketFlags.DontWait))
+					while (-1 != zmq.msg_send(msg.Ptr, destination.SocketPtr, more ? (int)ZSocketFlags.More : (int)ZSocketFlags.None))
 					{
 						error = ZError.GetLastErr();
 
