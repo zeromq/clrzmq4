@@ -396,6 +396,27 @@ namespace ZeroMQ
 			return pos;
 		}
 
+		public byte[] Read()
+		{
+			int remaining = Math.Max(0, (int)(Length - Position));
+			return Read(remaining);
+		}
+
+		public byte[] Read(int count)
+		{
+			int remaining = Math.Min(count, Math.Max(0, (int)(Length - Position)));
+			if (remaining == 0) {
+				return new byte[0];
+			}
+			if (remaining < 0)
+			{
+				return null;
+			}
+			var bytes = new byte[remaining];
+			/* int bytesLength = */ Read(bytes, 0, remaining);
+			return bytes;
+		}
+
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			int remaining = Math.Min(count, Math.Max(0, (int)(Length - Position)));
