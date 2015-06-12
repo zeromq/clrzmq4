@@ -15,6 +15,28 @@ namespace ZeroMQ
 	/// </summary>
 	public class ZFrame : Stream, ICloneable, IDisposable
 	{
+		public static ZFrame FromStream(Stream stream, long i, int l)
+		{
+			stream.Position = i;
+			if (l == 0) return new ZFrame();
+
+			var frame = ZFrame.Create(l);
+			var buf = new byte[65535];
+			int bufLen, remaining, current = -1;
+			do {
+				++current;
+				remaining = Math.Min(Math.Max(0, l - current * buf.Length), buf.Length);
+				if (remaining < 1) break;
+				
+				bufLen = stream.Read(buf, 0, remaining);
+				frame.Write(buf, 0, bufLen);
+
+			} while (bufLen > 0);
+
+			frame.Position = 0;
+			return frame;
+		}
+
 		public static ZFrame CopyFrom(ZFrame frame)
 		{
 			return frame.Duplicate();
@@ -865,8 +887,11 @@ namespace ZeroMQ
 		{
 			if (Length > -1)
 			{
+				long old = Position;
 				Position = 0;
-				return ReadString();
+				string retur = ReadString();
+				Position = old;
+				return retur;
 			}
 			return base.ToString();
 		}
