@@ -110,26 +110,25 @@ namespace ZeroMQ
 			return Decode(encoded);
 		}
 
-		public static string ToZ85Decoded(this string encoded) 
+        public static byte[] ToZ85Decoded(this string encoded) 
 		{
 			return Decode(encoded, ZContext.Encoding);
 		}
 
-		public static string ToZ85Decoded(this string encoded, Encoding encoding) 
+        public static byte[] ToZ85Decoded(this string encoded, Encoding encoding) 
 		{
 			return Decode(encoded, encoding);
 		}
 
-		public static string Decode(string strg)
+        public static byte[] Decode(string strg)
 		{
 			return Decode(strg, ZContext.Encoding);
 		}
 
-		public static string Decode(string strg, Encoding encoding)
+        public static byte[] Decode(string strg, Encoding encoding)
 		{
 			byte[] bytes = encoding.GetBytes(strg);
-			byte[] encoded = Decode(bytes);
-			return encoding.GetString(encoded);
+			return Decode(bytes);
 		}
 	}
 }
