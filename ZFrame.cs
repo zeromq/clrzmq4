@@ -306,16 +306,9 @@ namespace ZeroMQ
 		{
 			if (_framePtr != null)
 			{
-				try
+				if (_framePtr.Ptr != IntPtr.Zero)
 				{
-					if (_framePtr.Ptr != IntPtr.Zero)
-					{
-						Close();
-					}
-				}
-				finally 
-				{
-					Dismiss();
+					Close();
 				}
 			}
 			base.Dispose(disposing);
@@ -738,30 +731,25 @@ namespace ZeroMQ
 			}
 
 			ZError error;
-			try
+			while (-1 == zmq.msg_close(_framePtr))
 			{
-				while (-1 == zmq.msg_close(_framePtr))
-				{
-					error = ZError.GetLastErr();
+				error = ZError.GetLastErr();
 
-					if (error == ZError.EINTR)
-					{
-						error = default(ZError);
-						continue;
-					}
-					if (error == ZError.EFAULT)
-					{
-						// Ignore: Invalid message.
-						break;
-					}
-					throw new ZException(error, "zmq_msg_close");
+				if (error == ZError.EINTR)
+				{
+					error = default(ZError);
+					continue;
 				}
+				if (error == ZError.EFAULT)
+				{
+					// Ignore: Invalid message.
+					break;
+				}
+				return;
 			}
-			finally
-			{
-				// Go unallocating the HGlobal
-				Dismiss();
-			}
+
+			// Go unallocating the HGlobal
+			Dismiss();
 		}
 
 		public void CopyZeroTo(ZFrame other)

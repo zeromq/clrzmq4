@@ -728,27 +728,21 @@ namespace ZeroMQ
 
 			error = default(ZError);
 
-			try
+			while (-1 == zmq.msg_send(frame.Ptr, _socketPtr, (int)flags))
 			{
-				while (-1 == zmq.msg_send(frame.Ptr, _socketPtr, (int)flags))
+				error = ZError.GetLastErr();
+
+				if (error == ZError.EINTR)
 				{
-					error = ZError.GetLastErr();
-
-					if (error == ZError.EINTR)
-					{
-						error = default(ZError);
-						continue;
-					}
-
-					return false;
+					error = default(ZError);
+					continue;
 				}
-			}
-			finally
-			{
-				// Tell IDisposable to not unallocate zmq_msg
-				frame.Dismiss();
+
+				return false;
 			}
 
+			// Tell IDisposable to not unallocate zmq_msg
+			frame.Dismiss();
 			return true;
 		}
 
