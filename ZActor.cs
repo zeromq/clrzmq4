@@ -8,11 +8,11 @@
 
 		public ZContext Context { get; protected set; }
 
-		protected ZSocket Backend { get; set; }
+		public ZSocket Backend { get; protected set; }
 
-		protected ZAction Action { get; set; }
+		public ZAction Action { get; protected set; }
 
-		protected object[] Arguments { get; set; }
+		public object[] Arguments { get; protected set; }
 
 		public ZSocket Frontend { get; protected set; }
 
