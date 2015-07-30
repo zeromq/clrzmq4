@@ -4,15 +4,15 @@
 
 	public class ZActor : ZThread
 	{
-		public string Endpoint { get; protected set; }
-
 		public ZContext Context { get; protected set; }
 
-		public ZSocket Backend { get; protected set; }
+		public string Endpoint { get; protected set; }
 
 		public ZAction Action { get; protected set; }
 
 		public object[] Arguments { get; protected set; }
+
+		public ZSocket Backend { get; protected set; }
 
 		public ZSocket Frontend { get; protected set; }
 
