@@ -68,7 +68,7 @@ namespace ZeroMQ
 
 		public static string Encode(string strg, Encoding encoding)
 		{
-			byte[] encoded = EncodeBytes(bytes, encoding);
+			byte[] encoded = EncodeBytes(strg, encoding);
 			return encoding.GetString(encoded);
 		}
 
