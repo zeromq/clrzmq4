@@ -51,6 +51,16 @@ namespace ZeroMQ
 			return Encode(decoded, encoding);
 		}
 
+		public static byte[] ToZ85EncodedBytes(this string decoded) 
+		{
+			return EncodeToBytes(decoded, ZContext.Encoding);
+		}
+
+		public static byte[] ToZ85EncodedBytes(this string decoded, Encoding encoding) 
+		{
+			return EncodeToBytes(decoded, encoding);
+		}
+
 		public static string Encode(string strg)
 		{
 			return Encode(strg, ZContext.Encoding);
@@ -58,19 +68,16 @@ namespace ZeroMQ
 
 		public static string Encode(string strg, Encoding encoding)
 		{
-			byte[] bytes = encoding.GetBytes(strg);
-
-			byte[] encoded = Encode(bytes);
-
+			byte[] encoded = EncodeToBytes(bytes, encoding);
 			return encoding.GetString(encoded);
 		}
 
-		public static byte[] EncodeBytes(string strg)
+		public static byte[] EncodeToBytes(string strg)
 		{
-			return EncodeBytes(strg, ZContext.Encoding);
+			return EncodeToBytes(strg, ZContext.Encoding);
 		}
 
-		public static byte[] EncodeBytes(string strg, Encoding encoding)
+		public static byte[] EncodeToBytes(string strg, Encoding encoding)
 		{
 			byte[] bytes = encoding.GetBytes(strg);
 			return Encode(bytes);
@@ -120,6 +127,16 @@ namespace ZeroMQ
 			return Decode(encoded, encoding);
 		}
 
+		public static byte[] ToZ85DecodedBytes(this string encoded) 
+		{
+			return DecodeBytes(encoded, ZContext.Encoding);
+		}
+
+		public static byte[] ToZ85DecodedBytes(this string encoded, Encoding encoding) 
+		{
+			return DecodeBytes(encoded, encoding);
+		}
+
 		public static string Decode(string strg)
 		{
 			return Decode(strg, ZContext.Encoding);
@@ -127,9 +144,14 @@ namespace ZeroMQ
 
 		public static string Decode(string strg, Encoding encoding)
 		{
-			byte[] bytes = encoding.GetBytes(strg);
-			byte[] encoded = Decode(bytes);
+			byte[] encoded = DecodeToBytes(strg, encoding);
 			return encoding.GetString(encoded);
+		}
+		
+		public static byte[] DecodeToBytes(string strg, Encoding encoding)
+		{
+			byte[] bytes = encoding.GetBytes(strg);
+			return Decode(bytes);
 		}
 	}
 }
