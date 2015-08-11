@@ -584,6 +584,11 @@ namespace ZeroMQ
 
 		public string ReadLine()
 		{
+			return ReadLine(ZContext.Encoding);
+		}
+
+		public string ReadLine(Encoding encoding)
+		{
 			long start = Position;
 			long length = Length;
 			long lengthToRead = 0;
@@ -614,7 +619,7 @@ namespace ZeroMQ
 			{
 				this._position = (int)start;
 
-				strg = ReadString((int)lengthToRead, ZContext.Encoding);
+				strg = ReadString((int)lengthToRead, encoding);
 
 				if (lastByt == 0x0D) // Carriage Return
 				{
@@ -873,11 +878,16 @@ namespace ZeroMQ
 
 		public override string ToString()
 		{
+			return ToString(ZContext.Encoding);
+		}
+
+		public virtual string ToString(Encoding encoding)
+		{
 			if (Length > -1)
 			{
 				long old = Position;
 				Position = 0;
-				string retur = ReadString();
+				string retur = ReadString(encoding);
 				Position = old;
 				return retur;
 			}
