@@ -25,6 +25,10 @@ namespace ZeroMQ.Monitoring
 
 		private readonly Dictionary<ZMonitorEvents, Action<ZMonitorEventData>> _eventHandler;
 
+		protected ZMonitor(ZSocket socket, string endpoint)
+			: this(ZContext.Current, socket, endpoint) 
+		{ }
+
 		protected ZMonitor(ZContext context, ZSocket socket, string endpoint)
 			: base()
 		{
@@ -47,6 +51,11 @@ namespace ZeroMQ.Monitoring
 			};
 		}
 
+		public static ZMonitor Create(string endpoint)
+		{
+			return Create(ZContext.Current, endpoint);
+		}
+
 		public static ZMonitor Create(ZContext context, string endpoint)
 		{
 			ZError error;
@@ -56,6 +65,16 @@ namespace ZeroMQ.Monitoring
 				throw new ZException(error);
 			}
 			return monitor;
+		}
+
+		/// <summary>
+		/// Create a socket with the current context and the specified socket type.
+		/// </summary>
+		/// <param name="socketType">A <see cref="ZSocketType"/> value for the socket.</param>
+		/// <returns>A <see cref="ZSocket"/> instance with the current context and the specified socket type.</returns>
+		public static ZMonitor Create(string endpoint, out ZError error)
+		{
+			return Create(ZContext.Current, endpoint, out error);
 		}
 
 		/// <summary>
