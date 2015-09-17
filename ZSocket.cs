@@ -17,10 +17,27 @@ namespace ZeroMQ
 		/// Create a <see cref="ZSocket"/> instance.
 		/// </summary>
 		/// <returns><see cref="ZSocket"/></returns>
+		public static ZSocket Create(ZSocketType socketType)
+		{
+			return new ZSocket(ZContext.Current, socketType);
+		}
+
+		/// <summary>
+		/// Create a <see cref="ZSocket"/> instance.
+		/// </summary>
+		/// <returns><see cref="ZSocket"/></returns>
 		public static ZSocket Create(ZContext context, ZSocketType socketType)
 		{
-
 			return new ZSocket(context, socketType);
+		}
+
+		/// <summary>
+		/// Create a <see cref="ZSocket"/> instance.
+		/// </summary>
+		/// <returns><see cref="ZSocket"/></returns>
+		public static ZSocket Create(ZSocketType socketType, out ZError error)
+		{
+			return Create(ZContext.Current, socketType, out error);
 		}
 
 		/// <summary>
@@ -45,6 +62,12 @@ namespace ZeroMQ
 		private IntPtr _socketPtr;
 
 		private ZSocketType _socketType;
+		
+		/// <summary>
+		/// Create a <see cref="ZSocket"/> instance.
+		/// </summary>
+		/// <returns><see cref="ZSocket"/></returns>
+		public ZSocket(ZSocketType socketType) : this (ZContext.Current, socketType) { }
 
 		/// <summary>
 		/// Create a <see cref="ZSocket"/> instance.
