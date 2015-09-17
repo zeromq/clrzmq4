@@ -23,6 +23,19 @@ namespace ZeroMQ
 			protected set { _encoding = value; }
 		}
 
+		private static ZContext _current;
+
+		public static ZContext Current {
+			get {
+				if (_current == null)
+				{
+					// INFO: This is the ZContext who is the one, running this program.
+					_current = new ZContext();
+				}
+				return _current;
+			}
+		}
+
 		public static bool Has(string capability)
 		{
 			using (var capabilityPtr = DispoIntPtr.AllocString(capability))
