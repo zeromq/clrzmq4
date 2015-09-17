@@ -16,6 +16,10 @@
 
 		public ZSocket Frontend { get; protected set; }
 
+		public ZActor(ZAction action, params object[] args)
+			: this(ZContext.Current, action, args)
+		{ }
+
 		public ZActor (ZContext context, ZAction action, params object[] args)
 			: this (context, default(string), action, args)
 		{
@@ -23,6 +27,10 @@
 			using (var rng = new System.Security.Cryptography.RNGCryptoServiceProvider()) rng.GetNonZeroBytes(rnd0);
 			this.Endpoint = string.Format("inproc://{0}", ZContext.Encoding.GetString(rnd0));
 		}
+
+		public ZActor(string endpoint, ZAction action, params object[] args)
+			: this (ZContext.Current, endpoint, action, args)
+		{ }
 
 		public ZActor(ZContext context, string endpoint, ZAction action, params object[] args)
 			: base ()
