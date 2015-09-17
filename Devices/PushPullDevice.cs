@@ -16,7 +16,12 @@
 		/// The backend <see cref="ZSocketType"/> for a streamer device.
 		/// </summary>
 		public static readonly ZSocketType BackendType = ZSocketType.PUSH;
-		
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PushPullDevice"/> class.
+		/// </summary>
+		public PushPullDevice() : this(ZContext.Current) { }
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PushPullDevice"/> class.
 		/// </summary>
@@ -25,7 +30,14 @@
 		{ }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="StreamerDevice"/> class.
+		/// Initializes a new instance of the <see cref="PushPullDevice"/> class.
+		/// </summary>
+		public PushPullDevice(string frontendBindAddr, string backendBindAddr)
+			: this(ZContext.Current, frontendBindAddr, backendBindAddr)
+		{ }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PushPullDevice"/> class.
 		/// </summary>
 		public PushPullDevice(ZContext context, string frontendBindAddr, string backendBindAddr)
 			: base(context, FrontendType, BackendType)
@@ -43,7 +55,7 @@
 		}
 
 		/// <summary>
-		/// Not implemented for the <see cref="StreamerDevice"/>.
+		/// Not implemented for the <see cref="PushPullDevice"/>.
 		/// </summary>
 		protected override bool BackendHandler(ZSocket args, out ZMessage message, out ZError error)
 		{

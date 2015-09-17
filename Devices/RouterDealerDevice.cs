@@ -14,12 +14,25 @@
 		/// The backend <see cref="ZSocketType"/> for a queue device.
 		/// </summary>
 		public static readonly ZSocketType BackendType = ZSocketType.DEALER;
+		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="RouterDealerDevice"/> class.
+		/// </summary>
+		public RouterDealerDevice() : this(ZContext.Current) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RouterDealerDevice"/> class.
 		/// </summary>
 		public RouterDealerDevice(ZContext context)
 			: base(context, FrontendType, BackendType)
+		{ }
+		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="RouterDealerDevice"/> class
+		/// and binds to the specified Frontend and Backend address.
+		/// </summary>
+		public RouterDealerDevice(string frontendBindAddr, string backendBindAddr)
+			: this(ZContext.Current, frontendBindAddr, backendBindAddr)
 		{ }
 
 		/// <summary>

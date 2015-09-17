@@ -34,11 +34,29 @@
 		/// </summary>
 		public ZSocket BackendSocket;
 
+		protected ZDevice()
+			: this (ZContext.Current)
+		{ }
+
 		protected ZDevice(ZContext context)
 			: base()
 		{
 			Context = context;
 		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ZDevice"/> class.
+		/// </summary>
+		/// <param name="frontendSocket">
+		/// A <see cref="ZSocket"/> that will pass incoming messages to <paramref name="backendSocket"/>.
+		/// </param>
+		/// <param name="backendSocket">
+		/// A <see cref="ZSocket"/> that will receive messages from (and optionally send replies to) <paramref name="frontendSocket"/>.
+		/// </param>
+		/// <param name="mode">The <see cref="DeviceMode"/> for the current device.</param>
+		protected ZDevice(ZSocketType frontendType, ZSocketType backendType)
+			: this (ZContext.Current, frontendType, backendType)
+		{ }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ZDevice"/> class.

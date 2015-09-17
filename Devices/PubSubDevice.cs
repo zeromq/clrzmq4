@@ -20,6 +20,11 @@
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PubSubDevice"/> class.
 		/// </summary>
+		public PubSubDevice() : this(ZContext.Current) { }
+		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PubSubDevice"/> class.
+		/// </summary>
 		public PubSubDevice(ZContext context)
 			: base(context, FrontendType, BackendType)
 		{
@@ -27,7 +32,14 @@
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ForwarderDevice"/> class.
+		/// Initializes a new instance of the <see cref="PubSubDevice"/> class.
+		/// </summary>
+		public PubSubDevice(string frontendBindAddr, string backendBindAddr)
+			: this(ZContext.Current, frontendBindAddr, backendBindAddr)
+		{ }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PubSubDevice"/> class.
 		/// </summary>
 		public PubSubDevice(ZContext context, string frontendBindAddr, string backendBindAddr)
 			: base(context, FrontendType, BackendType)

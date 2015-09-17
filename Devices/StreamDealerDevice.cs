@@ -26,8 +26,19 @@
 		/// <summary>
 		/// Initializes a new instance of the <see cref="StreamDealerDevice"/> class.
 		/// </summary>
+		public StreamDealerDevice() : this(ZContext.Current) { }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="StreamDealerDevice"/> class.
+		/// </summary>
 		public StreamDealerDevice(ZContext context)
 			: base(context, FrontendType, BackendType)
+		{ }
+		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="StreamDealerDevice"/> class.
+		/// </summary>
+		public StreamDealerDevice(string frontendBindAddr, string backendBindAddr)
+			: this(ZContext.Current, frontendBindAddr, backendBindAddr)
 		{ }
 
 		/// <summary>
