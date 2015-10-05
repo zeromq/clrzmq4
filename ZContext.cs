@@ -32,8 +32,6 @@ namespace ZeroMQ
 				if (_current == null)
 				{
 					// INFO: This is the ZContext who is the one, running this program.
-
-					// let's lock (this "one") down to "the one, running this program"
 					lock (SyncObject)
 					{
 						if (_current == null)
@@ -42,8 +40,6 @@ namespace ZeroMQ
 						}
 					}
 				}
-
-				// otherwise, just return "the current ZContext"
 				return _current;
 			}
 		}
