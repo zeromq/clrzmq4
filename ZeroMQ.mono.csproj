@@ -39,6 +39,14 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>ZeroMQ.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release iOS|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release iOS\</OutputPath>
+    <DefineConstants>TRACE;IOS_INTERNAL</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
