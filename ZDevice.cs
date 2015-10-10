@@ -20,7 +20,7 @@
 		protected readonly TimeSpan PollingInterval = TimeSpan.FromMilliseconds(500);
 
 		/// <summary>
-		/// The ZmqContext reference, to not become finalized
+		/// The ZContext reference, to not become finalized
 		/// </summary>
 		protected readonly ZContext Context;
 
@@ -34,6 +34,9 @@
 		/// </summary>
 		public ZSocket BackendSocket;
 
+		/// <summary>
+		/// You are using ZContext.Current!
+		/// </summary>
 		protected ZDevice()
 			: this (ZContext.Current)
 		{ }
@@ -46,6 +49,7 @@
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ZDevice"/> class.
+		/// You are using ZContext.Current!
 		/// </summary>
 		/// <param name="frontendSocket">
 		/// A <see cref="ZSocket"/> that will pass incoming messages to <paramref name="backendSocket"/>.

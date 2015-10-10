@@ -17,27 +17,9 @@ namespace ZeroMQ
 		/// Create a <see cref="ZSocket"/> instance.
 		/// </summary>
 		/// <returns><see cref="ZSocket"/></returns>
-		public static ZSocket Create(ZSocketType socketType)
-		{
-			return new ZSocket(ZContext.Current, socketType);
-		}
-
-		/// <summary>
-		/// Create a <see cref="ZSocket"/> instance.
-		/// </summary>
-		/// <returns><see cref="ZSocket"/></returns>
 		public static ZSocket Create(ZContext context, ZSocketType socketType)
 		{
 			return new ZSocket(context, socketType);
-		}
-
-		/// <summary>
-		/// Create a <see cref="ZSocket"/> instance.
-		/// </summary>
-		/// <returns><see cref="ZSocket"/></returns>
-		public static ZSocket Create(ZSocketType socketType, out ZError error)
-		{
-			return Create(ZContext.Current, socketType, out error);
 		}
 
 		/// <summary>
@@ -65,6 +47,7 @@ namespace ZeroMQ
 		
 		/// <summary>
 		/// Create a <see cref="ZSocket"/> instance.
+		/// You are using ZContext.Current!
 		/// </summary>
 		/// <returns><see cref="ZSocket"/></returns>
 		public ZSocket(ZSocketType socketType) : this (ZContext.Current, socketType) { }
@@ -85,8 +68,7 @@ namespace ZeroMQ
 			}
 		}
 
-		protected ZSocket()
-		{ }
+		protected ZSocket() { }
 
 		protected bool Initialize(out ZError error)
 		{
@@ -330,7 +312,7 @@ namespace ZeroMQ
 		{
 			ZError error;
 			int length;
-			if (0 > (length = ReceiveBytes(buffer, offset, count, ZSocketFlags.None, out error)))
+			if (-1 == (length = ReceiveBytes(buffer, offset, count, ZSocketFlags.None, out error)))
 			{
 				throw new ZException(error);
 			}
@@ -349,7 +331,7 @@ namespace ZeroMQ
 			IntPtr pinPtr = pin.AddrOfPinnedObject() + offset;
 
 			int length;
-			while (0 > (length = zmq.recv(this.SocketPtr, pinPtr, count, (int)flags)))
+			while (-1 == (length = zmq.recv(this.SocketPtr, pinPtr, count, (int)flags)))
 			{
 				error = ZError.GetLastErr();
 				if (error == ZError.EINTR)
@@ -387,7 +369,7 @@ namespace ZeroMQ
 			IntPtr pinPtr = pin.AddrOfPinnedObject() + offset;
 
 			int length;
-			while (0 > (length = zmq.send(SocketPtr, pinPtr, count, (int)flags)))
+			while (-1 == (length = zmq.send(SocketPtr, pinPtr, count, (int)flags)))
 			{
 				error = ZError.GetLastErr();
 
@@ -1523,8 +1505,8 @@ namespace ZeroMQ
 		/// </summary>
 		/// <seealso cref="ClearTcpAcceptFilter"/>
 		/// <remarks>
-		/// If no filters are applied, then TCP transport allows connections from any IP. If at least one
-		/// filter is applied then new connection source IP should be matched.
+		/// If no filters are applied, then TCP transport allows connections from any IP.
+		/// If at least one filter is applied then new connection source IP should be matched.
 		/// </remarks>
 		/// <param name="filter">IPV6 or IPV4 CIDR filter.</param>
 		public void AddTcpAcceptFilter(string filter)
@@ -1538,7 +1520,8 @@ namespace ZeroMQ
 		}
 
 		/// <summary>
-		/// Reset all TCP filters assigned by <see cref="AddTcpAcceptFilter"/> and allow TCP transport to accept connections from any IP.
+		/// Reset all TCP filters assigned by <see cref="AddTcpAcceptFilter"/>
+		/// and allow TCP transport to accept connections from any IP.
 		/// </summary>
 		public void ClearTcpAcceptFilter()
 		{

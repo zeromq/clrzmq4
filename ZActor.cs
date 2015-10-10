@@ -1,5 +1,9 @@
-﻿namespace ZeroMQ
+﻿using System;
+
+namespace ZeroMQ
 {
+	public delegate void ZAction0(ZSocket backend, System.Threading.CancellationTokenSource cancellor, object[] args);
+
 	public delegate void ZAction(ZContext context, ZSocket backend, System.Threading.CancellationTokenSource cancellor, object[] args);
 
 	public class ZActor : ZThread
@@ -10,35 +14,53 @@
 
 		public ZAction Action { get; protected set; }
 
+		public ZAction0 Action0 { get; protected set; }
+
 		public object[] Arguments { get; protected set; }
 
 		public ZSocket Backend { get; protected set; }
 
 		public ZSocket Frontend { get; protected set; }
 
-		public ZActor(ZAction action, params object[] args)
-			: this(ZContext.Current, action, args)
-		{ }
-
-		public ZActor (ZContext context, ZAction action, params object[] args)
-			: this (context, default(string), action, args)
+		public ZActor(ZContext context, ZAction action, params object[] args)
+			: this(context, default(string), action, args)
 		{
 			var rnd0 = new byte[8];
 			using (var rng = new System.Security.Cryptography.RNGCryptoServiceProvider()) rng.GetNonZeroBytes(rnd0);
 			this.Endpoint = string.Format("inproc://{0}", ZContext.Encoding.GetString(rnd0));
 		}
 
-		public ZActor(string endpoint, ZAction action, params object[] args)
-			: this (ZContext.Current, endpoint, action, args)
-		{ }
-
 		public ZActor(ZContext context, string endpoint, ZAction action, params object[] args)
-			: base ()
+			: base()
 		{
 			this.Context = context;
 
 			this.Endpoint = endpoint;
 			this.Action = action;
+			this.Arguments = args;
+		}
+
+		/// <summary>
+		/// You are using ZContext.Current!
+		/// </summary>
+		public ZActor(ZAction0 action, params object[] args)
+			: this(default(string), action, args)
+		{
+			var rnd0 = new byte[8];
+			using (var rng = new System.Security.Cryptography.RNGCryptoServiceProvider()) rng.GetNonZeroBytes(rnd0);
+			this.Endpoint = string.Format("inproc://{0}", ZContext.Encoding.GetString(rnd0));
+		}
+
+		/// <summary>
+		/// You are using ZContext.Current!
+		/// </summary>
+		public ZActor(string endpoint, ZAction0 action, params object[] args)
+			: base()
+		{
+			this.Context = ZContext.Current;
+
+			this.Endpoint = endpoint;
+			this.Action0 = action;
 			this.Arguments = args;
 		}
 
@@ -48,7 +70,14 @@
 			{
 				Backend.Bind(Endpoint);
 
-				Action(Context, Backend, Cancellor, Arguments);
+				if (Action0 != null)
+				{
+					Action0(Backend, Cancellor, Arguments);
+				}
+				if (Action != null)
+				{
+					Action(Context, Backend, Cancellor, Arguments);
+				}
 			}
 		}
 
