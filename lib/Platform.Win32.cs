@@ -1,6 +1,7 @@
 ﻿namespace ZeroMQ.lib
 {
 	using System;
+	using System.ComponentModel;
 	using System.Diagnostics;
 	using System.IO;
 	using System.Reflection;
@@ -119,7 +120,7 @@
 
 			public static Exception GetLastLibraryError()
 			{
-				return Marshal.GetExceptionForHR(Marshal.GetHRForLastWin32Error());
+				return new Win32Exception();
 			}
 
 			[DllImport(KernelLib, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
