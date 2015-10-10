@@ -39,6 +39,22 @@ namespace ZeroMQ.lib
 
 	public static partial class Platform
 	{
+		public static readonly string LibraryFileExtension;
+
+		public delegate UnmanagedLibrary LoadUnmanagedLibraryDelegate(string libraryName);
+		public static readonly LoadUnmanagedLibraryDelegate LoadUnmanagedLibrary;
+
+		public delegate SafeLibraryHandle OpenHandleDelegate(string filename);
+		public static readonly OpenHandleDelegate OpenHandle;
+
+		public delegate IntPtr LoadProcedureDelegate(SafeLibraryHandle handle, string functionName);
+		public static readonly LoadProcedureDelegate LoadProcedure;
+
+		public delegate bool ReleaseHandleDelegate(IntPtr handle);
+		public static readonly ReleaseHandleDelegate ReleaseHandle;
+
+		public delegate Exception GetLastLibraryErrorDelegate();
+		public static readonly GetLastLibraryErrorDelegate GetLastLibraryError;
 
 		public static readonly PlatformKind Kind;
 
@@ -260,23 +276,6 @@ namespace ZeroMQ.lib
 
 			return true;
 		}
-
-		public static readonly string LibraryFileExtension;
-
-		public delegate UnmanagedLibrary LoadUnmanagedLibraryDelegate(string libraryName);
-		public static readonly LoadUnmanagedLibraryDelegate LoadUnmanagedLibrary;
-
-		public delegate SafeLibraryHandle OpenHandleDelegate(string filename);
-		public static readonly OpenHandleDelegate OpenHandle;
-
-		public delegate IntPtr LoadProcedureDelegate(SafeLibraryHandle handle, string functionName);
-		public static readonly LoadProcedureDelegate LoadProcedure;
-
-		public delegate bool ReleaseHandleDelegate(IntPtr handle);
-		public static readonly ReleaseHandleDelegate ReleaseHandle;
-
-		public delegate Exception GetLastLibraryErrorDelegate();
-		public static readonly GetLastLibraryErrorDelegate GetLastLibraryError;
 
 	}
 }
