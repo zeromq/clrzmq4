@@ -2,6 +2,7 @@ namespace ZeroMQ.lib
 {
 	using System;
 	using System.IO;
+	using System.Linq;
 	using System.Reflection;
 	using System.Runtime.InteropServices;
 
@@ -236,6 +237,17 @@ namespace ZeroMQ.lib
 			}
 
 			Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+
+			if (resourceStream == null)
+			{
+				// Locate the resource in any of the current loaded assemblies
+				var resourceAssembly = AppDomain.CurrentDomain
+					.GetAssemblies()
+					.FirstOrDefault(ass => ass.GetManifestResourceNames().Contains(resourceName));
+
+				if (resourceAssembly != null)
+					resourceStream = resourceAssembly.GetManifestResourceStream(resourceName);
+			}
 
 			if (resourceStream == null)
 			{

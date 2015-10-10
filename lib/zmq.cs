@@ -5,12 +5,18 @@
 
 	public static unsafe class zmq
 	{
-		private const string SodiumLibraryName = "libsodium";
-
+		// Under iOS, the libzmq and libsodium need to be linked statically into the project.
+		// The library name for the Dllimport then needs to be "__Internal".
+		// In addition, the libraries must not be loaded!
+		#if IOS_INTERNAL
+			private const string LibraryName = "__Internal";
+			private const string SodiumLibraryName = "__Internal";
+		#else
+			private const string LibraryName = "libzmq";
+			private const string SodiumLibraryName = "libsodium";
+		#endif
+		
 		private static readonly UnmanagedLibrary NativeLibSodium;
-
-		private const string LibraryName = "libzmq";
-
 		private static readonly UnmanagedLibrary NativeLib;
 
 		// From zmq.h (v3):
@@ -25,10 +31,12 @@
 
 		static zmq()
 		{
-			try { NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName); } 
-			catch (System.IO.FileNotFoundException) { }
-
-			NativeLib = Platform.LoadUnmanagedLibrary(LibraryName);
+			#if !IOS_INTERNAL
+				try { NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName); } 
+				catch (System.IO.FileNotFoundException) { }
+				
+				NativeLib = Platform.LoadUnmanagedLibrary(LibraryName);
+			#endif
 
 			int major, minor, patch;
 			version(out major, out minor, out patch);
