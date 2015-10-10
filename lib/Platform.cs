@@ -18,7 +18,7 @@ namespace ZeroMQ.lib
 	public enum PlatformName : int
 	{
 		CLI = 0,
-		Unix,
+		Posix,
 		Windows,
 		MacOSX,
 	}
@@ -108,7 +108,7 @@ namespace ZeroMQ.lib
 				case PlatformID.Unix:
 					Kind = PlatformKind.Posix;
 					// TODO: older MS.NET frameworks say Unix for MacOSX ?
-					Name = PlatformName.Unix;
+					Name = PlatformName.Posix;
 					break;
 
 				case PlatformID.MacOSX:
