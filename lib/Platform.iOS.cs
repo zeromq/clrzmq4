@@ -11,7 +11,7 @@
 		/// </summary>
 		public static class iOS
 		{
-			public const string LibraryName = UnmanagedLibrary.StaticLibraryName;
+			public const string LibraryName = "__Internal";
 
 			public static bool IsMonoTouch
 			{
@@ -25,7 +25,7 @@
 					Platform.AssignImplementations(typeof (ZeroMQ.lib.zmq), "iOS");
 				}
 			
-				return new UnmanagedLibrary(UnmanagedLibrary.StaticLibraryName, null);
+				return null;
 			}
 			
 			public static SafeLibraryHandle OpenHandle(string fileName)

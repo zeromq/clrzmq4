@@ -41,8 +41,6 @@
 	/// </remarks>
 	public sealed class UnmanagedLibrary : IDisposable
 	{
-		public const string StaticLibraryName = "__Internal";
-
 		private readonly string TraceLabel;
 
 		private readonly SafeLibraryHandle _handle;
@@ -53,7 +51,7 @@
 			{
 				throw new ArgumentException("A valid library name is expected.", "libraryName");
 			}
-			if (libraryName != StaticLibraryName && libraryHandle.IsNullOrInvalid())
+			if (libraryHandle.IsNullOrInvalid())
 			{
 				throw new ArgumentNullException("libraryHandle");
 			}
