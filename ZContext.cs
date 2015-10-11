@@ -23,6 +23,8 @@ namespace ZeroMQ
 			protected set { _encoding = value; }
 		}
 
+		private static readonly object SyncObject = new object();
+
 		private static ZContext _current;
 
 		public static ZContext Current {
@@ -30,10 +32,54 @@ namespace ZeroMQ
 				if (_current == null)
 				{
 					// INFO: This is the ZContext who is the one, running this program.
-					_current = new ZContext();
+					lock (SyncObject)
+					{
+						if (_current == null)
+						{
+							_current = new ZContext();
+						}
+					}
 				}
 				return _current;
 			}
+		}
+
+		/// <summary>
+		/// Create a <see cref="ZContext"/> instance.
+		/// </summary>
+		/// <returns><see cref="ZContext"/></returns>
+		public ZContext()
+		{
+			_contextPtr = zmq.ctx_new();
+
+			if (_contextPtr == IntPtr.Zero)
+			{
+				throw new InvalidProgramException("zmq_ctx_new");
+			}
+		}
+
+		/// <summary>
+		/// Create a <see cref="ZContext"/> instance.
+		/// </summary>
+		/// <returns><see cref="ZContext"/></returns>
+		public static ZContext Create()
+		{
+			return new ZContext();
+		}
+
+		~ZContext()
+		{
+			Dispose(false);
+		}
+
+		private IntPtr _contextPtr;
+
+		/// <summary>
+		/// Gets a handle to the native ZeroMQ context.
+		/// </summary>
+		public IntPtr ContextPtr
+		{
+			get { return _contextPtr; }
 		}
 
 		public static bool Has(string capability)
@@ -120,44 +166,6 @@ namespace ZeroMQ
 				return false;
 			}
 			return true;
-		}
-
-		private IntPtr _contextPtr;
-
-		/// <summary>
-		/// Create a <see cref="ZContext"/> instance.
-		/// </summary>
-		/// <returns><see cref="ZContext"/></returns>
-		public ZContext()
-		{
-			_contextPtr = zmq.ctx_new();
-
-			if (_contextPtr == IntPtr.Zero)
-			{
-				throw new InvalidProgramException("zmq_ctx_new");
-			}
-		}
-
-		~ZContext()
-		{
-			Dispose(false);
-		}
-
-		/// <summary>
-		/// Gets a handle to the native ZeroMQ context.
-		/// </summary>
-		public IntPtr ContextPtr
-		{
-			get { return _contextPtr; }
-		}
-
-		/// <summary>
-		/// Create a <see cref="ZContext"/> instance.
-		/// </summary>
-		/// <returns><see cref="ZContext"/></returns>
-		public static ZContext Create()
-		{
-			return new ZContext();
 		}
 
 		public void SetOption(ZContextOption option, int optionValue)

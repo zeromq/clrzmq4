@@ -15,7 +15,7 @@ namespace ZeroMQ
 			{
 				throw new InvalidOperationException("decoded.Length must be divisible by 4");
 			}
-			int destLen = (Int32)(decoded.Length * 1.25) + 1;
+			int destLen = (Int32)(decoded.Length * 1.25);
 
 			var data = GCHandle.Alloc(decoded, GCHandleType.Pinned);
 
