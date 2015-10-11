@@ -3,7 +3,7 @@
 	using System;
 	using System.Runtime.InteropServices;
 
-	public static unsafe class zmq
+	public static unsafe partial class zmq
 	{
 		private const string SodiumLibraryName = "libsodium";
 
