@@ -48,11 +48,13 @@
     <Compile Include="lib\DispoIntPtr.cs" />
     <Compile Include="lib\DispoIntPtr.Ansi.cs" />
     <Compile Include="lib\Platform.cs" />
+    <Compile Include="lib\Platform.iOS.cs" />
     <Compile Include="lib\Platform.Posix.cs" />
     <Compile Include="lib\Platform.Win32.cs" />
     <Compile Include="lib\Platform.MacOSX.cs" />
     <Compile Include="lib\UnmanagedLibrary.cs" />
     <Compile Include="lib\zmq.cs" />
+    <Compile Include="lib\zmq.iOS.cs" />
     <Compile Include="lib\zmq_pollitem_posix_t.cs" />
     <Compile Include="lib\zmq_pollitem_windows_t.cs" />
     <Compile Include="Monitoring\ZMonitorEventData.cs" />
