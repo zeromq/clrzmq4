@@ -1,13 +1,31 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 using ZeroMQ.lib;
 
 namespace ZeroMQ
 {
 	public static class Z85
 	{
+		public static void CurveKeypair(out byte[] publicKey, out byte[] secretKey)
+		{
+			const int destLen = 40;
+			using (var publicKeyData = DispoIntPtr.Alloc(destLen + 1))
+			using (var secretKeyData = DispoIntPtr.Alloc(destLen + 1))
+			{
+				if (0 != zmq.curve_keypair(publicKeyData, secretKeyData))
+				{
+					throw new InvalidOperationException();
+				}
+				
+				publicKey = new byte[destLen];
+				Marshal.Copy(publicKeyData, publicKey, 0, destLen);
+				
+				secretKey = new byte[destLen];
+				Marshal.Copy(secretKeyData, secretKey, 0, destLen);
+			}
+		}
+
 		public static byte[] Encode(byte[] decoded)
 		{
 			int dataLen = decoded.Length;
