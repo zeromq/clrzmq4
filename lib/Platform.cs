@@ -3,7 +3,6 @@ namespace ZeroMQ.lib
 	using System;
 	using System.IO;
 	using System.Reflection;
-	using System.Runtime.InteropServices;
 
 	/* Common CLR type System.Runtime.InteropServices.ImageFileMachine *
 	public enum ImageFileMachine
@@ -21,6 +20,7 @@ namespace ZeroMQ.lib
 		Posix,
 		Windows,
 		MacOSX,
+		iOS
 	}
 
 	public enum PlatformKind : int
@@ -125,6 +125,11 @@ namespace ZeroMQ.lib
 					}
 
 					break;
+			}
+
+			if (Platform.iOS.IsMonoTouch)
+			{
+				Name = PlatformName.iOS;
 			}
 
 			// TODO: Detect and distinguish available Compilers and Runtimes
