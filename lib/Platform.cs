@@ -17,7 +17,7 @@ namespace ZeroMQ.lib
 
 	public enum PlatformName : int
 	{
-		CLI = 0,
+		__Internal = 0,
 		Posix,
 		Windows,
 		MacOSX,
@@ -25,14 +25,14 @@ namespace ZeroMQ.lib
 
 	public enum PlatformKind : int
 	{
-		CLI = 0,
+		__Internal = 0,
 		Posix,
 		Win32,
 	}
 
 	public enum PlatformCompiler : int
 	{
-		CLI = 0,
+		Unknown = 0,
 		VisualC,
 		GCC
 	}
@@ -70,14 +70,12 @@ namespace ZeroMQ.lib
 
 		static Platform()
 		{
-
 			PortableExecutableKinds peKinds;
 			typeof(object).Module.GetPEKind(out peKinds, out Architecture);
 
 			Version osVersion;
 			switch (Environment.OSVersion.Platform)
 			{
-
 				case PlatformID.Win32Windows: // Win9x supported?
 				case PlatformID.Win32S: // Win16 NTVDM on Win x86?
 				case PlatformID.Win32NT: // Windows NT
@@ -106,8 +104,8 @@ namespace ZeroMQ.lib
 					break;
 
 				case PlatformID.Unix:
-					Kind = PlatformKind.Posix;
 					// TODO: older MS.NET frameworks say Unix for MacOSX ?
+					Kind = PlatformKind.Posix;
 					Name = PlatformName.Posix;
 					break;
 
@@ -151,7 +149,24 @@ namespace ZeroMQ.lib
 			default:
 				throw new PlatformNotSupportedException ();
 			} */
+
+			if (IsMonoTouch)
+			{
+				Kind = PlatformKind.__Internal;
+				// Name = PlatformName.__Internal;
+			}
+
 			SetupPlatformImplementation(typeof(Platform));
+		}
+
+		public static bool IsMono
+		{
+			get { return Type.GetType("Mono.Runtime") != null; }
+		}
+
+		public static bool IsMonoTouch
+		{
+			get { return Type.GetType("MonoTouch.ObjCRuntime.Class") != null; }
 		}
 
 		public static void SetupPlatformImplementation(Type platformDependentType)
@@ -190,17 +205,70 @@ namespace ZeroMQ.lib
 			// BindingFlags bindings = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 			// MemberInfo[] members = platformDependentType.GetMembers(bindings);
 
-			// Baseline by PlatformKind
-			AssignImplementations(platformDependentType, Enum.GetName(typeof(PlatformKind), Platform.Kind));
+			if (Kind == PlatformKind.__Internal)
+			{
+				AssignImplementations__Internal(platformDependentType);
+			}
+			else 
+			{
+				// Baseline by PlatformKind
+				string platformKindName = Enum.GetName(typeof(PlatformKind), Platform.Kind);
+				AssignImplementations(platformDependentType, platformKindName);
 
-			// Overwrite by PlatformName
-			AssignImplementations(platformDependentType, Enum.GetName(typeof(PlatformName), Platform.Name));
+				// Overwrite by PlatformName
+				string platformNameName = Enum.GetName(typeof(PlatformName), Platform.Name);
+
+				if (platformKindName != platformNameName)
+				{
+					AssignImplementations(platformDependentType, platformNameName);
+				}
+			}
+		}
+
+		private const BindingFlags bindings = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
+		private static void AssignImplementations__Internal(Type platformDependentType)
+		{
+			/* 
+			Type platformNameImpl = platformDependentType.GetNestedType("__Internal", bindings);
+			if (platformNameImpl == null)
+			{
+				// TODO: else fail?
+				return;
+			} /**/
+
+			FieldInfo[] fields = platformDependentType.GetFields(bindings);
+			foreach (FieldInfo field in fields)
+			{
+				var fieldType = field.FieldType;
+
+				// YOU now have
+				// public static readonly crypto_box_delegate box = crypto_box;
+
+				// YOU need
+				// public static readonly crypto_box_delegate box = crypto_box_internal;
+
+				string delegateName = fieldType.Name;
+				if (!delegateName.EndsWith("_delegate")) continue;
+
+				delegateName = delegateName.Substring(0, delegateName.Length - "_delegate".Length);
+				if (delegateName.Length == 0) continue;
+
+				MethodInfo methodInfo__internal = platformDependentType.GetMethod(delegateName + "__Internal", bindings);
+				if (methodInfo__internal != null)
+				{
+					var delegat = Delegate.CreateDelegate(fieldType, methodInfo__internal);
+					field.SetValue(null /* static */, delegat);
+				}
+				else
+				{
+					field.SetValue(null /* static */, null /* null */ );
+				}
+			}
 		}
 
 		private static void AssignImplementations(Type platformDependentType, string implementationName)
 		{
-			BindingFlags bindings = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
-
 			// TODO: instance members
 
 			Type platformNameImpl = platformDependentType.GetNestedType(implementationName, bindings);

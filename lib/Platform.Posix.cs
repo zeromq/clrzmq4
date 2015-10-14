@@ -11,6 +11,8 @@
 	{
 		public static class Posix
 		{
+			private const CallingConvention CCCdecl = CallingConvention.Cdecl;
+
 			public const string LibraryFileExtension = ".so";
 
 			private const string KernelLib = "libdl";
@@ -20,6 +22,18 @@
 			private const int RTLD_GLOBAL = 0x0100;
 			private const int RTLD_LOCAL = 0x0000;
 
+			[DllImport(KernelLib, CallingConvention = CCCdecl)]
+			private static extern SafeLibraryHandle dlopen(IntPtr filename, int flags);
+
+			[DllImport(KernelLib, CallingConvention = CCCdecl)]
+			private static extern int dlclose(IntPtr handle);
+
+			[DllImport(KernelLib, CallingConvention = CCCdecl)]
+			private static extern IntPtr dlerror();
+
+			[DllImport(KernelLib, CallingConvention = CCCdecl)]
+			private static extern IntPtr dlsym(SafeLibraryHandle handle, IntPtr symbol);
+			
 			[DllImport("__Internal")]
 			private static extern void mono_dllmap_insert(IntPtr assembly, IntPtr dll, IntPtr func, IntPtr tdll, IntPtr tfunc);
 
@@ -167,19 +181,6 @@
 				}
 				return new DllNotFoundException(strg);
 			}
-
-			[DllImport(KernelLib, CallingConvention = CallingConvention.Cdecl)]
-			private static extern SafeLibraryHandle dlopen(IntPtr filename, int flags);
-
-			[DllImport(KernelLib, CallingConvention = CallingConvention.Cdecl)]
-			private static extern int dlclose(IntPtr handle);
-
-			[DllImport(KernelLib, CallingConvention = CallingConvention.Cdecl)]
-			private static extern IntPtr dlerror();
-
-			[DllImport(KernelLib, CallingConvention = CallingConvention.Cdecl)]
-			private static extern IntPtr dlsym(SafeLibraryHandle handle, IntPtr symbol);
-
 		}
 	}
 }

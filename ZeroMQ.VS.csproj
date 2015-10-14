@@ -47,6 +47,7 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="lib\Platform.__Internal.cs" />
     <Compile Include="ZDevice.cs" />
     <Compile Include="Monitoring\ZMonitors.cs" />
     <Compile Include="Z85.cs" />
