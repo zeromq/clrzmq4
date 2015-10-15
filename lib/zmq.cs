@@ -13,8 +13,10 @@
 
 		private static readonly UnmanagedLibrary NativeLibSodium;
 
+		// Use a const for the library name
 		private const string LibraryName = "libzmq";
 
+		// Hold a handle to the static instance
 		private static readonly UnmanagedLibrary NativeLib;
 
 		// From zmq.h (v3):
@@ -27,12 +29,20 @@
 
 		public static readonly int sizeof_zmq_msg_t = sizeof_zmq_msg_t_v4;
 
+		// The static constructor prepares static readonly fields
 		static zmq()
 		{
-			try { NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName); } catch (System.IO.FileNotFoundException) { }
-			NativeLib = Platform.LoadUnmanagedLibrary(LibraryName);
-			Platform.SetupPlatformImplementation(typeof(zmq));
+			// (0) Initialize Library handle (try libsodium.* before libzmq.*)
+			try { NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName); }
+			catch (System.IO.FileNotFoundException) { }
 
+			// (0) Initialize Library handle
+			NativeLib = Platform.LoadUnmanagedLibrary(LibraryName);
+
+			// (1) Initialize Platform information 
+			Platform.SetupImplementation(typeof(zmq));
+
+			// Set once LibVersion to libversion()
 			int major, minor, patch;
 			version(out major, out minor, out patch);
 			Version = new Version(major, minor, patch);
@@ -64,25 +74,28 @@
 
 		private static NotSupportedException VersionNotSupported(string methodName, string requiredVersion)
 		{
-			if (methodName == null)
-			{
-				return new NotSupportedException(
-					string.Format(
-						"libzmq version not supported. Required version {0}",
-						requiredVersion));
-			}
 			return new NotSupportedException(
 				string.Format(
-					"{0}: libzmq version not supported. Required version {1}",
-					methodName,
+					"{0}libzmq version not supported. Required version {1}",
+					methodName == null ? string.Empty : methodName + ": ",
 					requiredVersion));
 		}
 
+		// (2) Declare privately the extern entry point
 		[DllImport(LibraryName, EntryPoint = "zmq_version", CallingConvention = CCCdecl)]
 		private static extern void zmq_version(out int major, out int minor, out int patch);
 		[DllImport(__Internal, EntryPoint = "zmq_version", CallingConvention = CCCdecl)]
 		private static extern void zmq_version__Internal(out int major, out int minor, out int patch);
+
+		// (3) Describe the extern function using a delegate
 		public delegate void zmq_version_delegate(out int major, out int minor, out int patch);
+
+		// (4) Save and return the managed delegate to the unmanaged function
+		//     This static readonly field definition allows to be 
+		//     initialized and possibly redirected by the static constructor.
+		//
+		//     By default this is set to the extern function declaration,
+		//     it may be set to the __Internal extern function declaration.
 		public static readonly zmq_version_delegate version = zmq_version;
 
 		public static readonly Version Version;

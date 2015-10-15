@@ -156,7 +156,7 @@ namespace ZeroMQ.lib
 				// Name = PlatformName.__Internal;
 			}
 
-			SetupPlatformImplementation(typeof(Platform));
+			SetupImplementation(typeof(Platform));
 		}
 
 		public static bool IsMono
@@ -169,7 +169,7 @@ namespace ZeroMQ.lib
 			get { return Type.GetType("MonoTouch.ObjCRuntime.Class") != null; }
 		}
 
-		public static void SetupPlatformImplementation(Type platformDependentType)
+		public static void SetupImplementation(Type platformDependentType)
 		{
 
 			/* A typical class should look like
@@ -205,11 +205,7 @@ namespace ZeroMQ.lib
 			// BindingFlags bindings = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 			// MemberInfo[] members = platformDependentType.GetMembers(bindings);
 
-			if (Kind == PlatformKind.__Internal)
-			{
-				AssignImplementations__Internal(platformDependentType);
-			}
-			else 
+			if (Kind != PlatformKind.__Internal)
 			{
 				// Baseline by PlatformKind
 				string platformKindName = Enum.GetName(typeof(PlatformKind), Platform.Kind);
@@ -222,6 +218,10 @@ namespace ZeroMQ.lib
 				{
 					AssignImplementations(platformDependentType, platformNameName);
 				}
+			}
+			else
+			{
+				AssignImplementations__Internal(platformDependentType);
 			}
 		}
 
@@ -236,34 +236,51 @@ namespace ZeroMQ.lib
 				// TODO: else fail?
 				return;
 			} /**/
+			Type platformNameImpl = platformDependentType.GetNestedType("__Internal", bindings);
 
 			FieldInfo[] fields = platformDependentType.GetFields(bindings);
 			foreach (FieldInfo field in fields)
 			{
 				var fieldType = field.FieldType;
-
-				// YOU now have
-				// public static readonly crypto_box_delegate box = crypto_box;
-
-				// YOU need
-				// public static readonly crypto_box_delegate box = crypto_box_internal;
-
 				string delegateName = fieldType.Name;
-				if (!delegateName.EndsWith("_delegate")) continue;
+				MethodInfo methodInfo__internal = null;
 
-				delegateName = delegateName.Substring(0, delegateName.Length - "_delegate".Length);
-				if (delegateName.Length == 0) continue;
+				if (delegateName.EndsWith("_delegate"))
+				{
+					// YOU now have
+					// public static readonly crypto_box_delegate box = crypto_box;
 
-				MethodInfo methodInfo__internal = platformDependentType.GetMethod(delegateName + "__Internal", bindings);
+					// YOU need
+					// public static readonly crypto_box_delegate box = crypto_box__Internal;
+
+					delegateName = delegateName.Substring(0, delegateName.Length - "_delegate".Length);
+					if (delegateName.Length > 0)
+					{
+						methodInfo__internal = platformDependentType.GetMethod(delegateName + "__Internal", bindings);
+					}
+				}
+				else if (delegateName.EndsWith("Delegate") && platformNameImpl != null)
+				{
+					// YOU now have
+					// public static readonly UnmanagedLibrary LoadUnmanagedLibraryDelegate;
+
+					// YOU need
+					// public static readonly LoadUnmanagedLibraryDelegate LoadUnmanagedLibrary 
+					//     = Platform.__Internal.LoadUnmanagedLibrary;
+
+					delegateName = delegateName.Substring(0, delegateName.Length - "Delegate".Length);
+					if (delegateName.Length > 0)
+					{
+						methodInfo__internal = platformNameImpl.GetMethod(delegateName, bindings);
+					}
+				}
+
 				if (methodInfo__internal != null)
 				{
 					var delegat = Delegate.CreateDelegate(fieldType, methodInfo__internal);
 					field.SetValue(null /* static */, delegat);
 				}
-				else
-				{
-					field.SetValue(null /* static */, null /* null */ );
-				}
+				// else { field.SetValue(null /* static */, null /* null */ ); }
 			}
 		}
 
