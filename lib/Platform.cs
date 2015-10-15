@@ -209,19 +209,26 @@ namespace ZeroMQ.lib
 			// BindingFlags bindings = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 			// MemberInfo[] members = platformDependentType.GetMembers(bindings);
 
+			string platformNameName = Enum.GetName(typeof(PlatformName), Platform.Name);
+			string platformKindName = Enum.GetName(typeof(PlatformKind), Platform.Kind);
+			
 			if (Kind == PlatformKind.__Internal)
 			{
+				// Baseline by PlatformName
+				AssignImplementations(platformDependentType, platformNameName);
+				if (platformKindName != platformNameName)
+				{
+					AssignImplementations(platformDependentType, platformKindName);
+				}
+				
 				AssignImplementations__Internal(platformDependentType);
 			}
 			else 
 			{
 				// Baseline by PlatformKind
-				string platformKindName = Enum.GetName(typeof(PlatformKind), Platform.Kind);
 				AssignImplementations(platformDependentType, platformKindName);
 
 				// Overwrite by PlatformName
-				string platformNameName = Enum.GetName(typeof(PlatformName), Platform.Name);
-
 				if (platformKindName != platformNameName)
 				{
 					AssignImplementations(platformDependentType, platformNameName);
