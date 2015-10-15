@@ -119,7 +119,7 @@
 
 			public static Exception GetLastLibraryError()
 			{
-				return Marshal.GetExceptionForHR(Marshal.GetHRForLastWin32Error());
+				return new System.ComponentModel.Win32Exception();
 			}
 
 			[DllImport(KernelLib, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
