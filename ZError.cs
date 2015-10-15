@@ -19,7 +19,7 @@ namespace ZeroMQ
 		{
 			static Code() 
 			{
-				Platform.SetupPlatformImplementation(typeof(Code));
+				Platform.SetupImplementation(typeof(Code));
 			}
 
 			private const int HAUSNUMERO = 156384712;

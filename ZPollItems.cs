@@ -21,7 +21,7 @@ namespace ZeroMQ
 		static ZPollItems()
 		{
 			// Initialize static Fields
-			Platform.SetupPlatformImplementation(typeof(ZPollItems));
+			Platform.SetupImplementation(typeof(ZPollItems));
 		}
 
 		public static bool PollIn(this ZSocket socket, ZPollItem item, out ZMessage incoming, out ZError error, TimeSpan? timeout = null)
