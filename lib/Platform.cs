@@ -2,8 +2,8 @@ namespace ZeroMQ.lib
 {
 	using System;
 	using System.IO;
+	using System.Linq;
 	using System.Reflection;
-	using System.Runtime.InteropServices;
 
 	/* Common CLR type System.Runtime.InteropServices.ImageFileMachine *
 	public enum ImageFileMachine
@@ -73,7 +73,6 @@ namespace ZeroMQ.lib
 			PortableExecutableKinds peKinds;
 			typeof(object).Module.GetPEKind(out peKinds, out Architecture);
 
-			Version osVersion;
 			switch (Environment.OSVersion.Platform)
 			{
 				case PlatformID.Win32Windows: // Win9x supported?
@@ -166,7 +165,12 @@ namespace ZeroMQ.lib
 
 		public static bool IsMonoTouch
 		{
-			get { return Type.GetType("MonoTouch.ObjCRuntime.Class") != null; }
+			get
+			{
+				return AppDomain.CurrentDomain.GetAssemblies().Any(a =>
+					a.GetName().Name.Equals("monotouch", StringComparison.InvariantCultureIgnoreCase) ||
+					a.GetName().Name.Equals("Xamarin.iOS", StringComparison.InvariantCultureIgnoreCase));
+			}
 		}
 
 		public static void SetupPlatformImplementation(Type platformDependentType)
@@ -205,19 +209,26 @@ namespace ZeroMQ.lib
 			// BindingFlags bindings = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 			// MemberInfo[] members = platformDependentType.GetMembers(bindings);
 
+			string platformNameName = Enum.GetName(typeof(PlatformName), Platform.Name);
+			string platformKindName = Enum.GetName(typeof(PlatformKind), Platform.Kind);
+			
 			if (Kind == PlatformKind.__Internal)
 			{
+				// Baseline by PlatformName
+				AssignImplementations(platformDependentType, platformNameName);
+				if (platformKindName != platformNameName)
+				{
+					AssignImplementations(platformDependentType, platformKindName);
+				}
+				
 				AssignImplementations__Internal(platformDependentType);
 			}
 			else 
 			{
 				// Baseline by PlatformKind
-				string platformKindName = Enum.GetName(typeof(PlatformKind), Platform.Kind);
 				AssignImplementations(platformDependentType, platformKindName);
 
 				// Overwrite by PlatformName
-				string platformNameName = Enum.GetName(typeof(PlatformName), Platform.Name);
-
 				if (platformKindName != platformNameName)
 				{
 					AssignImplementations(platformDependentType, platformNameName);
