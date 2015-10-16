@@ -151,6 +151,13 @@ namespace ZeroMQ.lib
 				throw new PlatformNotSupportedException ();
 			} */
 
+			IsMono = Type.GetType("Mono.Runtime") != null;
+
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			IsMonoTouch = assemblies.Any(a => a.GetName().Name.Equals("MonoTouch", StringComparison.InvariantCultureIgnoreCase));
+			IsXamarinIOS = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.iOS", StringComparison.InvariantCultureIgnoreCase));
+			IsXamarinAndroid = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.Android", StringComparison.InvariantCultureIgnoreCase));
+
 			if (IsXamarinIOS || IsMonoTouch)
 			{
 				Kind = PlatformKind.__Internal;
@@ -160,28 +167,13 @@ namespace ZeroMQ.lib
 			SetupImplementation(typeof(Platform));
 		}
 
-		public static bool IsMono
-		{
-			get { return Type.GetType("Mono.Runtime") != null; }
-		}
+		public static bool IsMono { get; private set; }
 
-		public static bool IsMonoTouch
-		{
-			get
-			{
-				return AppDomain.CurrentDomain.GetAssemblies()
-					.Any(a => a.GetName().Name.Equals("monotouch", StringComparison.InvariantCultureIgnoreCase));
-			}
-		}
-		      
-		public static bool IsXamarinIOS
-		{
-			get
-			{
-				return AppDomain.CurrentDomain.GetAssemblies()
-					.Any(a => a.GetName().Name.Equals("Xamarin.iOS", StringComparison.InvariantCultureIgnoreCase));
-			}
-		}
+		public static bool IsMonoTouch { get; private set; }
+
+		public static bool IsXamarinIOS { get; private set; }
+
+		public static bool IsXamarinAndroid { get; private set; }
 
 		public static void SetupImplementation(Type platformDependentType)
 		{
