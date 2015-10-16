@@ -2,6 +2,7 @@ namespace ZeroMQ.lib
 {
 	using System;
 	using System.IO;
+	using System.Linq;
 	using System.Reflection;
 	using System.Runtime.InteropServices;
 
@@ -150,7 +151,7 @@ namespace ZeroMQ.lib
 				throw new PlatformNotSupportedException ();
 			} */
 
-			if (IsMonoTouch)
+			if (IsXamarinIOS || IsMonoTouch)
 			{
 				Kind = PlatformKind.__Internal;
 				// Name = PlatformName.__Internal;
@@ -166,7 +167,20 @@ namespace ZeroMQ.lib
 
 		public static bool IsMonoTouch
 		{
-			get { return Type.GetType("MonoTouch.ObjCRuntime.Class") != null; }
+			get
+			{
+				return AppDomain.CurrentDomain.GetAssemblies()
+					.Any(a => a.GetName().Name.Equals("monotouch", StringComparison.InvariantCultureIgnoreCase));
+			}
+		}
+		      
+		public static bool IsXamarinIOS
+		{
+			get
+			{
+				return AppDomain.CurrentDomain.GetAssemblies()
+					.Any(a => a.GetName().Name.Equals("Xamarin.iOS", StringComparison.InvariantCultureIgnoreCase));
+			}
 		}
 
 		public static void SetupImplementation(Type platformDependentType)
