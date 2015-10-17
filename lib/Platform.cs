@@ -16,19 +16,19 @@ namespace ZeroMQ.lib
 		
 	} /**/
 
+	public enum PlatformKind : int
+	{
+		__Internal = 0,
+		Posix,
+		Win32,
+	}
+
 	public enum PlatformName : int
 	{
 		__Internal = 0,
 		Posix,
 		Windows,
 		MacOSX,
-	}
-
-	public enum PlatformKind : int
-	{
-		__Internal = 0,
-		Posix,
-		Win32,
 	}
 
 	public enum PlatformCompiler : int
@@ -153,7 +153,7 @@ namespace ZeroMQ.lib
 
 			IsMono = Type.GetType("Mono.Runtime") != null;
 
-			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 			IsMonoTouch = assemblies.Any(a => a.GetName().Name.Equals("MonoTouch", StringComparison.InvariantCultureIgnoreCase));
 			IsXamarinIOS = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.iOS", StringComparison.InvariantCultureIgnoreCase));
 			IsXamarinAndroid = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.Android", StringComparison.InvariantCultureIgnoreCase));
@@ -177,40 +177,6 @@ namespace ZeroMQ.lib
 
 		public static void SetupImplementation(Type platformDependentType)
 		{
-
-			/* A typical class should look like
-			 * 
-			 * class MyType {
-			 * 
-			 * 		// A delegate to describe a method
-			 * 		delegate void APlatformDependentMethodDelegate();
-			 * 
-			 * 		// A field to hold a method by delegate definition
-			 * 		static APlatformDependentMethodDelegate APlatformDependentMethod;
-			 * 
-			 * 		static readonly int APlatformDependentField;
-			 * 
-			 * 		static MyType() {
-			 * 			SetupPlatformImplementation(typeof(MyType));
-			 * 		}
-			 * 
-			 * 		static class Posix {
-			 * 
-			 * 			const int APlatformDependentField = 5;
-			 * 
-			 * 			void APlatformDependentMethod() {
-			 * 				// The actual Posix implementation of APlatformDependentMethodDelegate
-			 * 			}
-			 * 
-			 * 		}
-			 * 
-			 * }
-			 * 
-			 */
-
-			// BindingFlags bindings = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
-			// MemberInfo[] members = platformDependentType.GetMembers(bindings);
-
 			if (Kind != PlatformKind.__Internal)
 			{
 				// Baseline by PlatformKind
