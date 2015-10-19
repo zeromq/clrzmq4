@@ -57,6 +57,8 @@ namespace ZeroMQ.lib
 		public delegate Exception GetLastLibraryErrorDelegate();
 		public static readonly GetLastLibraryErrorDelegate GetLastLibraryError;
 
+		public static readonly bool Is__Internal;
+
 		public static readonly PlatformKind Kind;
 
 		public static readonly PlatformName Name;
@@ -154,13 +156,14 @@ namespace ZeroMQ.lib
 			IsMono = Type.GetType("Mono.Runtime") != null;
 
 			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-			IsMonoTouch = assemblies.Any(a => a.GetName().Name.Equals("MonoTouch", StringComparison.InvariantCultureIgnoreCase));
+			// IsMonoTouch = assemblies.Any(a => a.GetName().Name.Equals("MonoTouch", StringComparison.InvariantCultureIgnoreCase));
 			IsXamarinIOS = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.iOS", StringComparison.InvariantCultureIgnoreCase));
 			IsXamarinAndroid = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.Android", StringComparison.InvariantCultureIgnoreCase));
 
-			if (IsXamarinIOS || IsMonoTouch)
+			if (IsXamarinIOS) // || IsMonoTouch)
 			{
-				Kind = PlatformKind.__Internal;
+				Is__Internal = true;
+				// Kind = PlatformKind.__Internal;
 				// Name = PlatformName.__Internal;
 			}
 
@@ -169,132 +172,101 @@ namespace ZeroMQ.lib
 
 		public static bool IsMono { get; private set; }
 
-		public static bool IsMonoTouch { get; private set; }
+		// public static bool IsMonoTouch { get; private set; }
 
 		public static bool IsXamarinIOS { get; private set; }
 
 		public static bool IsXamarinAndroid { get; private set; }
 
-		public static void SetupImplementation(Type platformDependentType)
+		public static void SetupImplementation(Type platformDependant)
 		{
-			if (Kind != PlatformKind.__Internal)
+			// Baseline by PlatformKind
+			string platformKind = Enum.GetName(typeof(PlatformKind), Platform.Kind);
+			AssignImplementations(platformDependant, platformKind);
+
+			// Overwrite by PlatformName
+			string platformName = Enum.GetName(typeof(PlatformName), Platform.Name);
+			if (platformName != platformKind)
 			{
-				// Baseline by PlatformKind
-				string platformKindName = Enum.GetName(typeof(PlatformKind), Platform.Kind);
-				AssignImplementations(platformDependentType, platformKindName);
-
-				// Overwrite by PlatformName
-				string platformNameName = Enum.GetName(typeof(PlatformName), Platform.Name);
-
-				if (platformKindName != platformNameName)
-				{
-					AssignImplementations(platformDependentType, platformNameName);
-				}
+				AssignImplementations(platformDependant, platformName);
 			}
-			else
+
+			if (Is__Internal) 
 			{
-				AssignImplementations__Internal(platformDependentType);
+				AssignImplementations(platformDependant, "__Internal");
 			}
 		}
 
 		private const BindingFlags bindings = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
-		private static void AssignImplementations__Internal(Type platformDependentType)
+		private static void AssignImplementations(Type platformDependant, string implementationName)
 		{
-			/* 
-			Type platformNameImpl = platformDependentType.GetNestedType("__Internal", bindings);
-			if (platformNameImpl == null)
-			{
-				// TODO: else fail?
-				return;
-			} /**/
-			Type platformNameImpl = platformDependentType.GetNestedType("__Internal", bindings);
+			Type platformImplementation = platformDependant.GetNestedType(implementationName, bindings);
+			// if (platformImplementation == null) return;
 
-			FieldInfo[] fields = platformDependentType.GetFields(bindings);
+			FieldInfo[] fields = platformDependant.GetFields(bindings);
 			foreach (FieldInfo field in fields)
 			{
-				var fieldType = field.FieldType;
+				Type fieldType = field.FieldType;
 				string delegateName = fieldType.Name;
 				MethodInfo methodInfo__internal = null;
+				FieldInfo fieldInfo__internal = null;
 
-				if (delegateName.EndsWith("_delegate"))
+				// TODO: This is mapping sodium.crypto_box to sodium.crypto_box__Internal. Should we also map them to sodium.__Internal.crypto_box?
+				if (implementationName == "__Internal")
 				{
-					// YOU now have
-					// public static readonly crypto_box_delegate box = crypto_box;
-
-					// YOU need
-					// public static readonly crypto_box_delegate box = crypto_box__Internal;
-
-					delegateName = delegateName.Substring(0, delegateName.Length - "_delegate".Length);
-					if (delegateName.Length > 0)
+					if (delegateName.EndsWith("_delegate"))
 					{
-						methodInfo__internal = platformDependentType.GetMethod(delegateName + "__Internal", bindings);
+						// YOU now have
+						// public static readonly crypto_box_delegate box = crypto_box;
+
+						// YOU need
+						// public static readonly crypto_box_delegate box = crypto_box__Internal;
+
+						delegateName = delegateName.Substring(0, delegateName.Length - "_delegate".Length);
+						if (delegateName.Length > 0)
+						{
+							methodInfo__internal = platformDependant.GetMethod(delegateName + "__Internal", bindings);
+						}
 					}
 				}
-				else if (delegateName.EndsWith("Delegate") && platformNameImpl != null)
+				if (methodInfo__internal == null && platformImplementation != null)
 				{
-					// YOU now have
-					// public static readonly UnmanagedLibrary LoadUnmanagedLibraryDelegate;
-
-					// YOU need
-					// public static readonly LoadUnmanagedLibraryDelegate LoadUnmanagedLibrary 
-					//     = Platform.__Internal.LoadUnmanagedLibrary;
-
-					delegateName = delegateName.Substring(0, delegateName.Length - "Delegate".Length);
-					if (delegateName.Length > 0)
+					if (delegateName.EndsWith("Delegate"))
 					{
-						methodInfo__internal = platformNameImpl.GetMethod(delegateName, bindings);
+						// YOU now have
+						// public static readonly UnmanagedLibrary LoadUnmanagedLibraryDelegate;
+
+						// YOU need
+						// public static readonly LoadUnmanagedLibraryDelegate LoadUnmanagedLibrary 
+						//     = Platform.__Internal.LoadUnmanagedLibrary;
+
+						delegateName = delegateName.Substring(0, delegateName.Length - "Delegate".Length);
+
+						methodInfo__internal = platformImplementation.GetMethod(delegateName, bindings);
+					}
+					else
+					{
+						methodInfo__internal = platformImplementation.GetMethod(field.Name, bindings);
+					}
+
+					if (methodInfo__internal == null)
+					{
+						fieldInfo__internal = platformImplementation.GetField(field.Name, bindings);
 					}
 				}
 
 				if (methodInfo__internal != null)
 				{
 					var delegat = Delegate.CreateDelegate(fieldType, methodInfo__internal);
-					field.SetValue(null /* static */, delegat);
+					field.SetValue(null, delegat);
 				}
-				// else { field.SetValue(null /* static */, null /* null */ ); }
-			}
-		}
-
-		private static void AssignImplementations(Type platformDependentType, string implementationName)
-		{
-			// TODO: instance members
-
-			Type platformNameImpl = platformDependentType.GetNestedType(implementationName, bindings);
-			if (platformNameImpl == null)
-			{
-				// TODO: else fail?
-				return;
-			}
-
-			MemberInfo[] platformMembers = platformNameImpl.GetMembers(bindings);
-			foreach (MemberInfo platformMember in platformMembers)
-			{
-
-				// TODO: overloaded members, GetBySignature?
-				FieldInfo member = platformDependentType.GetField(platformMember.Name, bindings);
-				if (member == null)
+				else if (fieldInfo__internal != null)
 				{
-					// TODO: else fail?
-					continue;
+					object value = fieldInfo__internal.GetValue(null);
+					field.SetValue(null, value);
 				}
-
-				if (platformMember.MemberType == MemberTypes.Method)
-				{
-					// if (typeof(Delegate).IsAssignableFrom(member.FieldType)) {
-					var delegat = Delegate.CreateDelegate(member.FieldType, (MethodInfo)platformMember);
-					member.SetValue(null /* static */, delegat);
-					continue;
-
-				}
-				if (platformMember.MemberType == MemberTypes.Field)
-				{
-					// if (member.FieldType.IsAssignableFrom(platformMember.FieldType)) {
-					member.SetValue(null /* static */, ((FieldInfo)platformMember).GetValue(null /* static */));
-					continue;
-
-				}
-				// TODO: else fail?
+				// else { field.SetValue(null, null); }
 			}
 		}
 
