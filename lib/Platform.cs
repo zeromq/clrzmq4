@@ -156,7 +156,7 @@ namespace ZeroMQ.lib
 			IsMono = Type.GetType("Mono.Runtime") != null;
 
 			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-			// IsMonoTouch = assemblies.Any(a => a.GetName().Name.Equals("MonoTouch", StringComparison.InvariantCultureIgnoreCase));
+			IsMonoTouch = assemblies.Any(a => a.GetName().Name.Equals("MonoTouch", StringComparison.InvariantCultureIgnoreCase));
 			IsXamarinIOS = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.iOS", StringComparison.InvariantCultureIgnoreCase));
 			IsXamarinAndroid = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.Android", StringComparison.InvariantCultureIgnoreCase));
 
@@ -172,7 +172,7 @@ namespace ZeroMQ.lib
 
 		public static bool IsMono { get; private set; }
 
-		// public static bool IsMonoTouch { get; private set; }
+		public static bool IsMonoTouch { get; private set; }
 
 		public static bool IsXamarinIOS { get; private set; }
 
