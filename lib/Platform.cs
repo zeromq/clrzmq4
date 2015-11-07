@@ -160,7 +160,7 @@ namespace ZeroMQ.lib
 			IsXamarinIOS = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.iOS", StringComparison.InvariantCultureIgnoreCase));
 			IsXamarinAndroid = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.Android", StringComparison.InvariantCultureIgnoreCase));
 
-			if (IsXamarinIOS) // || IsMonoTouch)
+			if (IsXamarinIOS || IsMonoTouch)
 			{
 				Is__Internal = true;
 				// Kind = PlatformKind.__Internal;
