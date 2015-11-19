@@ -269,6 +269,8 @@ namespace ZeroMQ
 				return string.Empty;
 			}
 
+			remaining = Math.Min(charCount, remaining);
+
 			var resultChars = new char[charCount];
 			fixed (char* chars = resultChars)
 			{
@@ -623,6 +625,11 @@ namespace ZeroMQ
 			while (this._position < length)
 			{
 				byt = ReadAsByte();
+
+				if (byt == 0x00) // NUL
+				{
+					break;
+				}
 
 				if (byt == 0x0A) // Line Feed
 				{
