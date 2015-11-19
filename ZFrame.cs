@@ -269,8 +269,6 @@ namespace ZeroMQ
 				return string.Empty;
 			}
 
-			remaining = charCount > remaining ? remaining : charCount;
-
 			var resultChars = new char[charCount];
 			fixed (char* chars = resultChars)
 			{
@@ -578,8 +576,35 @@ namespace ZeroMQ
 				return string.Empty;
 			}
 
-			// int byteCount = encoding.GetMaxByteCount(length);
-			return ReadStringNative(length, encoding);
+			// Look for 0x00, there we'll cut the string
+			long start = Position;
+			long lengthToRead = 0;
+
+			byte byt = 0x00, lastByt = 0x00;
+
+			while (this._position < length)
+			{
+				byt = ReadAsByte();
+
+				if (byt == 0x00) // NUL
+				{
+					break;
+				}
+
+				++lengthToRead;
+				lastByt = byt;
+			}
+
+			string strg = null;
+
+			if (lengthToRead > 0)
+			{
+				this._position = (int)start;
+
+				strg = ReadStringNative((int)lengthToRead, encoding);
+			}
+
+			return strg ?? string.Empty;
 		}
 
 		public string ReadLine()
@@ -619,7 +644,7 @@ namespace ZeroMQ
 			{
 				this._position = (int)start;
 
-				strg = ReadString((int)lengthToRead, encoding);
+				strg = ReadStringNative((int)lengthToRead, encoding);
 
 				if (lastByt == 0x0D) // Carriage Return
 				{
