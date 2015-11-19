@@ -27,8 +27,10 @@ namespace ZeroMQ
 
 		private static ZContext _current;
 
-		public static ZContext Current {
-			get {
+		public static ZContext Current 
+		{
+			get 
+			{
 				if (_current == null)
 				{
 					// INFO: This is the ZContext who is the one, running this program.
