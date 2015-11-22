@@ -308,6 +308,9 @@ namespace ZeroMQ
 			return true;
 		}
 
+		/// <summary>
+		/// Receives HARD bytes into a new byte[n]. Please don't use ReceiveBytes, use instead ReceiveFrame.
+		/// </summary>
 		public int ReceiveBytes(byte[] buffer, int offset, int count)
 		{
 			ZError error;
@@ -319,6 +322,9 @@ namespace ZeroMQ
 			return length;
 		}
 
+		/// <summary>
+		/// Receives HARD bytes into a new byte[n]. Please don't use ReceiveBytes, use instead ReceiveFrame.
+		/// </summary>
 		public int ReceiveBytes(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
 		{
 			EnsureNotDisposed();
@@ -347,6 +353,9 @@ namespace ZeroMQ
 			return length;
 		}
 
+		/// <summary>
+		/// Sends HARD bytes from a byte[n]. Please don't use SendBytes, use instead SendFrame.
+		/// </summary>
 		public bool SendBytes(byte[] buffer, int offset, int count)
 		{
 			ZError error;
@@ -357,6 +366,9 @@ namespace ZeroMQ
 			return true;
 		}
 
+		/// <summary>
+		/// Sends HARD bytes from a byte[n]. Please don't use SendBytes, use instead SendFrame.
+		/// </summary>
 		public bool SendBytes(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error)
 		{
 			EnsureNotDisposed();
@@ -387,9 +399,15 @@ namespace ZeroMQ
 			return true;
 		}
 
+		/// <summary>
+		/// Sends HARD bytes from a byte[n]. Please don't use SendBytes, use instead SendFrame.
+		/// </summary>
 		public bool Send(byte[] buffer, int offset, int count) {
 			return SendBytes(buffer, offset, count);
 		} // just Send*
+		/// <summary>
+		/// Sends HARD bytes from a byte[n]. Please don't use SendBytes, use instead SendFrame.
+		/// </summary>
 		public bool Send(byte[] buffer, int offset, int count, ZSocketFlags flags, out ZError error) {
 			return SendBytes(buffer, offset, count, flags, out error);
 		} // just Send*
