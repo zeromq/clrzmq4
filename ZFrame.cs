@@ -207,79 +207,6 @@ namespace ZeroMQ
 			return msg;
 		}
 
-		unsafe internal void WriteStringNative(string str, Encoding encoding, bool create)
-		{
-			if (str == null)
-			{
-				throw new ArgumentNullException("str");
-			}
-			if (str == string.Empty)
-			{
-				if (create)
-				{
-					this._framePtr = CreateNative(0);
-					this._capacity = 0;
-					this._position = 0;
-				}
-				return;
-			}
-
-			int charCount = str.Length;
-			Encoder enc = encoding.GetEncoder();
-
-			fixed (char* strP = str)
-			{
-				int byteCount = enc.GetByteCount(strP, charCount, false);
-
-				if (create)
-				{
-					this._framePtr = CreateNative(byteCount);
-					this._capacity = byteCount;
-					this._position = 0;
-				}
-				else if (this._position + byteCount > this.Length)
-				{
-					// fail if frame is too small
-					throw new InvalidOperationException();
-				}
-
-				byteCount = enc.GetBytes(strP, charCount, (byte*)(this.DataPtr() + this._position), byteCount, true);
-				this._position += byteCount;
-			}
-		}
-
-		unsafe internal string ReadStringNative(int byteCount, Encoding encoding)
-		{
-			int remaining = Math.Min(byteCount, Math.Max(0, (int)(this.Length - this._position)));
-			if (remaining == 0)
-			{
-				return string.Empty;
-			}
-			if (remaining < 0)
-			{
-				return null;
-			}
-
-			var bytes = (byte*)(this.DataPtr() + this._position);
-
-			Decoder dec = encoding.GetDecoder();
-			int charCount = dec.GetCharCount(bytes, remaining, false);
-			if (charCount == 0)
-			{
-				return string.Empty;
-			}
-
-			remaining = Math.Min(charCount, remaining);
-
-			var resultChars = new char[charCount];
-			fixed (char* chars = resultChars)
-			{
-				charCount = dec.GetChars(bytes, remaining, chars, charCount, true);
-				this._position += remaining;
-				return new string(chars, 0, charCount);
-			}
-		}
-
 		/* internal static DispoIntPtr Alloc(IntPtr data, int size) 
 		{
 			var msg = DispoIntPtr.Alloc(zmq.sizeof_zmq_msg_t);
@@ -666,6 +593,38 @@ namespace ZeroMQ
 			return strg ?? string.Empty;
 		}
 
+		unsafe internal string ReadStringNative(int byteCount, Encoding encoding)
+		{
+			int remaining = Math.Min(byteCount, Math.Max(0, (int)(this.Length - this._position)));
+			if (remaining == 0)
+			{
+				return string.Empty;
+			}
+			if (remaining < 0)
+			{
+				return null;
+			}
+
+			var bytes = (byte*)(this.DataPtr() + this._position);
+
+			Decoder dec = encoding.GetDecoder();
+			int charCount = dec.GetCharCount(bytes, remaining, false);
+			if (charCount == 0)
+			{
+				return string.Empty;
+			}
+
+			remaining = Math.Min(charCount, remaining);
+
+			var resultChars = new char[charCount];
+			fixed (char* chars = resultChars)
+			{
+				charCount = dec.GetChars(bytes, remaining, chars, charCount, true);
+				this._position += remaining;
+				return new string(chars, 0, charCount);
+			}
+		}
+
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			if (Position + count > Length)
@@ -749,6 +708,57 @@ namespace ZeroMQ
 		public void Write(string str, Encoding encoding)
 		{
 			WriteStringNative(str, encoding, false);
+		}
+
+		public void WriteLine(string str)
+		{
+			WriteLine(str, ZContext.Encoding);
+		}
+
+		public void WriteLine(string str, Encoding encoding)
+		{
+			WriteStringNative(string.Format("{0}\r\n", str), encoding, false);
+		}
+
+		unsafe internal void WriteStringNative(string str, Encoding encoding, bool create)
+		{
+			if (str == null)
+			{
+				throw new ArgumentNullException("str");
+			}
+			if (str == string.Empty)
+			{
+				if (create)
+				{
+					this._framePtr = CreateNative(0);
+					this._capacity = 0;
+					this._position = 0;
+				}
+				return;
+			}
+
+			int charCount = str.Length;
+			Encoder enc = encoding.GetEncoder();
+
+			fixed (char* strP = str)
+			{
+				int byteCount = enc.GetByteCount(strP, charCount, false);
+
+				if (create)
+				{
+					this._framePtr = CreateNative(byteCount);
+					this._capacity = byteCount;
+					this._position = 0;
+				}
+				else if (this._position + byteCount > this.Length)
+				{
+					// fail if frame is too small
+					throw new InvalidOperationException();
+				}
+
+				byteCount = enc.GetBytes(strP, charCount, (byte*)(this.DataPtr() + this._position), byteCount, true);
+				this._position += byteCount;
+			}
 		}
 
 		public override void Flush()
@@ -923,7 +933,7 @@ namespace ZeroMQ
 				Position = old;
 				return retur;
 			}
-			return base.ToString();
+			return GetType().FullName;
 		}
 	}
 }
