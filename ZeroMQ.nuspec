@@ -2,13 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ZeroMQ</id>
-		<version>4.1.0.17</version>
+		<version>4.1.0.18</version>
 		<authors>metadings, Pieter Hintjens, Martin Sustrik</authors>
 		<projectUrl>https://github.com/zeromq/clrzmq4/</projectUrl>
 		<iconUrl>https://raw.githubusercontent.com/zeromq/clrzmq4/master/ZeroMQ.ico</iconUrl>
 		<licenseUrl>https://raw.githubusercontent.com/zeromq/clrzmq4/master/LICENSE.txt</licenseUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-		<description>ZeroMQ CLR namespace</description>
+		<description>ZeroMQ C# CLR namespace (.NET and mono, Windows and Linux, x86 and amd64)</description>
 		<copyright>ZeroMQ</copyright>
 		<tags>clrzmq4 ZeroMQ ZMQ 0MQ ØMQ Messaging</tags>
 		<references>

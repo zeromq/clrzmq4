@@ -25,8 +25,8 @@ public static void HWClient(string[] args)
 	//
 
 	// Create
-	using (var context = new ZContext())
-	using (var requester = new ZSocket(context, ZSocketType.REQ))
+	// you may do using (var context = new ZContext()), we now use ZContext.Current
+	using (var requester = new ZSocket(ZSocketType.REQ))
 	{
 		// Connect
 		requester.Connect("tcp://127.0.0.1:5555");
@@ -72,8 +72,8 @@ public static void HWServer(string[] args)
 	string name = args[0];
 
 	// Create
-	using (var context = new ZContext())
-	using (var responder = new ZSocket(context, ZSocketType.REP))
+	// you may do using (var context = new ZContext()), we now use ZContext.Current
+	using (var responder = new ZSocket(ZSocketType.REP))
 	{
 		// Bind
 		responder.Bind("tcp://*:5555");
@@ -124,8 +124,8 @@ public static void WUClient(string[] args)
 	}
 
 	// Socket to talk to server
-	using (var context = new ZContext())
-	using (var subscriber = new ZSocket(context, ZSocketType.SUB))
+	// you may do using (var context = new ZContext()), we now use ZContext.Current
+	using (var subscriber = new ZSocket(ZSocketType.SUB))
 	{
 		string connect_to = args[1];
 		Console.WriteLine("I: Connecting to {0}...", connect_to);
@@ -166,9 +166,9 @@ public static void WUServer(string[] args)
 	// Author: metadings
 	//
 
-	// Prepare our context and publisher
-	using (var context = new ZContext())
-	using (var publisher = new ZSocket(context, ZSocketType.PUB))
+	// Prepare our (context and) publisher
+	// you may do using (var context = new ZContext()), we now use ZContext.Current
+	using (var publisher = new ZSocket(ZSocketType.PUB))
 	{
 		string address = "tcp://*:5556";
 		Console.WriteLine("I: Publisher.Bind'ing on {0}", address);
