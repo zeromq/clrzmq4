@@ -505,23 +505,24 @@ namespace ZeroMQ
 				return string.Empty;
 			}
 
-			// Look for 0x00, there we'll cut the string
-			long start = Position;
-			long lengthToRead = 0;
-
-			byte byt = 0x00, lastByt = 0x00;
+			long start = Position, lengthToRead = 0;
+			int bytE = -1, lengthToMove = 0;
+			byte byt = 0x00; //, lastByt = 0x00;
 
 			while (this._position < length)
 			{
-				byt = ReadAsByte();
+				bytE = ReadByte();
+				if (bytE == -1) break;
+				byt = (byte)bytE;
 
 				if (byt == 0x00) // NUL
 				{
+					++lengthToMove;
 					break;
 				}
 
 				++lengthToRead;
-				lastByt = byt;
+				// lastByt = byt;
 			}
 
 			string strg = null;
@@ -531,6 +532,10 @@ namespace ZeroMQ
 				this._position = (int)start;
 
 				strg = ReadStringNative((int)lengthToRead, encoding);
+			}
+			if (lengthToMove > 0)
+			{
+				this._position += lengthToMove;
 			}
 
 			return strg ?? string.Empty;
@@ -543,18 +548,19 @@ namespace ZeroMQ
 
 		public string ReadLine(Encoding encoding)
 		{
-			long start = Position;
-			long length = Length;
-			long lengthToRead = 0;
-
+			long start = Position, length = Length, lengthToRead = 0;
+			int bytE = -1, lengthToMove = 0;
 			byte byt = 0x00, lastByt = 0x00;
 
 			while (this._position < length)
 			{
-				byt = ReadAsByte();
+				bytE = ReadByte();
+				if (bytE == -1) break;
+				byt = (byte)bytE;
 
 				if (byt == 0x00) // NUL
 				{
+					++lengthToMove;
 					break;
 				}
 
@@ -562,9 +568,11 @@ namespace ZeroMQ
 				{
 					if (lastByt == 0x0D) // Carriage Return
 					{
+						++lengthToMove;
 						--lengthToRead;
 					}
 
+					++lengthToMove;
 					break;
 				}
 
@@ -579,15 +587,10 @@ namespace ZeroMQ
 				this._position = (int)start;
 
 				strg = ReadStringNative((int)lengthToRead, encoding);
-
-				if (lastByt == 0x0D) // Carriage Return
-				{
-					this._position += 2;
-				}
-				else if (byt == 0x0A) // Line Feed
-				{
-					this._position += 1;
-				}
+			}
+			if (lengthToMove > 0)
+			{
+				this._position += lengthToMove;
 			}
 
 			return strg ?? string.Empty;
