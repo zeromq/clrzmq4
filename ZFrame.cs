@@ -522,6 +522,7 @@ namespace ZeroMQ
 				}
 
 				++lengthToRead;
+				lengthToMove = 0;
 				// lastByt = byt;
 			}
 
@@ -577,6 +578,7 @@ namespace ZeroMQ
 				}
 
 				++lengthToRead;
+				lengthToMove = 0;
 				lastByt = byt;
 			}
 
