@@ -111,6 +111,10 @@ namespace ZeroMQ
 			ZError error;
 			if (!Proxy(frontend, backend, capture, out error))
 			{
+				if (error == ZError.ETERM)
+				{
+					return;	// Interrupted
+				}
 				throw new ZException(error);
 			}
 		}
@@ -148,6 +152,10 @@ namespace ZeroMQ
 			ZError error;
 			if (!ProxySteerable(frontend, backend, capture, control, out error))
 			{
+				if (error == ZError.ETERM)
+				{
+					return;	// Interrupted
+				}
 				throw new ZException(error);
 			}
 		}
