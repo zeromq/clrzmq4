@@ -1,7 +1,7 @@
 ﻿
 **ZeroMQ C# namespace**
 
-Hello World. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 3+.
+Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 3+.
 
 ZeroMQ is built AnyCPU, to run on Windows (VC2010) and on GNU/Linux (C 4.8.2), i386 and amd64.
 
@@ -13,7 +13,7 @@ Get it
 Read [ZeroMQ - The Guide](http://zguide.zeromq.org/page:all)
 - ZeroMQ - The Guide [Examples in C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
 
-Ask your questions on [stackoverflow](http://stackoverflow.com/questions/tagged/c%23+zeromq) using tags `C#``ZeroMQ` !
+Ask questions on [stackoverflow](http://stackoverflow.com/questions/tagged/c%23+zeromq) using tags `C#``ZeroMQ` !
 
 #### **[HWClient](https://github.com/metadings/zguide/blob/master/examples/C%23/hwclient.cs) Example**
 ```csharp
