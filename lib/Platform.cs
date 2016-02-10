@@ -157,20 +157,30 @@ namespace ZeroMQ.lib
 
 			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 			IsMonoTouch = assemblies.Any(a => a.GetName().Name.Equals("MonoTouch", StringComparison.InvariantCultureIgnoreCase));
+			IsMonoMac = assemblies.Any(a => a.GetName().Name.Equals("MonoMac", StringComparison.InvariantCultureIgnoreCase));
 			IsXamarinIOS = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.iOS", StringComparison.InvariantCultureIgnoreCase));
 			IsXamarinAndroid = assemblies.Any(a => a.GetName().Name.Equals("Xamarin.Android", StringComparison.InvariantCultureIgnoreCase));
 
+			if (IsMonoMac)
+			{
+				Kind = PlatformKind.Posix;
+				Name = PlatformName.MacOSX;
+			}
+
 			if (IsXamarinIOS || IsMonoTouch)
 			{
-				Is__Internal = true;
 				// Kind = PlatformKind.__Internal;
 				// Name = PlatformName.__Internal;
+
+				Is__Internal = true;
 			}
 
 			SetupImplementation(typeof(Platform));
 		}
 
 		public static bool IsMono { get; private set; }
+
+		public static bool IsMonoMac { get; private set; }
 
 		public static bool IsMonoTouch { get; private set; }
 
