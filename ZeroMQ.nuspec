@@ -16,8 +16,14 @@
 		</references>
 	</metadata>
 	<files>
-		<file src="bin/Release/i386/*.*" target="content/i386/" />
-		<file src="bin/Release/amd64/*.*" target="content/amd64/" />
-		<file src="bin/Release/**/*.*" target="lib/net40/" />
+		<!-- targets file -->
+		<file src="ZeroMQ.targets" target="build/net40/ZeroMQ.targets" />
+		
+		<!-- managed assembly -->
+		<file src="bin/Release/ZeroMQ.dll" target="lib/net40/" />
+		
+		<!-- native binary files -->
+		<file src="i386/**/*.*" target="build/" />
+		<file src="amd64/**/*.*" target="build/" />
 	</files>
 </package>
