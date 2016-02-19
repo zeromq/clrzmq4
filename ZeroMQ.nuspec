@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ZeroMQ</id>
-		<version>4.1.0.18</version>
+		<version>4.1.0.19</version>
 		<authors>metadings, Pieter Hintjens, Martin Sustrik</authors>
 		<projectUrl>https://github.com/zeromq/clrzmq4/</projectUrl>
 		<iconUrl>https://raw.githubusercontent.com/zeromq/clrzmq4/master/ZeroMQ.ico</iconUrl>
@@ -23,7 +23,9 @@
 		<file src="bin/Release/ZeroMQ.dll" target="lib/net40/" />
 		
 		<!-- native binary files -->
-		<file src="i386/**/*.*" target="/build/" />
-		<file src="amd64/**/*.*" target="/build/" />
+		<file src="i386/libzmq.*" target="/build/i386/" />
+		<file src="i386/libsodium.*" target="/build/i386/" />
+		<file src="amd64/libzmq.*" target="/build/amd64/" />
+		<file src="amd64/libsodium.*" target="/build/amd64/" />
 	</files>
 </package>
