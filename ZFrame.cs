@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-
 using ZeroMQ.lib;
 
 namespace ZeroMQ
@@ -505,41 +502,8 @@ namespace ZeroMQ
 				return string.Empty;
 			}
 
-			long start = Position, lengthToRead = 0;
-			int bytE = -1, lengthToMove = 0;
-			byte byt = 0x00; //, lastByt = 0x00;
-
-			while (this._position < length)
-			{
-				bytE = ReadByte();
-				if (bytE == -1) break;
-				byt = (byte)bytE;
-
-				if (byt == 0x00) // NUL
-				{
-					++lengthToMove;
-					break;
-				}
-
-				++lengthToRead;
-				lengthToMove = 0;
-				// lastByt = byt;
-			}
-
-			string strg = null;
-
-			if (lengthToRead > 0)
-			{
-				this._position = (int)start;
-
-				strg = ReadStringNative((int)lengthToRead, encoding);
-			}
-			if (lengthToMove > 0)
-			{
-				this._position += lengthToMove;
-			}
-
-			return strg ?? string.Empty;
+			byte[] bytes = Read(length);
+			return encoding.GetString(bytes);
 		}
 
 		public string ReadLine()
@@ -549,53 +513,24 @@ namespace ZeroMQ
 
 		public string ReadLine(Encoding encoding)
 		{
-			long start = Position, length = Length, lengthToRead = 0;
-			int bytE = -1, lengthToMove = 0;
-			byte byt = 0x00, lastByt = 0x00;
+			// this reader will not close underlying stream, but will do buffered read
+			int save_pos = _position; // save current position
+			StreamReaderNoClose reader = new StreamReaderNoClose(this, encoding, false);
+			StringBuilder sb = reader.ReadLineWithTerminator();
+			reader.Close();
 
-			while (this._position < length)
+			// calc the actual bytes read, and set the position by force
+			var actualByteCount = sb == null ? 0 : encoding.GetByteCount(sb.ToString());
+			_position = Math.Min(save_pos + actualByteCount, (int)Length);
+
+			// then remove the terminating \r, \n, \r\n
+			if (sb == null)
+				return null;
+			else
 			{
-				bytE = ReadByte();
-				if (bytE == -1) break;
-				byt = (byte)bytE;
-
-				if (byt == 0x00) // NUL
-				{
-					++lengthToMove;
-					break;
-				}
-
-				if (byt == 0x0A) // Line Feed
-				{
-					if (lastByt == 0x0D) // Carriage Return
-					{
-						++lengthToMove;
-						--lengthToRead;
-					}
-
-					++lengthToMove;
-					break;
-				}
-
-				++lengthToRead;
-				lengthToMove = 0;
-				lastByt = byt;
+				while (sb.Length > 0 && (sb[sb.Length - 1] == '\r' || sb[sb.Length - 1] == '\n')) sb.Length--;
+				return sb.ToString();
 			}
-
-			string strg = null;
-
-			if (lengthToRead > 0)
-			{
-				this._position = (int)start;
-
-				strg = ReadStringNative((int)lengthToRead, encoding);
-			}
-			if (lengthToMove > 0)
-			{
-				this._position += lengthToMove;
-			}
-
-			return strg ?? string.Empty;
 		}
 
 		unsafe internal string ReadStringNative(int byteCount, Encoding encoding)
@@ -725,7 +660,7 @@ namespace ZeroMQ
 			WriteStringNative(string.Format("{0}\r\n", str), encoding, false);
 		}
 
-		unsafe internal void WriteStringNative(string str, Encoding encoding, bool create)
+		internal void WriteStringNative(string str, Encoding encoding, bool create)
 		{
 			if (str == null)
 			{
@@ -742,28 +677,14 @@ namespace ZeroMQ
 				return;
 			}
 
-			int charCount = str.Length;
-			Encoder enc = encoding.GetEncoder();
-
-			fixed (char* strP = str)
+			byte[] bytes = encoding.GetBytes(str);
+			if (create)
 			{
-				int byteCount = enc.GetByteCount(strP, charCount, false);
-
-				if (create)
-				{
-					this._framePtr = CreateNative(byteCount);
-					this._capacity = byteCount;
-					this._position = 0;
-				}
-				else if (this._position + byteCount > this.Length)
-				{
-					// fail if frame is too small
-					throw new InvalidOperationException();
-				}
-
-				byteCount = enc.GetBytes(strP, charCount, (byte*)(this.DataPtr() + this._position), byteCount, true);
-				this._position += byteCount;
+				this._framePtr = CreateNative(bytes.Length);
+				this._capacity = bytes.Length;
+				this._position = 0;
 			}
+			Write(bytes, 0, bytes.Length);
 		}
 
 		public override void Flush()
