@@ -238,6 +238,7 @@ namespace ZeroMQ
 					Close();
 				}
 			}
+			GC.SuppressFinalize(this);
 			base.Dispose(disposing);
 		}
 
@@ -248,6 +249,7 @@ namespace ZeroMQ
 				_framePtr.Dispose();
 				_framePtr = null;
 			}
+			GC.SuppressFinalize(this);
 		}
 
 		public bool IsDismissed
