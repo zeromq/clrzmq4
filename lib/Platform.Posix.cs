@@ -257,6 +257,8 @@
 								var _libLoadConf = EnumerateLibLdConf(file);
 								libLoadConf.AddRange(_libLoadConf);
 							}
+
+							continue;
 						}
 
 						// Folder
