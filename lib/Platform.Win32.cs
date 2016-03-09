@@ -55,8 +55,7 @@ namespace ZeroMQ.lib
 
 				Platform.ExpandPaths(libraryPaths, "{Path}", EnumeratePATH());
 
-				Platform.ExpandPaths(libraryPaths, "{AppBase}", 
-					EnsureNotEndingBackSlash(
+				Platform.ExpandPaths(libraryPaths, "{AppBase}", EnsureNotEndingBackSlash(
 						AppDomain.CurrentDomain.BaseDirectory));
 
 				Platform.ExpandPaths(libraryPaths, "{LibraryName}", libraryName);
@@ -174,16 +173,23 @@ namespace ZeroMQ.lib
 				var pathList = new List<string>();
 				foreach (string path in paths)
 				{
-					pathList.Add(EnsureNotEndingBackSlash(path));
+					pathList.Add(
+						EnsureNotDoubleQuoted(
+							EnsureNotEndingBackSlash(path)));
 				}
 				return pathList.ToArray();
+			}
+
+			private static string EnsureNotDoubleQuoted(string path)
+			{
+				if (path == null) return null;
+				return path.Trim(new char[] { '"' });
 			}
 
 			private static string EnsureNotEndingBackSlash(string path)
 			{
 				if (path == null) return null;
-				if (path.EndsWith("\\")) return path.Substring(0, path.Length - 1);
-				return path;
+				return path.TrimEnd(new char[] { '\\' });
 			}
 
 			public static SafeLibraryHandle OpenHandle(string filename)
