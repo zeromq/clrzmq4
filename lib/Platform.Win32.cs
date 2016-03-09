@@ -1,8 +1,12 @@
-﻿namespace ZeroMQ.lib
+﻿using System.Text;
+
+namespace ZeroMQ.lib
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.IO;
+	using System.Linq;
 	using System.Reflection;
 	using System.Runtime.ConstrainedExecution;
 	using System.Runtime.InteropServices;
@@ -11,95 +15,168 @@
 	{
 		public static class Win32
 		{
+			private const string LibraryName = "kernel32";
+
 			public const string LibraryFileExtension = ".dll";
 
-			private const string KernelLib = "kernel32";
+			public static readonly string[] LibraryPaths = new string[] {
+				@"{AppBase}\{Arch}\{Compiler}\{LibraryName}{Ext}",
+				@"{AppBase}\{Arch}\{LibraryName}{Ext}",
+				@"{Path}\{LibraryName}{Ext}",
+			};
+
+			[DllImport(LibraryName, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
+			private static extern SafeLibraryHandle LoadLibrary(string fileName);
+
+			[ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+			[DllImport(LibraryName, SetLastError = true)]
+			[return: MarshalAs(UnmanagedType.Bool)]
+			private static extern bool FreeLibrary(IntPtr moduleHandle);
+
+			[DllImport(LibraryName)]
+			private static extern IntPtr GetProcAddress(SafeLibraryHandle moduleHandle, string procname);
 
 			public static UnmanagedLibrary LoadUnmanagedLibrary(string libraryName)
 			{
-				if (string.IsNullOrEmpty(libraryName))
+				if (string.IsNullOrWhiteSpace(libraryName))
 				{
 					throw new ArgumentException("A valid library name is expected.", "libraryName");
 				}
 
-				string fileName = string.Concat(libraryName, Platform.LibraryFileExtension);
-				string arch = Enum.GetName(typeof(ImageFileMachine), Platform.Architecture).ToLower();
+				// Now look: This method should ExpandPaths on LibraryPaths.
+				// That being said, it should just enumerate
+				// Path, AppBase, Arch, Compiler, LibraryName, Extension
+
+				// Secondly, this method should try each /lib/x86_64-linux-gnu/libload.so.2 to load,
+				// Third, this method should try EmbeddedResources,
+				// Finally, this method fails, telling the user all libraryPaths searched.
+
+				var libraryPaths = new List<string>(Platform.LibraryPaths);
+
+				Platform.ExpandPaths(libraryPaths, "{Path}", EnumeratePATH());
+
+				Platform.ExpandPaths(libraryPaths, "{AppBase}", 
+					Platform.EnsureNotEndingSlash(
+						AppDomain.CurrentDomain.BaseDirectory));
+
+				Platform.ExpandPaths(libraryPaths, "{LibraryName}", libraryName);
+
+				Platform.ExpandPaths(libraryPaths, "{Ext}", Platform.LibraryFileExtension);
+
+				string architecture;
+				string[] architecturePaths = null;
 				if (Platform.Architecture == ImageFileMachine.I386 && Environment.Is64BitProcess)
 				{
-					// In mono on linux, even the 32bit mono uses the 64bit library
-					// TODO: load the 32bit binary on windows in the 32bit runtime?
-					arch = Enum.GetName(typeof(ImageFileMachine), ImageFileMachine.AMD64).ToLower();
+					architecture = "amd64";
 				}
+				else {
+					architecture = Enum.GetName(typeof(ImageFileMachine), Platform.Architecture).ToLower();
+				}
+				if (architecture == "i386") architecturePaths = new string[] { "i386", "x86" };
+				if (architecture == "amd64") architecturePaths = new string[] { "amd64", "x64" };
+				if (architecturePaths == null) architecturePaths = new string[] { architecture };
+				Platform.ExpandPaths(libraryPaths, "{Arch}", architecturePaths);
 
-				string path;
-				SafeLibraryHandle handle;
+				// Expand Compiler
+				Platform.ExpandPaths(libraryPaths, "{Compiler}", Platform.Compiler);
+
+				// Now TRY the enumerated Directories for libFile.so.*
+
 				string traceLabel = string.Format("UnmanagedLibrary[{0}]", libraryName);
 
-				// This is Platform.Windows, LoadLibrary will prepare future DllImport
-
-				// Search ~[/bin]/arch/fileName.ext
-				path = AppDomain.CurrentDomain.BaseDirectory;
-				if (null != AppDomain.CurrentDomain.RelativeSearchPath)
+				foreach (string libraryPath in libraryPaths)
 				{
-					path = Path.Combine(path, AppDomain.CurrentDomain.RelativeSearchPath);
+					string folder = "C:";
+					string filesPattern = libraryPath;
+					int filesPatternI;
+					if (-1 < (filesPatternI = filesPattern.LastIndexOf('\\')))
+					{
+						folder = filesPattern.Substring(0, filesPatternI + 1);
+						filesPattern = filesPattern.Substring(filesPatternI + 1);
+					}
+
+					if (!Directory.Exists(folder)) continue;
+
+					string[] files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
+
+					foreach (string file in files)
+					{
+						// Finally, I am really loading this file
+						SafeLibraryHandle handle = OpenHandle(file);
+
+						if (!handle.IsNullOrInvalid())
+						{
+							Trace.TraceInformation(string.Format("{0} Loaded binary \"{1}\"", 
+								traceLabel, file));
+
+							return new UnmanagedLibrary(libraryName, handle);
+						}
+						else
+						{
+							Exception nativeEx = GetLastLibraryError();
+							Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
+								traceLabel, file, nativeEx.Message));
+						}
+					}
 				}
-				path = Path.Combine(Path.Combine(path, arch), fileName);
 
-				if (File.Exists(path))
+				// Search ManifestResources for fileName.arch.ext
+				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, LibraryFileExtension);
+				string tempPath = Path.Combine(Path.GetTempPath(), resourceName);
+
+				if (ExtractManifestResource(resourceName, tempPath))
 				{
-					handle = OpenHandle(path);
+					SafeLibraryHandle handle = OpenHandle(tempPath);
+
 					if (!handle.IsNullOrInvalid())
 					{
-						Trace.TraceInformation(string.Format("{0} Loaded \"{1}\".", traceLabel, path));
+						Trace.TraceInformation(string.Format("{0} Loaded binary from EmbeddedResource \"{1}\" from \"{2}\".", 
+							traceLabel, resourceName, tempPath));
+						
 						return new UnmanagedLibrary(libraryName, handle);
 					}
 					else
 					{
-						Exception nativeEx = GetLastLibraryError();
-						Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", traceLabel, path, nativeEx.Message));
-					}
-				}
-
-				// Search %SYSTEMDEFAULT% + fileName.ext
-				path = fileName;
-				handle = OpenHandle(path);
-
-				if (!handle.IsNullOrInvalid())
-				{
-					Trace.TraceInformation(string.Format("{0} Loaded \"{1}\" from system default paths.", traceLabel, path));
-					return new UnmanagedLibrary(libraryName, handle);
-				}
-
-				// Search ManifestResources/fileName.arch.ext
-				path = Path.Combine(Path.GetTempPath(), fileName);
-				string resourceName = string.Format(string.Format("ZeroMQ.{0}.{1}{2}", libraryName, arch, LibraryFileExtension));
-
-				if (ExtractManifestResource(resourceName, path))
-				{
-					handle = OpenHandle(path);
-					if (!handle.IsNullOrInvalid())
-					{
-						Trace.TraceInformation(string.Format("{0} Loaded \"{1}\" from extracted resource \"{2}\".", traceLabel, path, resourceName));
-						return new UnmanagedLibrary(libraryName, handle);
+						Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
+							traceLabel, resourceName, tempPath));
 					}
 				}
 				else
 				{
-					Trace.TraceWarning(
-						string.Format("{0} Unable to extract native library resource \"{1}\" to \"{2}\".",
-							  traceLabel, resourceName, path));
+					Trace.TraceWarning(string.Format("{0} Unable to extract the EmbeddedResource \"{1}\" to \"{2}\".",
+						traceLabel, resourceName, tempPath));
 				}
 
-				throw new FileNotFoundException(
-					string.Format(
-						"{0} Unable to load library \"{1}\" from \"{2}\". Inspect Trace output for details.",
-						traceLabel,
-						libraryName,
-						path
-					),
-					path,
-					GetLastLibraryError()
-				);
+				var fnf404 = new StringBuilder();
+				fnf404.Append(traceLabel);
+				fnf404.Append(" Unable to load binary \"");
+				fnf404.Append(libraryName);
+				fnf404.AppendLine("\" from folders");
+				foreach (string path in libraryPaths)
+				{
+					fnf404.Append("\t");
+					fnf404.AppendLine(path);
+				}
+				fnf404.Append(" Also unable to load binary from EmbeddedResource \"");
+				fnf404.Append(resourceName);
+				fnf404.Append("\", from temporary path \"");
+				fnf404.Append(tempPath);
+				fnf404.Append("\". See Trace output for more information.");
+
+				throw new FileNotFoundException(fnf404.ToString());
+			}
+
+			public static string[] EnumeratePATH()
+			{
+				string PATH = System.Environment.GetEnvironmentVariable("PATH");
+				string[] paths = PATH.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+				var pathList = new List<string>();
+				foreach (string path in paths)
+				{
+					pathList.Add(Platform.EnsureNotEndingSlash(path));
+				}
+				return pathList.ToArray();
 			}
 
 			public static SafeLibraryHandle OpenHandle(string filename)
@@ -121,17 +198,6 @@
 			{
 				return new System.ComponentModel.Win32Exception();
 			}
-
-			[DllImport(KernelLib, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
-			private static extern SafeLibraryHandle LoadLibrary(string fileName);
-
-			[ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-			[DllImport(KernelLib, SetLastError = true)]
-			[return: MarshalAs(UnmanagedType.Bool)]
-			private static extern bool FreeLibrary(IntPtr moduleHandle);
-
-			[DllImport(KernelLib)]
-			private static extern IntPtr GetProcAddress(SafeLibraryHandle moduleHandle, string procname);
 		}
 	}
 }

@@ -1,11 +1,14 @@
 ﻿namespace ZeroMQ.lib
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Configuration;
 	using System.Diagnostics;
 	using System.IO;
+	using System.Linq;
 	using System.Reflection;
 	using System.Runtime.InteropServices;
+	using System.Text;
 
 	public static partial class Platform
 	{
@@ -13,124 +16,52 @@
 		{
 			private const CallingConvention CCCdecl = CallingConvention.Cdecl;
 
+			private const string __Internal = "__Internal";
+
+			// private const string LibraryName = "libdl";
+
 			public const string LibraryFileExtension = ".so";
 
-			private const string KernelLib = "libdl";
+			public static readonly string[] LibraryPaths = new string[] {
+				"{AppBase}/{Arch}/{Compiler}/{LibraryName}{Ext}.*",
+				"{AppBase}/{Arch}/{Compiler}/{LibraryName}{Ext}",
+				"{AppBase}/{Arch}/{LibraryName}{Ext}.*",
+				"{AppBase}/{Arch}/{LibraryName}{Ext}",
+				"{Path}/{LibraryName}{Ext}.*",
+				"{Path}/{LibraryName}{Ext}",
+			};
 
 			private const int RTLD_LAZY = 0x0001;
 			private const int RTLD_NOW = 0x0002;
 			private const int RTLD_GLOBAL = 0x0100;
 			private const int RTLD_LOCAL = 0x0000;
 
-			[DllImport(KernelLib, CallingConvention = CCCdecl)]
+			[DllImport(__Internal, CallingConvention = CCCdecl)]
 			private static extern SafeLibraryHandle dlopen(IntPtr filename, int flags);
 
-			[DllImport(KernelLib, CallingConvention = CCCdecl)]
+			[DllImport(__Internal, CallingConvention = CCCdecl)]
 			private static extern int dlclose(IntPtr handle);
 
-			[DllImport(KernelLib, CallingConvention = CCCdecl)]
+			[DllImport(__Internal, CallingConvention = CCCdecl)]
 			private static extern IntPtr dlerror();
 
-			[DllImport(KernelLib, CallingConvention = CCCdecl)]
+			[DllImport(__Internal, CallingConvention = CCCdecl)]
 			private static extern IntPtr dlsym(SafeLibraryHandle handle, IntPtr symbol);
 			
-			[DllImport("__Internal")]
+			[DllImport(__Internal)]
 			private static extern void mono_dllmap_insert(IntPtr assembly, IntPtr dll, IntPtr func, IntPtr tdll, IntPtr tfunc);
 
 			/* [DllImport("libc", EntryPoint = "chmod", SetLastError = true)]
 			internal static extern int syscall_chmod (IntPtr path, uint mode); */
 
-			public static UnmanagedLibrary LoadUnmanagedLibrary(string libraryName)
+			/* private static void syscall_chmod_execute(string libraryPath) 
 			{
-				if (string.IsNullOrWhiteSpace(libraryName))
-				{
-					throw new ArgumentException("A valid library name is expected.", "libraryName");
+				IntPtr pathPtr = Marshal.StringToHGlobalAnsi(libraryPath);
+				if (0 != syscall_chmod(pathPtr, (uint)( FilePermissions.ALLPERMS ))) {
+					// error
 				}
-
-				string fileName = string.Concat(libraryName, Platform.LibraryFileExtension);
-				string arch = Enum.GetName(typeof(ImageFileMachine), Platform.Architecture).ToLower();
-				if (Platform.Architecture == ImageFileMachine.I386 && Environment.Is64BitProcess)
-				{
-					// In mono on linux, 32bit mono takes only the 64bit library
-					// TODO: load the 32bit binary on windows in the 32bit runtime?
-					arch = Enum.GetName(typeof(ImageFileMachine), ImageFileMachine.AMD64).ToLower();
-				}
-
-				// This is Platform.Posix. In mono, just dlopen'ing the library doesn't work.
-				// Using DllImport("__Internal", EntryPoint = "mono_dllmap_insert") to get mono on the path.
-
-				string path;
-				SafeLibraryHandle handle;
-				string traceLabel = string.Format("UnmanagedLibrary[{0}]", libraryName);
-
-				// Search for ~[/bin]/arch/fileName.ext
-				path = AppDomain.CurrentDomain.BaseDirectory;
-				if (null != AppDomain.CurrentDomain.RelativeSearchPath)
-				{
-					path = Path.Combine(path, AppDomain.CurrentDomain.RelativeSearchPath);
-				}
-				path = Path.Combine(Path.Combine(path, arch), fileName);
-
-				if (File.Exists(path))
-				{
-					// syscall_chmod_execute(path);
-					handle = OpenHandle(path);
-					if (!handle.IsNullOrInvalid())
-					{
-						Trace.TraceInformation(string.Format("{0} Loaded \"{1}\".", traceLabel, path));
-						MonoDllMapInsert(libraryName, path);
-						return new UnmanagedLibrary(libraryName, handle);
-					}
-					else
-					{
-						Exception nativeEx = GetLastLibraryError();
-						Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", traceLabel, path, nativeEx.Message));
-					}
-				}
-
-				// Search System's Default Paths for fileName.ext
-				path = fileName;
-				handle = OpenHandle(path);
-				if (!handle.IsNullOrInvalid())
-				{
-					Trace.TraceInformation(string.Format("{0} Loaded \"{1}\" from system default paths.", traceLabel, path));
-					MonoDllMapInsert(libraryName, path);
-					return new UnmanagedLibrary(libraryName, handle);
-				}
-
-				// Search ManifestResources for fileName.arch.ext
-				path = Path.Combine(Path.GetTempPath(), fileName);
-				string resourceName = string.Format(string.Format("ZeroMQ.{0}.{1}{2}", libraryName, arch, LibraryFileExtension));
-
-				if (ExtractManifestResource(resourceName, path))
-				{
-					// TODO: need syscall_chmod_execute(path); ?
-					handle = OpenHandle(path);
-					if (!handle.IsNullOrInvalid())
-					{
-						Trace.TraceInformation(string.Format("{0} Loaded \"{1}\" from extracted resource \"{2}\".", traceLabel, path, resourceName));
-						MonoDllMapInsert(libraryName, path);
-						return new UnmanagedLibrary(libraryName, handle);
-					}
-				}
-				else
-				{
-					Trace.TraceWarning(
-						string.Format("{0} Unable to extract native library resource \"{1}\" to \"{2}\".",
-							  traceLabel, resourceName, path));
-				}
-
-				throw new FileNotFoundException(
-					string.Format(
-						"{0} Unable to load library \"{1}\" from \"{2}\". Inspect Trace output for details.",
-						traceLabel,
-						libraryName,
-						path
-					),
-					path,
-					GetLastLibraryError()
-				);
-			}
+				Marshal.FreeHGlobal(pathPtr);
+			} */
 
 			private static void MonoDllMapInsert(string libraryName, string libraryPath)
 			{
@@ -141,14 +72,199 @@
 				Marshal.FreeHGlobal(pathPtr);
 			}
 
-			/* private static void syscall_chmod_execute(string libraryPath) 
+			public static UnmanagedLibrary LoadUnmanagedLibrary(string libraryName)
 			{
-				IntPtr pathPtr = Marshal.StringToHGlobalAnsi(libraryPath);
-				if (0 != syscall_chmod(pathPtr, (uint)( FilePermissions.ALLPERMS ))) {
-					// error
+				if (string.IsNullOrWhiteSpace(libraryName))
+				{
+					throw new ArgumentException("A valid library name is expected.", "libraryName");
 				}
-				Marshal.FreeHGlobal(pathPtr);
-			} */
+
+				// Now look: This method should ExpandPaths on LibraryPaths.
+				// That being said, it should just enumerate
+				// Path, AppBase, Arch, Compiler, LibraryName, Extension
+
+				// Secondly, this method should try each /lib/x86_64-linux-gnu/libload.so.2 to load,
+				// Third, this method should try EmbeddedResources,
+				// Finally, this method fails, telling the user all libraryPaths searched.
+
+				var libraryPaths = new List<string>(Platform.LibraryPaths);
+
+				Platform.ExpandPaths(libraryPaths, "{Path}", EnumerateLibLdConf("/etc/ld.so.conf"));
+
+				Platform.ExpandPaths(libraryPaths, "{AppBase}", 
+					Platform.EnsureNotEndingSlash(
+						AppDomain.CurrentDomain.BaseDirectory));
+
+				Platform.ExpandPaths(libraryPaths, "{LibraryName}", libraryName);
+
+				Platform.ExpandPaths(libraryPaths, "{Ext}", Platform.LibraryFileExtension);
+
+				string architecture;
+				string[] architecturePaths = null;
+				if (Platform.Architecture == ImageFileMachine.I386 && Environment.Is64BitProcess) 
+				{
+					architecture = "amd64";
+				}
+				else {
+					architecture = Enum.GetName(typeof(ImageFileMachine), Platform.Architecture).ToLower();
+				}
+				if (architecture == "i386") architecturePaths = new string[] { "i386", "x86" };
+				if (architecture == "amd64") architecturePaths = new string[] { "amd64", "x64" };
+				if (architecturePaths == null) architecturePaths = new string[] { architecture };
+				Platform.ExpandPaths(libraryPaths, "{Arch}", architecturePaths);
+
+				// Expand Compiler
+				Platform.ExpandPaths(libraryPaths, "{Compiler}", Platform.Compiler);
+
+				// Now TRY the enumerated Directories for libFile.so.*
+
+				string traceLabel = string.Format("UnmanagedLibrary[{0}]", libraryName);
+
+				foreach (string libraryPath in libraryPaths)
+				{
+					string folder = "/";
+					string filesPattern = libraryPath;
+					int filesPatternI;
+					if (-1 < (filesPatternI = filesPattern.LastIndexOf('/')))
+					{
+						folder = filesPattern.Substring(0, filesPatternI + 1);
+						filesPattern = filesPattern.Substring(filesPatternI + 1);
+					}
+
+					if (!Directory.Exists(folder)) continue;
+
+					string[] files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
+
+					foreach (string file in files)
+					{
+						// Finally, I am really loading this file
+						SafeLibraryHandle handle = OpenHandle(file);
+
+						if (!handle.IsNullOrInvalid())
+						{
+							// This is Platform.Posix. In mono, just dlopen'ing the library doesn't work.
+							// Using DllImport("__Internal", EntryPoint = "mono_dllmap_insert") to get mono on the path.
+							MonoDllMapInsert(libraryName, file);
+
+							Trace.TraceInformation(string.Format("{0} Loaded binary \"{1}\"", 
+								traceLabel, file));
+
+							return new UnmanagedLibrary(libraryName, handle);
+						}
+						else
+						{
+							Exception nativeEx = GetLastLibraryError();
+							Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
+								traceLabel, file, nativeEx.Message));
+						}
+					}					
+				}
+
+				// Search ManifestResources for fileName.arch.ext
+				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, LibraryFileExtension);
+				string tempPath = Path.Combine(Path.GetTempPath(), resourceName);
+
+				if (ExtractManifestResource(resourceName, tempPath))
+				{
+					// TODO: need syscall_chmod_execute(path); ?
+					SafeLibraryHandle handle = OpenHandle(tempPath);
+
+					if (!handle.IsNullOrInvalid())
+					{
+						MonoDllMapInsert(libraryName, tempPath);
+
+						Trace.TraceInformation(string.Format("{0} Loaded binary from EmbeddedResource \"{1}\" from \"{2}\".", 
+							traceLabel, resourceName, tempPath));
+						
+						return new UnmanagedLibrary(libraryName, handle);
+					}					
+					else
+					{
+						Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
+							traceLabel, resourceName, tempPath));
+					}
+				}
+				else
+				{
+					Trace.TraceWarning(string.Format("{0} Unable to extract the EmbeddedResource \"{1}\" to \"{2}\".",
+						traceLabel, resourceName, tempPath));
+				}
+
+
+				var fnf404 = new StringBuilder();
+				fnf404.Append(traceLabel);
+				fnf404.Append(" Unable to load binary \"");
+				fnf404.Append(libraryName);
+				fnf404.AppendLine("\" from folders");
+				foreach (string path in libraryPaths)
+				{
+					fnf404.Append("\t");
+					fnf404.AppendLine(path);
+				}
+				fnf404.Append(" Also unable to load binary from EmbeddedResource \"");
+				fnf404.Append(resourceName);
+				fnf404.Append("\", from temporary path \"");
+				fnf404.Append(tempPath);
+				fnf404.Append("\". See Trace output for more information.");
+
+				throw new FileNotFoundException(fnf404.ToString());
+			}
+
+			public static string[] EnumerateLibLdConf(string fileName)
+			{
+				if (!File.Exists(fileName)) return null;
+
+				var libLoadConf = new List<string>();
+				using (var fileReader = new StreamReader(fileName))
+				{
+					while (!fileReader.EndOfStream)
+					{
+						string line = fileReader.ReadLine().TrimStart(new char[] { ' ' });
+
+						// Comments
+						if (line.StartsWith("#", StringComparison.OrdinalIgnoreCase)) continue;
+						int commentI;
+						if (-1 < (commentI = line.IndexOf("#")))
+						{
+							// remove Comments
+							line = line.Substring(0, commentI);
+						}
+
+						// Include /etc/ld.so.conf.d/*.conf, say enumerate files
+						if (line.StartsWith("include ", StringComparison.OrdinalIgnoreCase))
+						{
+							string folder = "/";
+							string filesPattern = line.Substring("include ".Length);
+							int filesPatternI;
+							if (-1 < (filesPatternI = filesPattern.IndexOf('*')))
+							{
+								if (-1 < (filesPatternI = filesPattern.LastIndexOf('/', filesPatternI)))
+								{
+									folder = filesPattern.Substring(0, filesPatternI + 1);
+									filesPattern = filesPattern.Substring(filesPatternI + 1);
+								}
+							}
+
+							if (!Directory.Exists(folder)) continue;
+
+							string[] files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
+
+							foreach (string file in files)
+							{
+								var _libLoadConf = EnumerateLibLdConf(file);
+								libLoadConf.AddRange(_libLoadConf);
+							}
+						}
+
+						// Folder
+						if (!Directory.Exists(line)) continue;
+
+						libLoadConf.Add(Platform.EnsureNotEndingSlash(line));
+					}
+				}
+
+				return libLoadConf.ToArray();
+			}
 
 			public static SafeLibraryHandle OpenHandle(string fileName)
 			{

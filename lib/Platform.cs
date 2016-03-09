@@ -1,6 +1,7 @@
 namespace ZeroMQ.lib
 {
 	using System;
+	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
 	using System.Reflection;
@@ -31,16 +32,25 @@ namespace ZeroMQ.lib
 		MacOSX,
 	}
 
-	public enum PlatformCompiler : int
-	{
-		Unknown = 0,
-		VisualC,
-		GCC
-	}
-
 	public static partial class Platform
 	{
+		public static readonly string[] Compilers = new string[] {
+			"msvc2008",
+			"msvc2010",
+			"msvc2012",
+			"msvc2013",
+			"msvc2015",
+			"gcc3",
+			"gcc4",
+			"gcc5",
+			"mingw32",
+		};
+
+		// public static readonly string LibraryName;
+
 		public static readonly string LibraryFileExtension;
+
+		public static readonly string[] LibraryPaths;
 
 		public delegate UnmanagedLibrary LoadUnmanagedLibraryDelegate(string libraryName);
 		public static readonly LoadUnmanagedLibraryDelegate LoadUnmanagedLibrary;
@@ -65,11 +75,7 @@ namespace ZeroMQ.lib
 
 		public static readonly ImageFileMachine Architecture;
 
-		public static readonly int OSVersion;
-
-		public static readonly PlatformCompiler Compiler;
-
-		public static readonly int CVersion;
+		public static readonly string Compiler;
 
 		static Platform()
 		{
@@ -187,6 +193,52 @@ namespace ZeroMQ.lib
 		public static bool IsXamarinIOS { get; private set; }
 
 		public static bool IsXamarinAndroid { get; private set; }
+
+		public static void ExpandPaths(IList<string> stream,
+			string extension, string path)
+		{
+			ExpandPaths(stream, extension, path != null ? new string[] { path } : null);
+		}
+
+		public static void ExpandPaths(IList<string> stream,
+			string extension, IEnumerable<string> paths) 
+		{
+			int pathsC = paths == null ? 0 : paths.Count();
+				
+			foreach (string libraryPath in stream.ToArray())
+			{
+				if (-1 == libraryPath.IndexOf(extension)) continue;
+
+				int libraryPathI = stream.IndexOf(libraryPath);
+				stream.RemoveAt(libraryPathI);
+
+				if (pathsC == 0)
+				{
+					// just continue, don't Insert them again
+					continue;
+				}
+
+				if (pathsC == 1)
+				{
+					stream.Insert(libraryPathI, libraryPath.Replace(extension, paths.ElementAt(0)));
+					continue;
+				}
+
+				foreach (string realLibraryPath in paths)
+				{
+					stream.Insert(libraryPathI, libraryPath.Replace(extension, realLibraryPath));
+					++libraryPathI;
+				}
+
+			}
+		}
+
+		public static string EnsureNotEndingSlash(string path)
+		{
+			if (path == null) return null;
+			if (path.EndsWith("/")) return path.Substring(0, path.Length - 1);
+			return path;
+		}
 
 		public static void SetupImplementation(Type platformDependant)
 		{
