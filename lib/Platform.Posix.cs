@@ -230,22 +230,25 @@
 							line = line.Substring(0, commentI);
 						}
 
+						if (string.IsNullOrWhiteSpace(line.Trim())) continue;
+
 						// Include /etc/ld.so.conf.d/*.conf, say enumerate files
 						if (line.StartsWith("include ", StringComparison.OrdinalIgnoreCase))
 						{
-							string folder = "/";
+							string folder = null;
 							string filesPattern = line.Substring("include ".Length);
 							int filesPatternI;
-							if (-1 < (filesPatternI = filesPattern.IndexOf('*')))
+							if (-1 == (filesPatternI = filesPattern.IndexOf('*')))
 							{
-								if (-1 < (filesPatternI = filesPattern.LastIndexOf('/', filesPatternI)))
-								{
-									folder = filesPattern.Substring(0, filesPatternI + 1);
-									filesPattern = filesPattern.Substring(filesPatternI + 1);
-								}
+								filesPatternI = filesPattern.Length;
+							}
+							if (-1 < (filesPatternI = filesPattern.LastIndexOf('/', filesPatternI)))
+							{
+								folder = filesPattern.Substring(0, filesPatternI + 1);
+								filesPattern = filesPattern.Substring(filesPatternI + 1);
 							}
 
-							if (!Directory.Exists(folder)) continue;
+							if (folder == null || !Directory.Exists(folder)) continue;
 
 							string[] files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
 
