@@ -233,13 +233,6 @@ namespace ZeroMQ.lib
 			}
 		}
 
-		public static string EnsureNotEndingSlash(string path)
-		{
-			if (path == null) return null;
-			if (path.EndsWith("/")) return path.Substring(0, path.Length - 1);
-			return path;
-		}
-
 		public static void SetupImplementation(Type platformDependant)
 		{
 			// Baseline by PlatformKind

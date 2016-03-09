@@ -92,7 +92,7 @@
 				Platform.ExpandPaths(libraryPaths, "{Path}", EnumerateLibLdConf("/etc/ld.so.conf"));
 
 				Platform.ExpandPaths(libraryPaths, "{AppBase}", 
-					Platform.EnsureNotEndingSlash(
+					EnsureNotEndingSlash(
 						AppDomain.CurrentDomain.BaseDirectory));
 
 				Platform.ExpandPaths(libraryPaths, "{LibraryName}", libraryName);
@@ -122,7 +122,7 @@
 
 				foreach (string libraryPath in libraryPaths)
 				{
-					string folder = "/";
+					string folder = null;
 					string filesPattern = libraryPath;
 					int filesPatternI;
 					if (-1 < (filesPatternI = filesPattern.LastIndexOf('/')))
@@ -131,7 +131,7 @@
 						filesPattern = filesPattern.Substring(filesPatternI + 1);
 					}
 
-					if (!Directory.Exists(folder)) continue;
+					if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) continue;
 
 					string[] files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
 
@@ -259,11 +259,18 @@
 						// Folder
 						if (!Directory.Exists(line)) continue;
 
-						libLoadConf.Add(Platform.EnsureNotEndingSlash(line));
+						libLoadConf.Add(EnsureNotEndingSlash(line));
 					}
 				}
 
 				return libLoadConf.ToArray();
+			}
+
+			private static string EnsureNotEndingSlash(string path)
+			{
+				if (path == null) return null;
+				if (path.EndsWith("/")) return path.Substring(0, path.Length - 1);
+				return path;
 			}
 
 			public static SafeLibraryHandle OpenHandle(string fileName)
