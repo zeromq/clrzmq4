@@ -22,7 +22,7 @@ namespace ZeroMQ.lib
 			public static readonly string[] LibraryPaths = new string[] {
 				@"{AppBase}\{Arch}\{Compiler}\{LibraryName}{Ext}",
 				@"{AppBase}\{Arch}\{LibraryName}{Ext}",
-				@"{Path}\{LibraryName}{Ext}",
+				@"{System32}\{LibraryName}{Ext}",
 			};
 
 			[DllImport(LibraryName, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
@@ -53,7 +53,7 @@ namespace ZeroMQ.lib
 
 				var libraryPaths = new List<string>(Platform.LibraryPaths);
 
-				Platform.ExpandPaths(libraryPaths, "{Path}", EnumeratePATH());
+				Platform.ExpandPaths(libraryPaths, "{System32}", Environment.SystemDirectory);
 
 				Platform.ExpandPaths(libraryPaths, "{AppBase}", EnsureNotEndingBackSlash(
 						AppDomain.CurrentDomain.BaseDirectory));
