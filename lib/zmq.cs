@@ -45,7 +45,7 @@
 			// Set once LibVersion to libversion()
 			int major, minor, patch;
 			version(out major, out minor, out patch);
-			Version = new Version(major, minor, patch);
+			LibraryVersion = new Version(major, minor, patch);
 
 			// Trigger static constructor
 			var noSym = ZSymbol.None;
@@ -98,7 +98,7 @@
 		//     it may be set to the __Internal extern function declaration.
 		public static readonly zmq_version_delegate version = zmq_version;
 
-		public static readonly Version Version;
+		public static readonly Version LibraryVersion;
 
 		/* Deprecated. Use zmq_ctx_new instead.
 		[DllImport(LibraryName, EntryPoint = "zmq_init", CallingConvention = CCCdecl)]
