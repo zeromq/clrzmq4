@@ -203,8 +203,12 @@ namespace ZeroMQ.lib
 		public static void ExpandPaths(IList<string> stream,
 			string extension, IEnumerable<string> paths) 
 		{
-			int pathsC = paths == null ? 0 : paths.Count();
-				
+			if (paths == null) return;
+
+			int pathsC = paths.Count();				
+
+			if (pathsC == 0) return;
+
 			foreach (string libraryPath in stream.ToArray())
 			{
 				if (-1 == libraryPath.IndexOf(extension)) continue;

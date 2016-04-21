@@ -254,17 +254,16 @@
 
 							foreach (string file in files)
 							{
-								var _libLoadConf = EnumerateLibLdConf(file);
-								libLoadConf.AddRange(_libLoadConf);
+								string[] _libLoadConf = EnumerateLibLdConf(file);
+								if (_libLoadConf != null) libLoadConf.AddRange(_libLoadConf);
 							}
 
 							continue;
 						}
 
 						// Folder
-						if (!Directory.Exists(line)) continue;
-
-						libLoadConf.Add(EnsureNotEndingSlash(line));
+						string path = EnsureNotEndingSlash(line);
+						if (path != null && Directory.Exists(path)) libLoadConf.Add(path);
 					}
 				}
 
