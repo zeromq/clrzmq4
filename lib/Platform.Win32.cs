@@ -181,7 +181,7 @@ namespace ZeroMQ.lib
 						EnsureNotDoubleQuoted(
 							EnsureNotEndingBackSlash(path));
 					
-					if (path != null && Directory.Exists(path)) pathList.Add(path);
+					if (_path != null && Directory.Exists(_path)) pathList.Add(_path);
 				}
 				return pathList.ToArray();
 			}
