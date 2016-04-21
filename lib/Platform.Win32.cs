@@ -177,9 +177,11 @@ namespace ZeroMQ.lib
 				var pathList = new List<string>();
 				foreach (string path in paths)
 				{
-					pathList.Add(
+					string _path =
 						EnsureNotDoubleQuoted(
-							EnsureNotEndingBackSlash(path)));
+							EnsureNotEndingBackSlash(path));
+					
+					if (path != null && Directory.Exists(path)) pathList.Add(path);
 				}
 				return pathList.ToArray();
 			}
