@@ -48,7 +48,7 @@ namespace ZeroMQ.lib
 
 		// public static readonly string LibraryName;
 
-		public static readonly string LibraryFileExtension;
+		// public static readonly string LibraryFileExtension;
 
 		public static readonly string[] LibraryPaths;
 
@@ -203,11 +203,7 @@ namespace ZeroMQ.lib
 		public static void ExpandPaths(IList<string> stream,
 			string extension, IEnumerable<string> paths) 
 		{
-			if (paths == null) return;
-
-			int pathsC = paths.Count();				
-
-			if (pathsC == 0) return;
+			int pathsC = paths == null ? 0 : paths.Count();
 
 			foreach (string libraryPath in stream.ToArray())
 			{

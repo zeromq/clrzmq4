@@ -20,15 +20,21 @@
 
 			// private const string LibraryName = "libdl";
 
-			public const string LibraryFileExtension = ".so";
+			// public const string LibraryFileExtension = ".so";
 
 			public static readonly string[] LibraryPaths = new string[] {
-				"{AppBase}/{Arch}/{Compiler}/{LibraryName}{Ext}.*",
-				"{AppBase}/{Arch}/{Compiler}/{LibraryName}{Ext}",
-				"{AppBase}/{Arch}/{LibraryName}{Ext}.*",
-				"{AppBase}/{Arch}/{LibraryName}{Ext}",
-				"{Path}/{LibraryName}{Ext}.*",
-				"{Path}/{LibraryName}{Ext}",
+				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.a",
+				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.a.*",
+				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.so",
+				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.so.*",
+				"{AppBase}/{Arch}/{LibraryName}.a",
+				"{AppBase}/{Arch}/{LibraryName}.a.*",
+				"{AppBase}/{Arch}/{LibraryName}.so",
+				"{AppBase}/{Arch}/{LibraryName}.so.*",
+				"{Path}/{LibraryName}.a",
+				"{Path}/{LibraryName}.a.*",
+				"{Path}/{LibraryName}.so",
+				"{Path}/{LibraryName}.so.*",
 			};
 
 			private const int RTLD_LAZY = 0x0001;
@@ -97,7 +103,7 @@
 
 				Platform.ExpandPaths(libraryPaths, "{LibraryName}", libraryName);
 
-				Platform.ExpandPaths(libraryPaths, "{Ext}", Platform.LibraryFileExtension);
+				// Platform.ExpandPaths(libraryPaths, "{Ext}", Platform.LibraryFileExtension);
 
 				string architecture;
 				string[] architecturePaths = null;
@@ -161,7 +167,8 @@
 				}
 
 				// Search ManifestResources for fileName.arch.ext
-				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, LibraryFileExtension);
+				// TODO: Enumerate ManifestResources for ZeroMQ{Arch}{Compiler}{LibraryName}{Ext}.so.*
+				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, ".so");
 				string tempPath = Path.Combine(Path.GetTempPath(), resourceName);
 
 				if (ExtractManifestResource(resourceName, tempPath))

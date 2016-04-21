@@ -17,12 +17,12 @@ namespace ZeroMQ.lib
 		{
 			private const string LibraryName = "kernel32";
 
-			public const string LibraryFileExtension = ".dll";
+			// public const string LibraryFileExtension = ".dll";
 
 			public static readonly string[] LibraryPaths = new string[] {
-				@"{AppBase}\{Arch}\{Compiler}\{LibraryName}{Ext}",
-				@"{AppBase}\{Arch}\{LibraryName}{Ext}",
-				@"{System32}\{LibraryName}{Ext}",
+				@"{AppBase}\{Arch}\{Compiler}\{LibraryName}.dll",
+				@"{AppBase}\{Arch}\{LibraryName}.dll",
+				@"{System32}\{LibraryName}.dll",
 			};
 
 			[DllImport(LibraryName, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
@@ -60,7 +60,7 @@ namespace ZeroMQ.lib
 
 				Platform.ExpandPaths(libraryPaths, "{LibraryName}", libraryName);
 
-				Platform.ExpandPaths(libraryPaths, "{Ext}", Platform.LibraryFileExtension);
+				// Platform.ExpandPaths(libraryPaths, "{Ext}", Platform.LibraryFileExtension);
 
 				string architecture;
 				string[] architecturePaths = null;
@@ -120,7 +120,8 @@ namespace ZeroMQ.lib
 				}
 
 				// Search ManifestResources for fileName.arch.ext
-				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, LibraryFileExtension);
+				// TODO: Enumerate ManifestResources for ZeroMQ{Arch}{Compiler}{LibraryName}{Ext}.dll
+				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, ".dll");
 				string tempPath = Path.Combine(Path.GetTempPath(), resourceName);
 
 				if (ExtractManifestResource(resourceName, tempPath))
