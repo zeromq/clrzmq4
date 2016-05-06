@@ -21,11 +21,11 @@ namespace ZeroMQ.lib
 
 			public static readonly string[] LibraryPaths = new string[] {
 				@"{AppBase}\{Arch}\{Compiler}\{LibraryName}.dll",
-				@"{AppBase}\{Arch}\{Compiler}\{LibraryName}-*.dll",
+				// @"{AppBase}\{Arch}\{Compiler}\{LibraryName}-*.dll",
 				@"{AppBase}\{Arch}\{LibraryName}.dll",
-				@"{AppBase}\{Arch}\{LibraryName}-*.dll",
+				// @"{AppBase}\{Arch}\{LibraryName}-*.dll",
 				@"{System32}\{LibraryName}.dll",
-				@"{System32}\{LibraryName}-*.dll",
+				// @"{System32}\{LibraryName}-*.dll",
 			};
 
 			[DllImport(LibraryName, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
