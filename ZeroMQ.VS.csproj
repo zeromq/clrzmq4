@@ -50,6 +50,9 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="backend\Context.cs" />
+    <Compile Include="backend\Frame.cs" />
+    <Compile Include="backend\Socket.cs" />
     <Compile Include="backend\zmq_poll.cs" />
     <Compile Include="lib\Platform.__Internal.cs" />
     <Compile Include="ZDevice.cs" />
