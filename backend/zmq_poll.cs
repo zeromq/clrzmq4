@@ -22,14 +22,14 @@ namespace ZeroMQ
         }
         public static object zmq_poll(IEnumerable<dynamic> socks, int timeout)
         {
-            var s2 = (from p in socks select ((ZSocket)p[0]._zmq_socket)).ToList();
+            var s2 = (from p in socks select (ZSocket)p[0]._ZSocket).ToList();
             var i2 = (from p in socks select make_pi((ZPoll)p[1])).ToList();
             ZError err;
             TimeSpan? ts = null;
             if (timeout > 0)
                 ts = TimeSpan.FromMilliseconds(timeout);
             ZPollItems.PollMany(s2, i2, ZPoll.In|ZPoll.Out, out err, ts);
-            return Enumerable.Zip(socks, i2, (p, i) => new object[] { p[0], (int)i.ReadyEvents }).ToList();
+            return Enumerable.Zip(socks, i2, (p, i) => new object[] { p[0], (int)i.ReadyEvents }).Where(p => (int)p[1] != (int)ZPoll.None).ToList();
         }
     }
 }

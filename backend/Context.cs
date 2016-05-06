@@ -26,7 +26,11 @@ namespace ZeroMQ
             public bool closed { get { return _ZContext == null || _ZContext.ContextPtr == IntPtr.Zero; } }
             public Socket socket(ZSocketType st)
             {
-                return new Socket(new ZSocket(_ZContext, st));
+                return new Socket(zsocket(st));
+            }
+            internal ZSocket zsocket(ZSocketType st)
+            {
+                return new ZSocket(_ZContext, st);
             }
         }
     }
