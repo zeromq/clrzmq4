@@ -1,6 +1,10 @@
 ﻿
 **ZeroMQ C# namespace**
 
+This fork is for adding support needed so that clrzmq4 can be used as a backend by the pyzmq binding under IronPython.  Chat is set up under my matching fork of pyzmq:
+
+[![Join the chat at https://gitter.im/swn1/pyzmq](https://badges.gitter.im/swn1/pyzmq.svg)](https://gitter.im/swn1/pyzmq?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 3+.
 
 ZeroMQ is built AnyCPU, to run on Windows (VC2010) and on GNU/Linux (C 4.8.4), i386 and amd64.
