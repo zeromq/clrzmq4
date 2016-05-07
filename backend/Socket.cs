@@ -29,12 +29,25 @@ namespace ZeroMQ
             {
                 _ZSocket.SetOption(so, buf.ToArray());
             }
-            public IEnumerable<Byte> get(ZSocketOption so)
+            public object get(ZSocketOption so)
             {
-                return _ZSocket.GetOptionBytes(so);
+                switch (so)
+                {
+                    case ZSocketOption.RCVMORE:
+                        return _ZSocket.GetOptionInt32(so);
+                    default:
+                        return _ZSocket.GetOptionBytes(so);
+                }
             }
 
-            public bool closed { get { return _ZSocket.SocketPtr == null; } }
+            bool _closed = false;
+            public bool closed { get { return _closed || _ZSocket.SocketPtr == null; } }
+
+            public void close()
+            {
+                _ZSocket.Close();
+                _closed = true;
+            }
 
             public int linger
             {
@@ -72,6 +85,19 @@ namespace ZeroMQ
                 _ZSocket.SendFrame(frm, (ZSocketFlags)flags);
                 if (track)
                     throw new NotImplementedException("tracking not yet wired up");
+            }
+
+            public object recv(int flags = 0, bool copy = false, bool track = false)
+            {
+                ZError err;
+                var zf = _ZSocket.ReceiveFrame((ZSocketFlags)flags, out err);
+                if (err != ZError.None)
+                    throw new ZException(err);
+
+                if (copy)
+                    return new IronPython.Runtime.Bytes(zf.Read());
+                else
+                    return new Frame(zf);
             }
         }
     }

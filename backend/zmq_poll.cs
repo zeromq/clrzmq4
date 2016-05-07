@@ -26,7 +26,7 @@ namespace ZeroMQ
             var i2 = (from p in socks select make_pi((ZPoll)p[1])).ToList();
             ZError err;
             TimeSpan? ts = null;
-            if (timeout > 0)
+            if (timeout >= 0)
                 ts = TimeSpan.FromMilliseconds(timeout);
             ZPollItems.PollMany(s2, i2, ZPoll.In|ZPoll.Out, out err, ts);
             return Enumerable.Zip(socks, i2, (p, i) => new object[] { p[0], (int)i.ReadyEvents }).Where(p => (int)p[1] != (int)ZPoll.None).ToList();
