@@ -621,7 +621,9 @@ namespace ZeroMQ
 				return string.Empty;
 			}
 
-			remaining = Math.Min(charCount, remaining);
+			// do not mix charCount and byteCount as multi-byte character sets
+			// like UTF-8 or UTF-16 do not have 1 byte per character (but more)!
+			//remaining = Math.Min(charCount, remaining);
 
 			var resultChars = new char[charCount];
 			fixed (char* chars = resultChars)
