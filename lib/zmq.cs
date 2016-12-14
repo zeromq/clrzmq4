@@ -67,6 +67,8 @@
 			{
 				// Backwards compatability for v3
 
+				sizeof_zmq_msg_t = sizeof_zmq_msg_t_v3;
+
 				zmq.ctx_shutdown = (ctxPtr) => { throw VersionNotSupported("zmq_ctx_shutdown", "v4"); };
 				zmq.msg_gets = (msgPtr, propertyPtr) => { throw VersionNotSupported("zmq_msg_gets", "v4"); };
 				zmq.has = (capabilityPtr) => { throw VersionNotSupported("zmq_has", "v4"); };
