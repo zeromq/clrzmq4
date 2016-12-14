@@ -22,6 +22,9 @@
 		<!-- managed assembly -->
 		<file src="bin/Release/ZeroMQ.dll" target="lib/net40/" />
 		
+		<!-- XML documentation file -->
+		<file src="bin/Release/ZeroMQ.XML" target="lib/net40/" />
+		
 		<!-- native binary files -->
 		<file src="i386/libzmq.*" target="/build/i386/" />
 		<file src="i386/libsodium.*" target="/build/i386/" />
