@@ -63,13 +63,30 @@
 					sizeof_zmq_msg_t = sizeof_zmq_msg_t_v3;
 				}
 			}
-			else // if (major >= 3)
+			else if (major >= 3)
 			{
-				// TODO: Backwards compatability for v3
+				// Backwards compatability for v3
 
-				throw VersionNotSupported(null, ">= 4");
+				zmq.ctx_shutdown = (ctxPtr) => { throw VersionNotSupported("zmq_ctx_shutdown", "v4"); };
+				zmq.msg_gets = (msgPtr, propertyPtr) => { throw VersionNotSupported("zmq_msg_gets", "v4"); };
+				zmq.has = (capabilityPtr) => { throw VersionNotSupported("zmq_has", "v4"); };
+				zmq.proxy_steerable = (frontendPtr, backendPtr, capturePtr, controlPtr)
+					=> { throw VersionNotSupported("zmq_proxy_steerable", "v4"); };
+				zmq.curve_keypair = (z85_public_key, z85_secret_key) => { throw VersionNotSupported("zmq_curve_keypair", "v4"); };
+				zmq.z85_encode = (dest, data, size) => { throw VersionNotSupported("zmq_z85_encode", "v4"); };
+				zmq.z85_decode = (dest, data) => { throw VersionNotSupported("zmq_z85_decode", "v4"); };
+
+				if (!Platform.Is__Internal) {
+					zmq.ctx_term = zmq.zmq_term;
+				}
+				else {
+					zmq.ctx_term = zmq.zmq_term__Internal;
+				}
 			}
-			// else { }
+			else 
+			{ 
+				throw VersionNotSupported(null, ">= v3");
+			}
 		}
 
 		private static NotSupportedException VersionNotSupported(string methodName, string requiredVersion)
@@ -136,9 +153,11 @@
 		[DllImport(LibraryName, CallingConvention = CCCdecl)]
 		private static extern Int32 zmq_term(IntPtr context); /**/
 
-		/* Deprecated. Use zmq_ctx_term instead.
-		[DllImport(LibraryName, CallingConvention = CCCdecl)]
-		private static extern Int32 zmq_ctx_destroy(IntPtr context); /**/
+		/* Deprecated. Use zmq_ctx_term instead. */
+		[DllImport(LibraryName, EntryPoint = "zmq_term", CallingConvention = CCCdecl)]
+		private static extern Int32 zmq_term(IntPtr context);
+		[DllImport(__Internal, EntryPoint = "zmq_term", CallingConvention = CCCdecl)]
+		private static extern Int32 zmq_term__Internal(IntPtr context);
 
 		[DllImport(LibraryName, EntryPoint = "zmq_ctx_term", CallingConvention = CCCdecl)]
 		private static extern Int32 zmq_ctx_term(IntPtr context);
@@ -278,9 +297,9 @@
 		public delegate Int32 zmq_setsockopt_delegate(IntPtr socket, Int32 option_name, IntPtr option_value, Int32 option_len);
 		public static readonly zmq_setsockopt_delegate setsockopt = zmq_setsockopt;
 
-		[DllImport(LibraryName, EntryPoint = "zmq_bind", /*CharSet = CharSet.Ansi,*/ CallingConvention = CCCdecl)]
+		[DllImport(LibraryName, EntryPoint = "zmq_bind", CallingConvention = CCCdecl)]
 		private static extern Int32 zmq_bind(IntPtr socket, IntPtr endpoint);
-		[DllImport(__Internal, EntryPoint = "zmq_bind", /*CharSet = CharSet.Ansi,*/ CallingConvention = CCCdecl)]
+		[DllImport(__Internal, EntryPoint = "zmq_bind", CallingConvention = CCCdecl)]
 		private static extern Int32 zmq_bind__Internal(IntPtr socket, IntPtr endpoint);
 		public delegate Int32 zmq_bind_delegate(IntPtr socket, IntPtr endpoint);
 		public static readonly zmq_bind_delegate bind = zmq_bind;
