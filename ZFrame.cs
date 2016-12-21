@@ -493,114 +493,10 @@ namespace ZeroMQ
 
 		public string ReadString(int length)
 		{
-			return ReadString( /* byteCount */ length, ZContext.Encoding);
+			return ReadString(/* byteCount */ length, ZContext.Encoding);
 		}
 
-		public string ReadString(int length, Encoding encoding)
-		{
-			if (length < 0)
-			{
-				throw new ArgumentOutOfRangeException("length");
-			}
-			if (length == 0)
-			{
-				return string.Empty;
-			}
-
-			long start = Position, lengthToRead = 0;
-			int bytE = -1, lengthToMove = 0;
-			byte byt = 0x00; //, lastByt = 0x00;
-
-			while (this._position < length)
-			{
-				bytE = ReadByte();
-				if (bytE == -1) break;
-				byt = (byte)bytE;
-
-				if (byt == 0x00) // NUL
-				{
-					++lengthToMove;
-					break;
-				}
-
-				++lengthToRead;
-				lengthToMove = 0;
-				// lastByt = byt;
-			}
-
-			string strg = null;
-
-			if (lengthToRead > 0)
-			{
-				this._position = (int)start;
-
-				strg = ReadStringNative((int)lengthToRead, encoding);
-			}
-			if (lengthToMove > 0)
-			{
-				this._position += lengthToMove;
-			}
-
-			return strg ?? string.Empty;
-		}
-
-		public string ReadLine()
-		{
-			return ReadLine(ZContext.Encoding);
-		}
-
-		public string ReadLine(Encoding encoding)
-		{
-			long start = Position, length = Length, lengthToRead = 0;
-			int bytE = -1, lengthToMove = 0;
-			byte byt = 0x00, lastByt = 0x00;
-
-			while (this._position < length)
-			{
-				bytE = ReadByte();
-				if (bytE == -1) break;
-				byt = (byte)bytE;
-
-				if (byt == 0x00) // NUL
-				{
-					++lengthToMove;
-					break;
-				}
-
-				if (byt == 0x0A) // Line Feed
-				{
-					if (lastByt == 0x0D) // Carriage Return
-					{
-						++lengthToMove;
-						--lengthToRead;
-					}
-
-					++lengthToMove;
-					break;
-				}
-
-				++lengthToRead;
-				lengthToMove = 0;
-				lastByt = byt;
-			}
-
-			string strg = null;
-
-			if (lengthToRead > 0)
-			{
-				this._position = (int)start;
-
-				strg = ReadStringNative((int)lengthToRead, encoding);
-			}
-			if (lengthToMove > 0)
-			{
-				this._position += lengthToMove;
-			}
-
-			return strg ?? string.Empty;
-		}
-
-		unsafe internal string ReadStringNative(int byteCount, Encoding encoding)
+		public string ReadString(int byteCount, Encoding encoding)
 		{
 			int remaining = Math.Min(byteCount, Math.Max(0, (int)(this.Length - this._position)));
 			if (remaining == 0)
@@ -612,21 +508,86 @@ namespace ZeroMQ
 				return null;
 			}
 
-			var bytes = (byte*)(this.DataPtr() + this._position);
+			unsafe
+			{
+				var bytes = (byte*)(this.DataPtr() + this._position);
 
-			Decoder dec = encoding.GetDecoder();
-			int charCount = dec.GetCharCount(bytes, remaining, false);
-			if (charCount == 0)
+				Decoder dec = encoding.GetDecoder();
+				int charCount = dec.GetCharCount(bytes, remaining, false);
+				if (charCount == 0)
+				{
+					return string.Empty;
+				}
+
+				var resultChars = new char[charCount];
+				fixed (char* chars = resultChars)
+				{
+					charCount = dec.GetChars(bytes, remaining, chars, charCount, true);
+					Encoder enc = encoding.GetEncoder();
+					this._position += enc.GetByteCount(chars, charCount, true);
+					return new string(chars, 0, charCount);
+				}
+			}
+		}
+
+		public string ReadLine()
+		{
+			return ReadLine((int)Length, ZContext.Encoding);
+		}
+
+		public string ReadLine(Encoding encoding)
+		{
+			return ReadLine((int)Length, encoding);
+		}
+
+		public string ReadLine(int byteCount, Encoding encoding)
+		{
+			int remaining = Math.Min(byteCount, Math.Max(0, (int)(this.Length - this._position)));
+			if (remaining == 0)
 			{
 				return string.Empty;
 			}
-
-			var resultChars = new char[charCount];
-			fixed (char* chars = resultChars)
+			if (remaining < 0)
 			{
-				charCount = dec.GetChars(bytes, remaining, chars, charCount, true);
-				this._position += remaining;
-				return new string(chars, 0, charCount);
+				return null;
+			}
+
+			string strg;
+			unsafe
+			{
+				var bytes = (byte*)(this.DataPtr() + this._position);
+
+				Decoder dec = encoding.GetDecoder();
+				int charCount = dec.GetCharCount(bytes, remaining, false);
+				if (charCount == 0) return string.Empty;
+
+				var resultChars = new char[charCount];
+				fixed (char* chars = resultChars)
+				{
+					charCount = dec.GetChars(bytes, remaining, chars, charCount, true);
+
+					int LF = 0, CR = -1;
+					for (; LF < charCount; ++LF, ++CR)
+					{
+						if (chars[LF] == '\n')
+						{
+							if (CR > -1 && chars[CR] == '\r')
+							{
+								charCount = LF - 1;
+							}
+							else
+							{
+								charCount = LF;
+							}
+						}
+					}
+
+					Encoder enc = encoding.GetEncoder();
+					this._position += enc.GetByteCount(chars, charCount + (CR > -1 ? 2 : (LF > 0 ? 1 : 0)), true);
+
+					if (charCount < 1) return string.Empty;
+					return strg = new string(chars, 0, charCount);
+				}
 			}
 		}
 
