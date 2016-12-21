@@ -55,7 +55,7 @@
 				// Current Version 4
 
 				// Use default delegate settings from field initializers.
-				// "Compatability" is done by "disabling" old methods, or "redirecting" to new methods,
+				// "Compatibility" is done by "disabling" old methods, or "redirecting" to new methods,
 				// so the developer is forced to work against the latest API
 
 				if (minor == 0)
@@ -65,18 +65,24 @@
 			}
 			else if (major >= 3)
 			{
-				// Backwards compatability for v3
+				// Backwards compatibility for v3
 
 				sizeof_zmq_msg_t = sizeof_zmq_msg_t_v3;
 
-				zmq.ctx_shutdown = (ctxPtr) => { throw VersionNotSupported("zmq_ctx_shutdown", "v4"); };
-				zmq.msg_gets = (msgPtr, propertyPtr) => { throw VersionNotSupported("zmq_msg_gets", "v4"); };
-				zmq.has = (capabilityPtr) => { throw VersionNotSupported("zmq_has", "v4"); };
+				zmq.ctx_shutdown = (ctxPtr) 
+					=> { throw VersionNotSupported("zmq_ctx_shutdown", "v4"); };
+				zmq.msg_gets = (msgPtr, propertyPtr) 
+					=> { throw VersionNotSupported("zmq_msg_gets", "v4"); };
+				zmq.has = (capabilityPtr) 
+					=> { throw VersionNotSupported("zmq_has", "v4"); };
 				zmq.proxy_steerable = (frontendPtr, backendPtr, capturePtr, controlPtr)
 					=> { throw VersionNotSupported("zmq_proxy_steerable", "v4"); };
-				zmq.curve_keypair = (z85_public_key, z85_secret_key) => { throw VersionNotSupported("zmq_curve_keypair", "v4"); };
-				zmq.z85_encode = (dest, data, size) => { throw VersionNotSupported("zmq_z85_encode", "v4"); };
-				zmq.z85_decode = (dest, data) => { throw VersionNotSupported("zmq_z85_decode", "v4"); };
+				zmq.curve_keypair = (z85_public_key, z85_secret_key) 
+					=> { throw VersionNotSupported("zmq_curve_keypair", "v4"); };
+				zmq.z85_encode = (dest, data, size) 
+					=> { throw VersionNotSupported("zmq_z85_encode", "v4"); };
+				zmq.z85_decode = (dest, data) 
+					=> { throw VersionNotSupported("zmq_z85_decode", "v4"); };
 
 				if (!Platform.Is__Internal) {
 					zmq.ctx_term = zmq.zmq_term;
