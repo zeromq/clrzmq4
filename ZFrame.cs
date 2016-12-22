@@ -614,7 +614,7 @@ namespace ZeroMQ
 					Encoder enc = encoding.GetEncoder();
 					this._position += enc.GetByteCount(chars, charCount, true) + z;
 
-					if (charCount < 1) return string.Empty;
+					if (charCount == 0) return string.Empty;
 					return new string(chars, 0, charCount); /* without z */
 				}
 			}
