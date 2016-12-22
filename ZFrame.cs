@@ -523,9 +523,27 @@ namespace ZeroMQ
 				fixed (char* chars = resultChars)
 				{
 					charCount = dec.GetChars(bytes, remaining, chars, charCount, true);
+
+					int i = -1, z = 0;
+					while (i < charCount)
+					{
+						++i;
+
+						if (chars[i] == '\0')
+						{
+							charCount = i;
+							++z;
+
+							break;
+						}
+					}
+					if (i == charCount) i = 0;
+
 					Encoder enc = encoding.GetEncoder();
-					this._position += enc.GetByteCount(chars, charCount, true);
-					return new string(chars, 0, charCount);
+					this._position += enc.GetByteCount(chars, charCount, true) + z;
+
+					if (charCount == 0) return string.Empty;
+					return new string(chars, 0, charCount); /* without z */
 				}
 			}
 		}
@@ -552,7 +570,6 @@ namespace ZeroMQ
 				return null;
 			}
 
-			string strg;
 			unsafe
 			{
 				var bytes = (byte*)(this.DataPtr() + this._position);
@@ -566,27 +583,39 @@ namespace ZeroMQ
 				{
 					charCount = dec.GetChars(bytes, remaining, chars, charCount, true);
 
-					int LF = 0, CR = -1;
-					for (; LF < charCount; ++LF, ++CR)
+					int i = -1, z = 0;
+					while (i < charCount)
 					{
-						if (chars[LF] == '\n')
+						++i;
+
+						if (chars[i] == '\n')
 						{
-							if (CR > -1 && chars[CR] == '\r')
+							charCount = i;
+							++z;
+
+							if (i - 1 > -1 && chars[i - 1] == '\r')
 							{
-								charCount = LF - 1;
+								--charCount;
+								++z;
 							}
-							else
-							{
-								charCount = LF;
-							}
+
+							break;
+						}
+						if (chars[i] == '\0')
+						{
+							charCount = i;
+							++z;
+
+							break;
 						}
 					}
+					if (i == charCount) i = 0;
 
 					Encoder enc = encoding.GetEncoder();
-					this._position += enc.GetByteCount(chars, charCount + (CR > -1 ? 2 : (LF > 0 ? 1 : 0)), true);
+					this._position += enc.GetByteCount(chars, charCount, true) + z;
 
 					if (charCount < 1) return string.Empty;
-					return strg = new string(chars, 0, charCount);
+					return new string(chars, 0, charCount); /* without z */
 				}
 			}
 		}
