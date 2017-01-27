@@ -35,6 +35,10 @@
 				"{Path}/{LibraryName}.a.*",
 				"{Path}/{LibraryName}.so",
 				"{Path}/{LibraryName}.so.*",
+				"{DllPath}/{LibraryName}.a",
+				"{DllPath}/{LibraryName}.a.*",
+				"{DllPath}/{LibraryName}.so",
+				"{DllPath}/{LibraryName}.so.*",
 			};
 
 			private const int RTLD_LAZY = 0x0001;
@@ -97,8 +101,10 @@
 
 				Platform.ExpandPaths(libraryPaths, "{Path}", EnumerateLibLdConf("/etc/ld.so.conf"));
 
-				Platform.ExpandPaths(libraryPaths, "{AppBase}", 
-					EnsureNotEndingSlash(
+				Platform.ExpandPaths(libraryPaths, "{DllPath}", EnsureNotEndingSlash(
+						Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
+
+				Platform.ExpandPaths(libraryPaths, "{AppBase}", EnsureNotEndingSlash(
 						AppDomain.CurrentDomain.BaseDirectory));
 
 				Platform.ExpandPaths(libraryPaths, "{LibraryName}", libraryName);

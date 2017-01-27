@@ -23,6 +23,7 @@ namespace ZeroMQ.lib
 				@"{AppBase}\{Arch}\{Compiler}\{LibraryName}.dll",
 				// @"{AppBase}\{Arch}\{Compiler}\{LibraryName}-*.dll",
 				@"{AppBase}\{Arch}\{LibraryName}.dll",
+				@"{DllPath}\{Arch}\{LibraryName}.dll",
 				// @"{AppBase}\{Arch}\{LibraryName}-*.dll",
 				@"{System32}\{LibraryName}.dll",
 				// @"{System32}\{LibraryName}-*.dll",
@@ -57,6 +58,9 @@ namespace ZeroMQ.lib
 				var libraryPaths = new List<string>(Platform.LibraryPaths);
 
 				Platform.ExpandPaths(libraryPaths, "{System32}", Environment.SystemDirectory);
+	
+				Platform.ExpandPaths(libraryPaths, "{DllPath}", EnsureNotEndingBackSlash(
+						Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
 
 				Platform.ExpandPaths(libraryPaths, "{AppBase}", EnsureNotEndingBackSlash(
 						AppDomain.CurrentDomain.BaseDirectory));
