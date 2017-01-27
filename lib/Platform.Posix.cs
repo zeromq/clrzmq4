@@ -31,14 +31,14 @@
 				"{AppBase}/{Arch}/{LibraryName}.a.*",
 				"{AppBase}/{Arch}/{LibraryName}.so",
 				"{AppBase}/{Arch}/{LibraryName}.so.*",
-				"{Path}/{LibraryName}.a",
-				"{Path}/{LibraryName}.a.*",
-				"{Path}/{LibraryName}.so",
-				"{Path}/{LibraryName}.so.*",
 				"{DllPath}/{LibraryName}.a",
 				"{DllPath}/{LibraryName}.a.*",
 				"{DllPath}/{LibraryName}.so",
 				"{DllPath}/{LibraryName}.so.*",
+				"{Path}/{LibraryName}.a",
+				"{Path}/{LibraryName}.a.*",
+				"{Path}/{LibraryName}.so",
+				"{Path}/{LibraryName}.so.*",
 			};
 
 			private const int RTLD_LAZY = 0x0001;
