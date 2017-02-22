@@ -59,8 +59,10 @@ namespace ZeroMQ.lib
 
 				Platform.ExpandPaths(libraryPaths, "{System32}", Environment.SystemDirectory);
 	
-				Platform.ExpandPaths(libraryPaths, "{DllPath}", EnsureNotEndingBackSlash(
-						Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
+				var PATHs = new List<string>();
+				PATHs.Add(EnsureNotEndingBackSlash(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
+				PATHs.AddRange(EnumeratePATH());
+				Platform.ExpandPaths(libraryPaths, "{DllPath}", PATHs);
 
 				Platform.ExpandPaths(libraryPaths, "{AppBase}", EnsureNotEndingBackSlash(
 						AppDomain.CurrentDomain.BaseDirectory));
@@ -176,6 +178,8 @@ namespace ZeroMQ.lib
 			public static string[] EnumeratePATH()
 			{
 				string PATH = System.Environment.GetEnvironmentVariable("PATH");
+				if (PATH == null) return new string[] { };
+
 				string[] paths = PATH.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
 				var pathList = new List<string>();
