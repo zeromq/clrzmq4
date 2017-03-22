@@ -476,7 +476,7 @@ namespace ZeroMQ
 
 		public string ReadString(Encoding encoding)
 		{
-			return ReadString( /* byteCount */ (int)Length, encoding);
+			return ReadString( /* byteCount */ (int)Length - position, encoding);
 		}
 
 		public string ReadString(int length)
