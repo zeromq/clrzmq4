@@ -293,22 +293,10 @@ namespace ZeroMQ
 
 		public override long Position
 		{
-			get
-			{
-				return position;
-			}
+			get { return position; }
 			set
 			{
-				if (value == 0)
-				{
-					position = 0;
-					return;
-				}
-				if (value < 0 || (Length == -1 || value > Length))
-				{
-					throw new IndexOutOfRangeException();
-				}
-				position = (int)value;
+				Seek(value, SeekOrigin.Begin);
 			}
 		}
 
