@@ -321,7 +321,7 @@ namespace ZeroMQ
 			else // if (origin == SeekOrigin.Begin)
 				pos = offset;
 
-			if (pos < 0 || (Length > 0 && pos > Length))
+			if (pos < 0 || pos > Length)
 				throw new ArgumentOutOfRangeException("offset");
 
 			position = (int)pos;
@@ -538,17 +538,17 @@ namespace ZeroMQ
 
 		public string ReadLine()
 		{
-			return ReadLine((int)Length, ZContext.Encoding);
+			return ReadLine((int)Length - position, ZContext.Encoding);
 		}
 
 		public string ReadLine(Encoding encoding)
 		{
-			return ReadLine((int)Length, encoding);
+			return ReadLine((int)Length - position, encoding);
 		}
 
 		public string ReadLine(int byteCount, Encoding encoding)
 		{
-			int remaining = Math.Min(byteCount, Math.Max(0, (int)(this.Length - this.position)));
+			int remaining = Math.Min(byteCount, Math.Max(0, (int)(this.Length - position)));
 			if (remaining == 0)
 			{
 				return string.Empty;
@@ -560,7 +560,7 @@ namespace ZeroMQ
 
 			unsafe
 			{
-				var bytes = (byte*)(this.DataPtr() + this.position);
+				var bytes = (byte*)(this.DataPtr() + position);
 
 				Decoder dec = encoding.GetDecoder();
 				int charCount = dec.GetCharCount(bytes, remaining, false);
@@ -600,7 +600,7 @@ namespace ZeroMQ
 					if (i == charCount) i = 0;
 
 					Encoder enc = encoding.GetEncoder();
-					this.position += enc.GetByteCount(chars, charCount, true) + z;
+					position += enc.GetByteCount(chars, charCount, true) + z;
 
 					if (charCount == 0) return string.Empty;
 					return new string(chars, 0, charCount); /* without z */
