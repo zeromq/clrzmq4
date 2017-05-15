@@ -862,11 +862,11 @@ namespace ZeroMQ
 		// From options.hpp: unsigned char identity [256];
 		private const int MaxBinaryOptionSize = 256;
 
-		public bool GetOption(ZSocketOption option, out byte[] value)
+		public bool GetOption(ZSocketOption option, out byte[] value, int size)
 		{
 			value = null;
 
-			int optionLength = MaxBinaryOptionSize;
+			int optionLength = size;
 			using (var optionValue = DispoIntPtr.Alloc(optionLength))
 			{
 				if (GetOption(option, optionValue, ref optionLength))
@@ -879,10 +879,10 @@ namespace ZeroMQ
 			}
 		}
 
-		public byte[] GetOptionBytes(ZSocketOption option)
+		public byte[] GetOptionBytes(ZSocketOption option, int size = MaxBinaryOptionSize)
 		{
 			byte[] result;
-			if (GetOption(option, out result))
+			if (GetOption(option, out result, size))
 			{
 				return result;
 			}
@@ -1203,15 +1203,17 @@ namespace ZeroMQ
 			set { SetOption(ZSocketOption.CONFLATE, value ? 1 : 0); }
 		}
 
+	    private const int BinaryKeySize = 32;
+
 		public byte[] CurvePublicKey
 		{
-			get { return GetOptionBytes(ZSocketOption.CURVE_PUBLICKEY); }
+			get { return GetOptionBytes(ZSocketOption.CURVE_PUBLICKEY, BinaryKeySize); }
 			set { SetOption(ZSocketOption.CURVE_PUBLICKEY, value); }
 		}
 
 		public byte[] CurveSecretKey
 		{
-			get { return GetOptionBytes(ZSocketOption.CURVE_SECRETKEY); }
+			get { return GetOptionBytes(ZSocketOption.CURVE_SECRETKEY, BinaryKeySize); }
 			set { SetOption(ZSocketOption.CURVE_SECRETKEY, value); }
 		}
 
@@ -1223,7 +1225,7 @@ namespace ZeroMQ
 
 		public byte[] CurveServerKey
 		{
-			get { return GetOptionBytes(ZSocketOption.CURVE_SERVERKEY); }
+			get { return GetOptionBytes(ZSocketOption.CURVE_SERVERKEY, BinaryKeySize); }
 			set { SetOption(ZSocketOption.CURVE_SERVERKEY, value); }
 		}
 
