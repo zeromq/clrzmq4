@@ -37,7 +37,8 @@ namespace ZeroMQ
 
 			var data = GCHandle.Alloc(decoded, GCHandleType.Pinned);
 
-			using (var dest = DispoIntPtr.Alloc(destLen))
+            // the buffer dest must be one byte larger than destLen to accomodate the null termination character
+			using (var dest = DispoIntPtr.Alloc(destLen + 1))
 			{
 				if (IntPtr.Zero == zmq.z85_encode(dest, data.AddrOfPinnedObject(), dataLen))
 				{
