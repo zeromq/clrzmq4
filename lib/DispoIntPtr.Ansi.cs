@@ -7,7 +7,7 @@ namespace ZeroMQ.lib
 	using System.Threading;
 	using System.Runtime.InteropServices;
 
-	public partial class DispoIntPtr : IDisposable
+	internal sealed partial class DispoIntPtr : IDisposable
 	{
 		public static class Ansi
 		{

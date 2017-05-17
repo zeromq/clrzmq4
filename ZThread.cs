@@ -119,13 +119,13 @@
 		/// <summary>
 		/// Releases all resources used by the current instance, including the frontend and backend sockets.
 		/// </summary>
-		public virtual void Dispose()
+		public void Dispose()
 		{
-			GC.SuppressFinalize(this);
 			Dispose(true);
-		}
+            GC.SuppressFinalize(this);
+        }
 
-		protected abstract void Run();
+        protected abstract void Run();
 
 		/// <summary>
 		/// Stops the device and releases the underlying sockets. Optionally disposes of managed resources.

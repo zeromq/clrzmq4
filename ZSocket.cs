@@ -92,15 +92,15 @@ namespace ZeroMQ
 
 		public void Dispose()
 		{
-			GC.SuppressFinalize(this);
 			Dispose(true);
-		}
+			GC.SuppressFinalize(this);
+        }
 
-		/// <summary>
-		/// Releases the unmanaged resources used by the <see cref="ZSocket"/>, and optionally disposes of the managed resources.
-		/// </summary>
-		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-		protected virtual void Dispose(bool disposing)
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="ZSocket"/>, and optionally disposes of the managed resources.
+        /// </summary>
+        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
 		{
 			if (disposing)
 			{

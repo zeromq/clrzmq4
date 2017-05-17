@@ -7,7 +7,7 @@ namespace ZeroMQ.lib
 	using System.Threading;
 	using System.Runtime.InteropServices;
 
-	public partial class DispoIntPtr : IDisposable
+    internal sealed partial class DispoIntPtr : IDisposable
 	{
 		private delegate DispoIntPtr AllocStringNativeDelegate(string str, out int byteCount);
 
@@ -113,7 +113,7 @@ namespace ZeroMQ.lib
 			GC.SuppressFinalize(this);
 		}
 
-		protected void Dispose(bool disposing)
+		void Dispose(bool disposing)
 		{
 			// TODO: instance ThreadStatic && do ( o == null ? return : ( lock(o, ms), check threadId, .. ) ) 
 			IntPtr handle = _ptr;
