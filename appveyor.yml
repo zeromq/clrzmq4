@@ -1,0 +1,6 @@
+version: 1.0.{build}
+before_build:
+- cmd: nuget restore clrzmq4.VS.sln
+build:
+  project: clrzmq4.VS.sln
+  verbosity: minimal
