@@ -34,7 +34,7 @@
     <Compile Include="Z85Test.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ZeroMQ.VS.csproj">
+    <ProjectReference Include="..\ZeroMQ.VS.csproj">
       <Project>{6FFD872F-A4A4-4EFA-9B4D-4342BA6CF250}</Project>
       <Name>ZeroMQ.VS</Name>
     </ProjectReference>
