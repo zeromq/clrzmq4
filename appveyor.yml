@@ -8,5 +8,5 @@ build:
   project: clrzmq4.VS.sln
   verbosity: minimal
 test_script:
-- cmd: "nuget install NUnit.Console -Version 3.6.1 -OutputDirectory tools\nnuget install OpenCover -Version 4.6.519 -OutputDirectory tools\nnuget install coveralls.net -Version 0.7.0 -OutputDirectory tools\n \n.\\tools\\OpenCover.4.6.519\\tools\\OpenCover.Console.exe -target:.\\tools\\NUnit.ConsoleRunner.3.6.1\\tools\\nunit3-console.exe -targetargs:\"ZeroMQTest.dll\" -filter:\"+[*]* -[*.Tests]*\" -register:user\n\n.\\tools\\coveralls.net.0.7.0\\tools\\csmacnz.Coveralls.exe --opencover -i .\\results.xml"
+- cmd: "nuget install NUnit.Console -Version 3.6.1 -OutputDirectory tools\nnuget install OpenCover -Version 4.6.519 -OutputDirectory tools\nnuget install coveralls.net -Version 0.7.0 -OutputDirectory tools\n \n.\\tools\\OpenCover.4.6.519\\tools\\OpenCover.Console.exe -target:.\\tools\\NUnit.ConsoleRunner.3.6.1\\tools\\nunit3-console.exe -targetargs:\"ZeroMQTest\\bin\\Debug\\ZeroMQTest.dll\" -filter:\"+[*]* -[*.Tests]*\" -register:user\n\n.\\tools\\coveralls.net.0.7.0\\tools\\csmacnz.Coveralls.exe --opencover -i .\\results.xml"
 
