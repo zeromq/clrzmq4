@@ -19,6 +19,8 @@ namespace ZeroMQTest
                 using (var socket = new ZSocket(context, socketType))
                 {
                     Assert.AreSame(context, socket.Context);
+                    Assert.IsNotNull(socket.SocketPtr);
+                    Assert.AreEqual(socketType, socket.SocketType);
                 }
             }
         }
@@ -313,5 +315,108 @@ namespace ZeroMQTest
         }
 
         #endregion
+
+        #region bind
+        [Test]
+        public void Bind()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket.Bind("inproc://foo");
+                }
+            }
+        }
+
+        [Test]
+        public void Bind_InvalidAddress()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    Assert.Throws<ZException>(() => socket.Bind("foo"));
+                }
+            }
+        }
+
+        [Test]
+        public void Unbind_Bound()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket.Bind("inproc://foo");
+                    socket.Unbind("inproc://foo");
+                }
+            }
+        }
+
+        [Test]
+        public void Unbind_Unbound_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    Assert.Throws<ZException>(() => socket.Unbind("inproc://foo"));
+                }
+            }
+        }
+        #endregion
+
+        #region connect
+        [Test]
+        public void Connect()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket.Connect("inproc://foo");
+                }
+            }
+        }
+
+        [Test]
+        public void Connect_InvalidAddress()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    Assert.Throws<ZException>(() => socket.Connect("foo"));
+                }
+            }
+        }
+
+        [Test]
+        public void Disconnect_Connected()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket.Connect("inproc://foo");
+                    socket.Disconnect("inproc://foo");
+                }
+            }
+        }
+
+        [Test]
+        public void Disconnect_Unconnected_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    Assert.Throws<ZException>(() => socket.Disconnect("inproc://foo"));
+                }
+            }
+        }
+        #endregion
+
     }
 }
