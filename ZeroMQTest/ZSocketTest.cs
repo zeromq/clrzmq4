@@ -9,6 +9,9 @@ namespace ZeroMQTest
     [TestFixture]
     public class ZSocketTest
     {
+        private const string DefaultAddress = "inproc://foo";
+        private const string InvalidAddress = "__BAD_ADDRESS__";
+
         static IEnumerable<ZSocketType> ValidSocketTypes { get { return Enum.GetValues(typeof(ZSocketType)).Cast<ZSocketType>().Except(new[] { ZSocketType.None }); } }
 
         [Test, TestCaseSource(nameof(ValidSocketTypes))]
@@ -324,7 +327,7 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.PAIR))
                 {
-                    socket.Bind("inproc://foo");
+                    socket.Bind(DefaultAddress);
                 }
             }
         }
@@ -336,7 +339,7 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.PAIR))
                 {
-                    Assert.Throws<ZException>(() => socket.Bind("foo"));
+                    Assert.Throws<ZException>(() => socket.Bind(InvalidAddress));
                 }
             }
         }
@@ -348,8 +351,8 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.PAIR))
                 {
-                    socket.Bind("inproc://foo");
-                    socket.Unbind("inproc://foo");
+                    socket.Bind(DefaultAddress);
+                    socket.Unbind(DefaultAddress);
                 }
             }
         }
@@ -361,7 +364,7 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.PAIR))
                 {
-                    Assert.Throws<ZException>(() => socket.Unbind("inproc://foo"));
+                    Assert.Throws<ZException>(() => socket.Unbind(DefaultAddress));
                 }
             }
         }
@@ -375,7 +378,7 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.PAIR))
                 {
-                    socket.Connect("inproc://foo");
+                    socket.Connect(DefaultAddress);
                 }
             }
         }
@@ -387,7 +390,7 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.PAIR))
                 {
-                    Assert.Throws<ZException>(() => socket.Connect("foo"));
+                    Assert.Throws<ZException>(() => socket.Connect(InvalidAddress));
                 }
             }
         }
@@ -399,8 +402,8 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.PAIR))
                 {
-                    socket.Connect("inproc://foo");
-                    socket.Disconnect("inproc://foo");
+                    socket.Connect(DefaultAddress);
+                    socket.Disconnect(DefaultAddress);
                 }
             }
         }
@@ -412,7 +415,7 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.PAIR))
                 {
-                    Assert.Throws<ZException>(() => socket.Disconnect("inproc://foo"));
+                    Assert.Throws<ZException>(() => socket.Disconnect(DefaultAddress));
                 }
             }
         }
