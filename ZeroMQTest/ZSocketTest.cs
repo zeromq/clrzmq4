@@ -76,6 +76,19 @@ namespace ZeroMQTest
         }
 
         [Test]
+        public void SetOption_Affinity()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket.Affinity = 1;
+                    Assert.AreEqual(1, socket.Affinity);
+                }
+            }
+        }
+
+        [Test]
         public void GetOption_Backlog()
         {
             using (var context = new ZContext())
@@ -83,6 +96,19 @@ namespace ZeroMQTest
                 using (var socket = new ZSocket(context, ZSocketType.PAIR))
                 {
                     Assert.AreEqual(100, socket.Backlog);
+                }
+            }
+        }
+
+        [Test]
+        public void SetOption_Backlog()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket.Backlog = 0;
+                    Assert.AreEqual(0, socket.Backlog);
                 }
             }
         }
@@ -108,6 +134,18 @@ namespace ZeroMQTest
                 {
                     // TODO: Probably this socket option cannot be queried. The property getter should be removed.
                     Assert.Throws<ZException>(() => { var x = socket.ConnectRID; });
+                }
+            }
+        }
+
+        [Test]
+        public void SetOption_ConnectRID()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.ROUTER))
+                {
+                    socket.ConnectRID = new byte[] { 1, 2, 3, 4 };
                 }
             }
         }
@@ -204,6 +242,76 @@ namespace ZeroMQTest
                 }
             }
         }
+
+        [Test]
+        public void GetOption_GSSAPIPlainText()
+        {
+
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    if (!ZContext.Has("gssapi"))
+                    {
+                        Assert.Throws<ZException>(() => { var res = socket.GSSAPIPlainText; });
+                    }
+                    else
+                    {
+                        Assert.AreEqual(false, socket.GSSAPIPlainText);
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void SetOption_GSSAPIPlainText()
+        {
+            if (!ZContext.Has("gssapi")) Assert.Ignore("libzmq does not support gssapi");
+
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket.GSSAPIPlainText = true;
+                    Assert.AreEqual(true, socket.GSSAPIPlainText);
+                }
+            }
+        }
+
+        [Test]
+        public void GetOption_GSSAPIPrincipal()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    if (!ZContext.Has("gssapi"))
+                    {
+                        Assert.Throws<ZException>(() => { var res = socket.GSSAPIPrincipal; });
+                    }
+                    else
+                    {
+                        Assert.IsEmpty(socket.GSSAPIPrincipal);
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void SetOption_GSSAPIPrincipal()
+        {
+            if (!ZContext.Has("gssapi")) Assert.Ignore("libzmq does not support gssapi");
+
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket.GSSAPIPrincipal = "foo";
+                    Assert.AreEqual("foo", socket.GSSAPIPrincipal);
+                }
+            }
+        }
+
         #endregion
     }
 }
