@@ -421,5 +421,50 @@ namespace ZeroMQTest
         }
         #endregion
 
+        #region send
+        [Test]
+        public void Send_ZMessage_Empty()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket.Send(new ZMessage());
+                }
+            }
+        }
+
+        [Test]
+        public void Send_ZMessage_NonEmpty()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    // TODO: if we leave out the Connect, this blocks indefinitely, even if Linger is set to Zero; probably this is due to a bug in libzmq
+                    socket.Connect(DefaultAddress);
+                    //socket.Linger = TimeSpan.Zero;
+                    socket.Send(new ZMessage(new ZFrame[] { new ZFrame('a') }));
+                }
+            }
+        }
+        #endregion
+
+        #region receive
+        [Test]
+        public void ReceiveMessage_DontWait_NoneAvailable()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    ZError error;
+                    ZMessage message = socket.ReceiveMessage(ZSocketFlags.DontWait, out error);
+                    Assert.AreEqual(ZError.EAGAIN, error);
+                    Assert.IsNull(message);
+                }
+            }
+        } 
+        #endregion
     }
 }
