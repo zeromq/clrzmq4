@@ -34,6 +34,7 @@
     <Compile Include="Z85Test.cs" />
     <Compile Include="ZContextTest.cs" />
     <Compile Include="ZMessageTest.cs" />
+    <Compile Include="ZSocketTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ZeroMQ.mono.csproj">
