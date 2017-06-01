@@ -9,7 +9,7 @@ namespace ZeroMQ
 	/// <summary>
 	/// Creates <see cref="ZSocket"/> instances within a process boundary.
 	/// </summary>
-	public class ZContext : IDisposable
+	public sealed class ZContext : IDisposable
 	{
 		static Encoding _encoding = System.Text.Encoding.UTF8;
 
@@ -20,7 +20,6 @@ namespace ZeroMQ
 		public static Encoding Encoding
 		{
 			get { return _encoding; }
-			protected set { _encoding = value; }
 		}
 
 		private static readonly object SyncObject = new object();
@@ -323,13 +322,13 @@ namespace ZeroMQ
 			return true;
 		}
 
-		public virtual void Dispose()
+		public void Dispose()
 		{
 			GC.SuppressFinalize(this);
 			Dispose(true);
 		}
 
-		protected virtual void Dispose(bool disposing)
+		void Dispose(bool disposing)
 		{
 			if (disposing)
 			{

@@ -13,7 +13,7 @@ namespace ZeroMQ
 	/// <summary>
 	/// A single part message, sent or received via a <see cref="ZSocket"/>.
 	/// </summary>
-	public class ZFrame : Stream, ICloneable, IDisposable
+	public sealed class ZFrame : Stream, ICloneable
 	{
 		public static ZFrame FromStream(Stream stream, long i, int l)
 		{
@@ -145,7 +145,7 @@ namespace ZeroMQ
 			: this(Alloc(data, size), size)
 		{ } */
 
-		protected ZFrame(DispoIntPtr frameIntPtr, int size)
+		internal ZFrame(DispoIntPtr frameIntPtr, int size)
 			: base()
 		{
 			framePtr = frameIntPtr;
@@ -375,7 +375,7 @@ namespace ZeroMQ
 			return byt;
 		}
 
-		public virtual byte ReadAsByte()
+		public byte ReadAsByte()
 		{
 			if (position + 1 > Length)
 				return default(byte);
@@ -385,7 +385,7 @@ namespace ZeroMQ
 			return byt;
 		}
 
-		public virtual Int16 ReadInt16()
+		public Int16 ReadInt16()
 		{
 			var bytes = new byte[2];
 			int len = Read(bytes, 0, 2);
@@ -397,7 +397,7 @@ namespace ZeroMQ
 			return BitConverter.ToInt16(bytes, 0);
 		}
 
-		public virtual UInt16 ReadUInt16()
+		public UInt16 ReadUInt16()
 		{
 			var bytes = new byte[2];
 			int len = Read(bytes, 0, 2);
@@ -409,7 +409,7 @@ namespace ZeroMQ
 			return BitConverter.ToUInt16(bytes, 0);
 		}
 
-		public virtual Char ReadChar()
+		public Char ReadChar()
 		{
 			var bytes = new byte[2];
 			int len = Read(bytes, 0, 2);
@@ -421,7 +421,7 @@ namespace ZeroMQ
 			return BitConverter.ToChar(bytes, 0);
 		}
 
-		public virtual Int32 ReadInt32()
+		public Int32 ReadInt32()
 		{
 			var bytes = new byte[4];
 			int len = Read(bytes, 0, 4);
@@ -433,7 +433,7 @@ namespace ZeroMQ
 			return BitConverter.ToInt32(bytes, 0);
 		}
 
-		public virtual UInt32 ReadUInt32()
+		public UInt32 ReadUInt32()
 		{
 			var bytes = new byte[4];
 			int len = Read(bytes, 0, 4);
@@ -445,7 +445,7 @@ namespace ZeroMQ
 			return BitConverter.ToUInt32(bytes, 0);
 		}
 
-		public virtual Int64 ReadInt64()
+		public Int64 ReadInt64()
 		{
 			var bytes = new byte[8];
 			int len = Read(bytes, 0, 8);
@@ -457,7 +457,7 @@ namespace ZeroMQ
 			return BitConverter.ToInt64(bytes, 0);
 		}
 
-		public virtual UInt64 ReadUInt64()
+		public UInt64 ReadUInt64()
 		{
 			var bytes = new byte[8];
 			int len = Read(bytes, 0, 8);
@@ -616,7 +616,7 @@ namespace ZeroMQ
 			position += count;
 		}
 
-		public virtual void Write(byte value)
+		public void Write(byte value)
 		{
 			if (position + 1 > Length)
 			{
@@ -904,7 +904,7 @@ namespace ZeroMQ
 			return ToString(ZContext.Encoding);
 		}
 
-		public virtual string ToString(Encoding encoding)
+		public string ToString(Encoding encoding)
 		{
 			if (Length > -1)
 			{
