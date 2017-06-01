@@ -8,6 +8,8 @@ namespace ZeroMQTest
     [TestFixture]
     public class ZPollTest
     {
+        private const string DefaultEndpoint = "inproc://foo";
+
         [Test]
         public void PollSingle_Timeout()
         {
@@ -94,16 +96,16 @@ namespace ZeroMQTest
         }
 
         [Test]
-        public void PollMany_Single_Ready()
+        public void PollMany_Single_In_Ready()
         {
             using (var context = new ZContext())
             {
                 using (var socket1 = new ZSocket(context, ZSocketType.PAIR))
                 {
-                    socket1.Bind("inproc://foo");
+                    socket1.Bind(DefaultEndpoint);
                     using (var socket2 = new ZSocket(context, ZSocketType.PAIR))
                     {
-                        socket2.Connect("inproc://foo");
+                        socket2.Connect(DefaultEndpoint);
                         socket2.Send(new ZMessage(new[] { new ZFrame(32) }));
 
                         var sockets = new[] { socket1 };
@@ -115,6 +117,67 @@ namespace ZeroMQTest
 
                         CollectionAssert.AreEqual(new[] { new ZMessage(new[] { new ZFrame(32) }) }, messages);
                         Assert.IsNull(error);
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void PollMany_Single_Out_Ready()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket1 = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket1.Bind(DefaultEndpoint);
+                    using (var socket2 = new ZSocket(context, ZSocketType.PAIR))
+                    {
+                        socket2.Connect(DefaultEndpoint);
+
+                        var sockets = new[] { socket1 };
+                        var pollItems = new[] { ZPollItem.CreateSender() }; // TODO: erroneously using CreateReceiver here causes a SEHException below. Shouldn't this be caught somehow?
+
+                        ZMessage[] messages = new[] { new ZMessage(new[] { new ZFrame(32) }) };
+                        ZError error;
+                        Assert.IsTrue(sockets.Poll(pollItems, ZPoll.Out, ref messages, out error, TimeSpan.Zero));
+                        Assert.IsNull(error);
+
+                        var message = socket2.ReceiveMessage();
+                        Assert.AreEqual(new ZMessage(new[] { new ZFrame(32) }), message);
+                    }
+                }
+            }
+        }
+
+        [Test, Ignore("The interface and/or behaviour must probably be revised")]
+        public void PollMany_Multiple_InOut()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket1 = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket1.Bind(DefaultEndpoint);
+                    using (var socket2 = new ZSocket(context, ZSocketType.PAIR))
+                    {
+                        socket2.Connect(DefaultEndpoint);
+
+                        var sockets = new[] { socket1, socket2 };
+                        var pollItems = new[] { ZPollItem.CreateSender(), ZPollItem.CreateReceiver() };
+
+                        ZMessage[] messages = new[] { new ZMessage(new[] { new ZFrame(32) }), null };
+                        ZError error;
+
+                        // TODO: why does this return false?
+                        Assert.IsTrue(sockets.Poll(pollItems, ZPoll.In | ZPoll.Out, ref messages, out error));
+                        Assert.IsNull(error);
+
+                        if (messages[1] == null)
+                        {
+                            Assert.IsTrue(sockets.Poll(pollItems, ZPoll.In | ZPoll.Out, ref messages, out error));
+                            Assert.IsNull(error);
+                        }
+
+                        CollectionAssert.AreEqual(new[] { null, new ZMessage(new[] { new ZFrame(32) }) }, messages);
                     }
                 }
             }
