@@ -10,6 +10,8 @@ namespace ZeroMQTest
     {
         private const string DefaultEndpoint = "inproc://foo";
 
+        // TODO: polling on a single socket makes (almost) no sense; these overloads should be removed from the library
+
         [Test]
         public void PollSingle_Timeout()
         {
@@ -40,6 +42,29 @@ namespace ZeroMQTest
 
                     Assert.IsNull(message);
                     Assert.AreEqual(ZError.EAGAIN, error);
+                }
+            }
+        }
+
+        [Test]
+        public void PollOutSingle_Ready()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket1 = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket1.Bind(DefaultEndpoint);
+                    using (var socket2 = new ZSocket(context, ZSocketType.PAIR))
+                    {
+                        socket2.Connect(DefaultEndpoint);
+
+                        ZError error;
+                        Assert.IsTrue(socket1.PollOut(ZPollItem.CreateSender(), new ZMessage(new[] { new ZFrame(32) }), out error, TimeSpan.Zero));
+                        Assert.IsNull(error);
+
+                        var message = socket2.ReceiveMessage();
+                        Assert.AreEqual(new ZMessage(new[] { new ZFrame(32) }), message);
+                    }
                 }
             }
         }
@@ -140,6 +165,33 @@ namespace ZeroMQTest
                         ZMessage[] messages = new[] { new ZMessage(new[] { new ZFrame(32) }) };
                         ZError error;
                         Assert.IsTrue(sockets.Poll(pollItems, ZPoll.Out, ref messages, out error, TimeSpan.Zero));
+                        Assert.IsNull(error);
+
+                        var message = socket2.ReceiveMessage();
+                        Assert.AreEqual(new ZMessage(new[] { new ZFrame(32) }), message);
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void PollOutMany_Single_Ready()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket1 = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    socket1.Bind(DefaultEndpoint);
+                    using (var socket2 = new ZSocket(context, ZSocketType.PAIR))
+                    {
+                        socket2.Connect(DefaultEndpoint);
+
+                        var sockets = new[] { socket1 };
+                        var pollItems = new[] { ZPollItem.CreateSender() }; // TODO: erroneously using CreateReceiver here causes a SEHException below. Shouldn't this be caught somehow?
+
+                        ZMessage[] messages = new[] { new ZMessage(new[] { new ZFrame(32) }) };
+                        ZError error;
+                        Assert.IsTrue(sockets.PollOut(pollItems, messages, out error, TimeSpan.Zero));
                         Assert.IsNull(error);
 
                         var message = socket2.ReceiveMessage();
