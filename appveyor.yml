@@ -1,6 +1,12 @@
 version: 1.0.{build}
 before_build:
 - cmd: nuget restore clrzmq4.VS.sln
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: t7KVFTv4fvwx1JL9LDFxeGIjDDWpGkjS9yOe1nY9v2/UrtCYgX0WHULt6P1EUOuP
 build:
   project: clrzmq4.VS.sln
   verbosity: minimal
+test_script:
+- cmd: "nuget install OpenCover -Version 4.6.519 -OutputDirectory tools\nnuget install coveralls.net -Version 0.7.0 -OutputDirectory tools\n \n.\\tools\\OpenCover.4.6.519\\tools\\OpenCover.Console.exe -target:nunit3-console.exe -targetargs:\"--result=myresults.xml;format=AppVeyor ZeroMQTest\\bin\\Debug\\ZeroMQTest.dll\" -filter:\"+[*]* -[*.Tests]*\" -register:user\n\n.\\tools\\coveralls.net.0.7.0\\tools\\csmacnz.Coveralls.exe --opencover -i .\\results.xml"
+

@@ -1203,7 +1203,7 @@ namespace ZeroMQ
 			set { SetOption(ZSocketOption.CONFLATE, value ? 1 : 0); }
 		}
 
-	    private const int BinaryKeySize = 32;
+	    public const int BinaryKeySize = 32;
 
 		public byte[] CurvePublicKey
 		{

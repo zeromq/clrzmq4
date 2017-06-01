@@ -4,7 +4,16 @@ namespace ZeroMQTest
 	[TestFixture]
 	public class Z85Test
 	{
-		[Test]
+        [TestFixtureSetUp]
+        public void FixtureSetUp()
+        {
+            if (!ZeroMQ.ZContext.Has("curve"))
+            {
+                Assert.Ignore("ZeroMQ library has no support for curve built in, skipping Z85 tests");
+            }
+        }
+
+        [Test]
 		public void CurveKeypair()
 		{
 			byte[] publicKey;
