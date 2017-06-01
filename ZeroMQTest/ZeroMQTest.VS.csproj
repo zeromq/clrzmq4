@@ -35,6 +35,7 @@
     <Compile Include="ZContextTest.cs" />
     <Compile Include="ZFrameTest.cs" />
     <Compile Include="ZMessageTest.cs" />
+    <Compile Include="ZMonitorTest.cs" />
     <Compile Include="ZPollTest.cs" />
     <Compile Include="ZSocketTest.cs" />
   </ItemGroup>
