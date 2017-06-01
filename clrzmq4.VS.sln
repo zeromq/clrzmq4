@@ -1,0 +1,23 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQTest.VS", "ZeroMQTest\ZeroMQTest.VS.csproj", "{2640CBE6-23BD-4104-90AC-0DDCDE4D0478}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQ.VS", "ZeroMQ.VS.csproj", "{6FFD872F-A4A4-4EFA-9B4D-4342BA6CF250}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2640CBE6-23BD-4104-90AC-0DDCDE4D0478}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2640CBE6-23BD-4104-90AC-0DDCDE4D0478}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2640CBE6-23BD-4104-90AC-0DDCDE4D0478}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2640CBE6-23BD-4104-90AC-0DDCDE4D0478}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FFD872F-A4A4-4EFA-9B4D-4342BA6CF250}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FFD872F-A4A4-4EFA-9B4D-4342BA6CF250}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FFD872F-A4A4-4EFA-9B4D-4342BA6CF250}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FFD872F-A4A4-4EFA-9B4D-4342BA6CF250}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

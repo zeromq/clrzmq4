@@ -2,10 +2,11 @@ bin/*
 obj/*
 *.user
 *.userprefs
-*.sln
 *.suo
 *.old*
 *.nupkg
 amd64/v*
 i386/v*
 ZeroMQ.*.zip
+**/bin/*
+**/obj/*
