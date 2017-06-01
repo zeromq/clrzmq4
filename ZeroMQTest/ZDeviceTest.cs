@@ -31,6 +31,7 @@ namespace ZeroMQTest
                     }
 
                     device.Stop();
+                    device.Join();
                 }
             }
         }
