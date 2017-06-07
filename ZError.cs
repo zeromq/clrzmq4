@@ -10,12 +10,12 @@ namespace ZeroMQ
 
 	public class ZError : ZSymbol
 	{
-		static ZError()
-		{
-			var one = ZSymbol.None;
-		}
+        static ZError()
+        {
+            var one = ZSymbol.None;
+        }
 
-		public static class Code
+        internal static class Code
 		{
 			static Code() 
 			{
@@ -24,7 +24,10 @@ namespace ZeroMQ
 
 			private const int HAUSNUMERO = 156384712;
 
-			public static readonly int
+            // TODO: find a way to make this independent of the Windows SDK version that libzmq was built against
+            // TODO: are all of these actually used by libzmq?
+            // these values are the Windows error codes as defined by the Windows 10 SDK when _CRT_NO_POSIX_ERROR_CODES is not defined
+            public static readonly int
 				EPERM = 1,
 				ENOENT = 2,
 				ESRCH = 3,
@@ -60,25 +63,25 @@ namespace ZeroMQ
 				EDOM = 33,
 				ERANGE = 34, // 34
 
-				ENOTSUP = HAUSNUMERO + 1,
-				EPROTONOSUPPORT = HAUSNUMERO + 2,
-				ENOBUFS = HAUSNUMERO + 3,
-				ENETDOWN = HAUSNUMERO + 4,
-				EADDRINUSE = HAUSNUMERO + 5,
-				EADDRNOTAVAIL = HAUSNUMERO + 6,
-				ECONNREFUSED = HAUSNUMERO + 7,
-				EINPROGRESS = HAUSNUMERO + 8,
-				ENOTSOCK = HAUSNUMERO + 9,
-				EMSGSIZE = HAUSNUMERO + 10,
+				ENOTSUP = 129,
+				EPROTONOSUPPORT = 135,
+				ENOBUFS = 119,
+				ENETDOWN = 116,
+				EADDRINUSE = 100,
+				EADDRNOTAVAIL = 101,
+				ECONNREFUSED = 107,
+				EINPROGRESS = 112,
+				ENOTSOCK = 128,
+				EMSGSIZE = 115,
 							// as of here are differences to nanomsg
-				EAFNOSUPPORT = HAUSNUMERO + 11,
-				ENETUNREACH = HAUSNUMERO + 12,
-				ECONNABORTED = HAUSNUMERO + 13,
-				ECONNRESET = HAUSNUMERO + 14,
-				ENOTCONN = HAUSNUMERO + 15,
-				ETIMEDOUT = HAUSNUMERO + 16,
-				EHOSTUNREACH = HAUSNUMERO + 17,
-				ENETRESET = HAUSNUMERO + 18,
+				EAFNOSUPPORT = 102,
+				ENETUNREACH = 118,
+				ECONNABORTED = 106,
+				ECONNRESET = 108,
+				ENOTCONN = 126,
+				ETIMEDOUT = 138,
+				EHOSTUNREACH = 110,
+				ENETRESET = 117,
 
 				/*  Native ZeroMQ error codes. */
 				EFSM = HAUSNUMERO + 51,
@@ -87,7 +90,7 @@ namespace ZeroMQ
 				EMTHREAD // = HAUSNUMERO + 54
 			;
 
-			public static class Posix
+			internal static class Posix
 			{
 				// source: http://www.virtsync.com/c-error-codes-include-errno
 
@@ -118,38 +121,21 @@ namespace ZeroMQ
 		{
 			int errno = zmq.errno();
 
-			return FromErrno(errno, true);
+			return FromErrno(errno);
 		}
 
 		public static ZError FromErrno(int num)
 		{
-			return FromErrno(num, true);
-		}
-
-		public static ZError FromErrno(int num, bool resolveText)
-		{
+            // TODO: this can be made more efficient
 			ZError symbol = Find("E", num).OfType<ZError>().FirstOrDefault();
 			if (symbol != null) return symbol;
 
-			// Unexpected error
-			string txt = null;
-			if (resolveText)
-			{
-				IntPtr errorString = zmq.strerror(num);
-				if (errorString != IntPtr.Zero)
-				{
-					txt = Marshal.PtrToStringAnsi(errorString);
-				}
-			}
-			return new ZError(num, null, txt);
+            // unexpected error
+			return new ZError(num);
 		}
 
-		public ZError(int errno)
+		internal ZError(int errno)
 			: base(errno)
-		{ }
-
-		public ZError(int errno, string errname, string errtext)
-			: base(errno, errname, errtext)
 		{ }
 
 		public static new ZError None

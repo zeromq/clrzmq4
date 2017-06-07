@@ -12,130 +12,87 @@
 	[Serializable]
 	public class ZException : Exception
 	{
-		private int? _errno = -1;
-		private string _errname = null;
-		private string _errtext = null;
+	    private ZError _error;
 
 		/// <summary>
 		/// Gets the error code returned by libzmq.
 		/// </summary>
-		public int ErrNo
+        [Obsolete("Use Error property instead")]
+        public int ErrNo
 		{
-			get
-			{
-				return !_errno.HasValue ? 0 : _errno.Value;
-			}
+            // TODO why is "0" the default?
+			get { return _error != null ? _error.Number : 0; }
 		}
 		/// <summary>
 		/// Gets the error code returned by libzmq.
 		/// </summary>
-		public string ErrName
+        [Obsolete("Use Error property instead")]
+        public string ErrName
 		{
 			get
 			{
-				return _errname == null ? string.Empty : _errname;
+				return _error != null ? _error.Name : string.Empty;
 			}
 		}
 
-		/// <summary>
-		/// Gets the error text returned by libzmq.
-		/// </summary>
-		public string ErrText
+        /// <summary>
+        /// Gets the error text returned by libzmq.
+        /// </summary>
+        [Obsolete("Use Error property instead")]
+        public string ErrText
 		{
 			get
 			{
-				return _errtext == null ? string.Empty : _errtext;
+				return _error != null ? _error.Text : string.Empty;
 			}
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZException"/> class.
-		/// </summary>
-		/// <param name="errorCode">The error code returned by the ZeroMQ library call.</param>
-		public ZException()
+	    public ZError Error
+	    {
+	        get { return _error; }
+	    }
+
+	    /// <summary>
+        /// Initializes a new instance of the <see cref="ZException"/> class.
+        /// </summary>
+        /// <param name="errorCode">The error code returned by the ZeroMQ library call.</param>
+        protected ZException()
 		{ }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ZException"/> class.
 		/// </summary>
 		/// <param name="errorCode">The error code returned by the ZeroMQ library call.</param>
-		public ZException(ZError errorSymbol)
+		internal ZException(ZError errorSymbol)
 			: this(errorSymbol, default(string), default(Exception))
 		{ }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZException"/> class.
-		/// </summary>
-		/// <param name="errorCode">The error code returned by the ZeroMQ library call.</param>
-		public ZException(ZError errorSymbol, string message)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ZException"/> class.
+        /// </summary>
+        /// <param name="errorCode">The error code returned by the ZeroMQ library call.</param>
+        internal ZException(ZError errorSymbol, string message)
 			: this(errorSymbol, message, default(Exception))
 		{ }
 
 		public ZException(ZError errorSymbol, string message, Exception inner)
-			: base(default(string), inner)
+			: base(MakeMessage(errorSymbol, message), inner)
 		{
-			if (errorSymbol != null)
-			{
-				this._errno = errorSymbol.Number;
-				this._errname = errorSymbol.Name;
-				this._errtext = errorSymbol.Text;
-			}
-			else
-			{
-				this._errno = -1;
-			}
-			_message = message;
+		    this._error = errorSymbol;
 		}
 
-		private string _message;
-
-		public override string Message
+		static string MakeMessage(ZError error, string additionalMessage)
 		{
-			get
-			{
-				if (!string.IsNullOrEmpty(_message))
-				{
-					return
-						string.Format("{0}({1}): {2}: {3}",
-							ErrName, ErrNo, ErrText, _message);
-				}
-				return
-					string.Format("{0}({1}): {2}",
-						ErrName, ErrNo, ErrText);
-			}
+		    return error != null
+		        ? (string.IsNullOrEmpty(additionalMessage)
+		            ? error.ToString()
+		            : string.Format("{0}: {1}", error, additionalMessage))
+		        : additionalMessage;
 		}
 
-		public override string ToString()
+	    public override string ToString()
 		{
 			return Message;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZException"/> class.
-		/// </summary>
-		/// <param name="errorCode">The error code returned by the ZeroMQ library call.</param>
-		public ZException(int errorCode)
-			: this(errorCode, default(string), default(Exception))
-		{ }
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZException"/> class
-		/// using zmq_strerror(int errno)
-		/// </summary>
-		/// <param name="errorCode">The error code returned by the ZeroMQ library call.</param>
-		public ZException(int errorCode, string errorText)
-			: this(errorCode, errorText, default(Exception))
-		{ }
-
-		public ZException(int errorCode, string errorText, Exception inner)
-			: base(default(string), inner)
-		{
-			this._errno = errorCode;
-			this._errtext = errorText;
-			if (this._errtext == null && this._errno.HasValue)
-			{
-				this._errtext = Marshal.PtrToStringAnsi(zmq.strerror(this._errno.Value));
-			}
 		}
 
 		/// <summary>

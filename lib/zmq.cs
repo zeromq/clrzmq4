@@ -48,6 +48,7 @@
 			LibraryVersion = new Version(major, minor, patch);
 
 			// Trigger static constructor
+            // TODO this is also done in the static initializer of ZError. Can this be unified?
 			var noSym = ZSymbol.None;
 
 			if (major >= 4)
