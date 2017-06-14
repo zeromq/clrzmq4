@@ -339,7 +339,21 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.PAIR))
                 {
-                    Assert.Throws<ZException>(() => socket.Bind(InvalidAddress));
+                    var exc = Assert.Throws<ZException>(() => socket.Bind(InvalidAddress));
+                    Assert.AreEqual(ZError.EINVAL, exc.Error);
+                }
+            }
+        }
+
+        [Test]
+        public void Bind_UnsupportedProtocol()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    var exc = Assert.Throws<ZException>(() => socket.Bind("xyz://foo"));
+                    Assert.AreEqual(ZError.EPROTONOSUPPORT, exc.Error);
                 }
             }
         }
