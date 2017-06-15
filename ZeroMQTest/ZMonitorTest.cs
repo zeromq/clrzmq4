@@ -18,7 +18,23 @@ namespace ZeroMQTest
         {
             using (var context = new ZContext())
             {
-                using (ZMonitor.Create(context, MonitorSocket)) {}
+                using (var monitor = ZMonitor.Create(context, MonitorSocket))
+                {
+                }
+            }
+        }
+
+        [Test]
+        public void Create_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                context.MaxSockets = 1;
+                using (var socket = ZSocket.Create(context, ZSocketType.PAIR))
+                {
+                    var exc = Assert.Throws<ZException>(() => ZMonitor.Create(context, MonitorSocket));
+                    Assert.AreEqual(ZError.EMFILE, exc.Error);
+                }
             }
         }
 
@@ -34,6 +50,28 @@ namespace ZeroMQTest
                     // TODO: the following is necessary since Dispose is not properly implemented
                     monitor.Close();
                     monitor.Join();
+                }
+            }
+        }
+
+        [Test]
+        public void Endpoint()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = ZSocket.Create(context, ZSocketType.PAIR))
+                {
+                    Assert.IsTrue(socket.Monitor(MonitorSocket));
+                    using (var monitor = ZMonitor.Create(context, MonitorSocket))
+                    {
+                        Assert.AreEqual(MonitorSocket, monitor.Endpoint);
+
+                        // TODO the following is necessary because ZMonitor.Dispose is not implemented properly
+                        monitor.Start();
+                        // TODO: the following is necessary because ZMonitor.Dispose is not implemented properly
+                        monitor.Close();
+                        monitor.Join();
+                    }
                 }
             }
         }

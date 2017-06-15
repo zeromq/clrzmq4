@@ -31,6 +31,21 @@ namespace ZeroMQTest
             }
         }
 
+        [Test, Ignore("This causes a SEHException, which is probably not the desired behaviour")]
+        public void PollInSingle_WithSender_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    ZMessage message;
+                    ZError error;
+                    Assert.Throws<InvalidOperationException>(() => socket.PollIn(ZPollItem.CreateSender(), 
+                        out message, out error, TimeSpan.Zero));
+                }
+            }
+        }
+
         [Test]
         public void PollInSingle_Timeout()
         {
