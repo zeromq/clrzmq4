@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using ZeroMQ;
 
 namespace ZeroMQTest
@@ -29,6 +31,21 @@ namespace ZeroMQTest
             }
         }
 
+        [Test, Ignore("This causes a SEHException, which is probably not the desired behaviour")]
+        public void PollInSingle_WithSender_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    ZMessage message;
+                    ZError error;
+                    Assert.Throws<InvalidOperationException>(() => socket.PollIn(ZPollItem.CreateSender(), 
+                        out message, out error, TimeSpan.Zero));
+                }
+            }
+        }
+
         [Test]
         public void PollInSingle_Timeout()
         {
@@ -44,6 +61,28 @@ namespace ZeroMQTest
                     Assert.AreEqual(ZError.EAGAIN, error);
                 }
             }
+        }
+
+        [Test]
+        public void PollInSingle_CancelByContextClose()
+        {
+            Task task;
+            ZError error = null;
+            using (var context = new ZContext())
+            {
+                var socket = new ZSocket(context, ZSocketType.PAIR);
+                task = Task.Run(() =>
+                 {
+                     using (socket)
+                     {
+                         ZMessage message;
+
+                         socket.PollIn(ZPollItem.CreateReceiver(), out message, out error);
+                     }
+                 });
+            }
+            Assert.IsTrue(task.Wait(1000));
+            Assert.AreEqual(ZError.ETERM, error);
         }
 
         [Test]
@@ -78,6 +117,30 @@ namespace ZeroMQTest
             ZMessage[] messages = null;
             ZError error;
             Assert.IsFalse(sockets.Poll(pollItems, ZPoll.In, ref messages, out error));
+        }
+
+        [Test]
+        public void PollInMany_CancelByContextClose()
+        {
+            Task task;
+            ZError error = null;
+            using (var context = new ZContext())
+            {
+                var socket = new ZSocket(context, ZSocketType.PAIR);
+                task = Task.Run(() =>
+                {
+                    using (socket)
+                    {
+                        var sockets = new[] { socket };
+                        var pollItems = new[] { ZPollItem.CreateReceiver() };
+
+                        ZMessage[] messages;
+                        sockets.PollIn(pollItems, out messages, out error, TimeSpan.Zero);
+                    }
+                });
+            }
+            Assert.IsTrue(task.Wait(1000));
+            Assert.AreEqual(ZError.ETERM, error);
         }
 
         [Test]
