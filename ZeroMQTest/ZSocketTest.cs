@@ -479,6 +479,92 @@ namespace ZeroMQTest
                 }
             }
         }
+
+        [Test]
+        public void ReceiveFrames_DontWait_NoneAvailable()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    ZError error;
+                    var message = socket.ReceiveFrames(1, ZSocketFlags.DontWait, out error);
+                    Assert.AreEqual(ZError.EAGAIN, error);
+                    Assert.IsNull(message);
+                }
+            }
+        }
+
+        [Test]
+        public void ReceiveFrame_DontWait_NoneAvailable()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    ZError error;
+                    var message = socket.ReceiveFrame(ZSocketFlags.DontWait, out error);
+                    Assert.AreEqual(ZError.EAGAIN, error);
+                    Assert.IsNull(message);
+                }
+            }
+        }
+
+        [Test]
+        public void ReceiveMessage_InvalidState()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REQ))
+                {
+                    ZError error;
+                    var message = socket.ReceiveMessage(out error);
+                    Assert.AreEqual(ZError.EFSM, error);
+                    Assert.IsNull(message);
+                }
+            }
+        }
+
+        [Test]
+        public void ReceiveFrames_InvalidState()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REQ))
+                {
+                    ZError error;
+                    var message = socket.ReceiveFrames(1, out error);
+                    Assert.AreEqual(ZError.EFSM, error);
+                    Assert.IsNull(message);
+                }
+            }
+        }
+
+        [Test]
+        public void ReceiveFrames_Exception_InvalidState()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REQ))
+                {
+                    var exc = Assert.Throws<ZException>(() => socket.ReceiveFrames(1));
+                    Assert.AreEqual(ZError.EFSM, exc.Error);
+                }
+            }
+        }
+
+        [Test]
+        public void ReceiveFrame_Exception_InvalidState()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REQ))
+                {
+                    var exc = Assert.Throws<ZException>(() => socket.ReceiveFrame());
+                    Assert.AreEqual(ZError.EFSM, exc.Error);
+                }
+            }
+        }
         #endregion
 
         #region send-and-receive
