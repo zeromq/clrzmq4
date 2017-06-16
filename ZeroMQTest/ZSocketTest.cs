@@ -489,7 +489,8 @@ namespace ZeroMQTest
             {
                 sendSocket.Send(CreateSingleFrameTestMessage());
 
-                var message = receiveSocket.ReceiveMessage(ZSocketFlags.None, out var error);
+                ZError error;
+                var message = receiveSocket.ReceiveMessage(ZSocketFlags.None, out error);
                 Assert.AreEqual(null, error);
                 Assert.AreEqual(CreateSingleFrameTestMessage(), message);
             });
@@ -502,7 +503,8 @@ namespace ZeroMQTest
             {
                 sendSocket.Send(CreateSingleFrameTestMessage());
 
-                var message = receiveSocket.ReceiveFrames(1, out var error);
+                ZError error;
+                var message = receiveSocket.ReceiveFrames(1, out error);
                 Assert.AreEqual(null, error);
                 Assert.AreEqual(CreateSingleFrameTestMessage(), message);
             });
@@ -515,7 +517,8 @@ namespace ZeroMQTest
             {
                 sendSocket.Send(CreateMultipleFrameTestMessage());
 
-                var message = receiveSocket.ReceiveFrames(1, out var error);
+                ZError error;
+                var message = receiveSocket.ReceiveFrames(1, out error);
                 Assert.AreEqual(null, error);
                 Assert.AreEqual(CreateSingleFrameTestMessage(), message);
             });
@@ -528,7 +531,8 @@ namespace ZeroMQTest
             {
                 sendSocket.Send(CreateSingleFrameTestMessage());
 
-                var message = receiveSocket.ReceiveFrames(0, out var error);
+                ZError error;
+                var message = receiveSocket.ReceiveFrames(0, out error);
                 Assert.AreEqual(null, error);
                 Assert.AreEqual(new ZMessage(), message);
             });
@@ -541,7 +545,8 @@ namespace ZeroMQTest
             {
                 sendSocket.Send(CreateSingleFrameTestMessage());
 
-                var message = receiveSocket.ReceiveFrames(2, out var error);
+                ZError error;
+                var message = receiveSocket.ReceiveFrames(2, out error);
                 Assert.AreEqual(null, error);
                 Assert.AreEqual(CreateSingleFrameTestMessage(), message);
 
