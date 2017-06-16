@@ -478,7 +478,104 @@ namespace ZeroMQTest
                     Assert.IsNull(message);
                 }
             }
-        } 
+        }
         #endregion
+
+        #region send-and-receive
+        [Test]
+        public void SendAndReceiveMessage()
+        {
+            DoWithConnectedSocketPair((sendSocket, receiveSocket) =>
+            {
+                sendSocket.Send(CreateSingleFrameTestMessage());
+
+                var message = receiveSocket.ReceiveMessage(ZSocketFlags.None, out var error);
+                Assert.AreEqual(null, error);
+                Assert.AreEqual(CreateSingleFrameTestMessage(), message);
+            });
+        }
+
+        [Test]
+        public void SendAndReceiveFrames()
+        {
+            DoWithConnectedSocketPair((sendSocket, receiveSocket) =>
+            {
+                sendSocket.Send(CreateSingleFrameTestMessage());
+
+                var message = receiveSocket.ReceiveFrames(1, out var error);
+                Assert.AreEqual(null, error);
+                Assert.AreEqual(CreateSingleFrameTestMessage(), message);
+            });
+        }
+
+        [Test]
+        public void SendAndReceiveFrames_LessFrames()
+        {
+            DoWithConnectedSocketPair((sendSocket, receiveSocket) =>
+            {
+                sendSocket.Send(CreateMultipleFrameTestMessage());
+
+                var message = receiveSocket.ReceiveFrames(1, out var error);
+                Assert.AreEqual(null, error);
+                Assert.AreEqual(CreateSingleFrameTestMessage(), message);
+            });
+        }
+
+        [Test, Ignore("The implementation must be fixed")]
+        public void SendAndReceiveFrames_NoFrames()
+        {
+            DoWithConnectedSocketPair((sendSocket, receiveSocket) =>
+            {
+                sendSocket.Send(CreateSingleFrameTestMessage());
+
+                var message = receiveSocket.ReceiveFrames(0, out var error);
+                Assert.AreEqual(null, error);
+                Assert.AreEqual(new ZMessage(), message);
+            });
+        }
+
+        [Test]
+        public void SendAndReceiveFrames_TooManyFrames()
+        {
+            DoWithConnectedSocketPair((sendSocket, receiveSocket) =>
+            {
+                sendSocket.Send(CreateSingleFrameTestMessage());
+
+                var message = receiveSocket.ReceiveFrames(2, out var error);
+                Assert.AreEqual(null, error);
+                Assert.AreEqual(CreateSingleFrameTestMessage(), message);
+
+                // TODO is this intended? shouldn't it yield an error if we want to receive more frames than the message contains?
+            });
+        }
+
+
+        private static void DoWithConnectedSocketPair(Action<ZSocket, ZSocket> action)
+        {
+            using (var context = new ZContext())
+            {
+                using (var sendSocket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    sendSocket.Connect(DefaultAddress);
+                    using (var receiveSocket = new ZSocket(context, ZSocketType.PAIR))
+                    {
+                        receiveSocket.Bind(DefaultAddress);
+                        action(sendSocket, receiveSocket);
+                    }
+                }
+            }
+        }
+
+        private static ZMessage CreateSingleFrameTestMessage()
+        {
+            return new ZMessage(new ZFrame[] { new ZFrame('a') });
+        }
+
+        private static ZMessage CreateMultipleFrameTestMessage()
+        {
+            return new ZMessage(new ZFrame[] { new ZFrame('a'), new ZFrame('b') });
+        }
+        #endregion
+
     }
 }
