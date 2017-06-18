@@ -464,7 +464,7 @@ namespace ZeroMQTest
         }
 
         [Test]
-        public void Send_ZMessage_IllegalState_Fails()
+        public void Send_ZMessage_Exception_IllegalState_Fails()
         {
             using (var context = new ZContext())
             {
@@ -477,7 +477,7 @@ namespace ZeroMQTest
         }
 
         [Test]
-        public void SendFrames_IllegalState_Fails()
+        public void SendFrames_Exception_IllegalState_Fails()
         {
             using (var context = new ZContext())
             {
@@ -485,6 +485,20 @@ namespace ZeroMQTest
                 {
                     var exc = Assert.Throws<ZException>(() => socket.SendFrames(new ZMessage(new ZFrame[] { new ZFrame('a') })));
                     Assert.AreEqual(ZError.EFSM, exc.Error);
+                }
+            }
+        }
+
+        [Test]
+        public void SendFrames_IllegalState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REP))
+                {
+                    ZError error;
+                    Assert.IsFalse(socket.SendFrames(new ZFrame[] { new ZFrame('a') }, out error));
+                    Assert.AreEqual(ZError.EFSM, error);
                 }
             }
         }
@@ -618,6 +632,21 @@ namespace ZeroMQTest
                 var message = receiveSocket.ReceiveMessage(ZSocketFlags.None, out error);
                 Assert.AreEqual(null, error);
                 Assert.AreEqual(CreateSingleFrameTestMessage(), message);
+            });
+        }
+
+        [Test]
+        public void SendBytesAndReceiveBytes()
+        {
+            DoWithConnectedSocketPair((sendSocket, receiveSocket) =>
+            {
+                var sentMessage = new byte[] { 42 };
+                sendSocket.SendBytes(sentMessage, 0, 1);
+
+                byte[] receivedMessage = new byte[1];
+                var result = receiveSocket.ReceiveBytes(receivedMessage, 0, 1);
+                Assert.AreEqual(1, result);
+                CollectionAssert.AreEqual(sentMessage, receivedMessage);
             });
         }
 
