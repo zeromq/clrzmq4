@@ -462,6 +462,32 @@ namespace ZeroMQTest
                 }
             }
         }
+
+        [Test]
+        public void Send_ZMessage_IllegalState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REP))
+                {
+                    var exc = Assert.Throws<ZException>(() => socket.Send(new ZMessage(new ZFrame[] { new ZFrame('a') })));
+                    Assert.AreEqual(ZError.EFSM, exc.Error);
+                }
+            }
+        }
+
+        [Test]
+        public void SendFrames_IllegalState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REP))
+                {
+                    var exc = Assert.Throws<ZException>(() => socket.SendFrames(new ZMessage(new ZFrame[] { new ZFrame('a') })));
+                    Assert.AreEqual(ZError.EFSM, exc.Error);
+                }
+            }
+        }
         #endregion
 
         #region receive
