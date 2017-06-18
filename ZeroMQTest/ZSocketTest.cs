@@ -502,6 +502,19 @@ namespace ZeroMQTest
                 }
             }
         }
+
+        [Test]
+        public void SendBytes_IllegalState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REP))
+                {
+                    var exc = Assert.Throws<ZException>(() => socket.SendBytes(new byte[] { 42 }, 0, 1));
+                    Assert.AreEqual(ZError.EFSM, exc.Error);
+                }
+            }
+        }
         #endregion
 
         #region receive
@@ -546,6 +559,20 @@ namespace ZeroMQTest
                     var message = socket.ReceiveFrame(ZSocketFlags.DontWait, out error);
                     Assert.AreEqual(ZError.EAGAIN, error);
                     Assert.IsNull(message);
+                }
+            }
+        }
+
+        [Test]
+        public void ReceiveBytes_InvalidState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REQ))
+                {
+                    var buffer = new byte[1];
+                    var exc = Assert.Throws<ZException>(() => socket.ReceiveBytes(buffer, 0, 1));
+                    Assert.AreEqual(ZError.EFSM, exc.Error);
                 }
             }
         }
