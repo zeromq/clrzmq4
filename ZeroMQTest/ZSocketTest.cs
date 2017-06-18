@@ -511,7 +511,7 @@ namespace ZeroMQTest
         }
 
         [Test]
-        public void ReceiveMessage_InvalidState()
+        public void ReceiveMessage_InvalidState_Fails()
         {
             using (var context = new ZContext())
             {
@@ -521,6 +521,19 @@ namespace ZeroMQTest
                     var message = socket.ReceiveMessage(out error);
                     Assert.AreEqual(ZError.EFSM, error);
                     Assert.IsNull(message);
+                }
+            }
+        }
+
+        [Test]
+        public void ReceiveMessage_WithFlags_InvalidState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REQ))
+                {
+                    var exc = Assert.Throws<ZException>(() => socket.ReceiveMessage(ZSocketFlags.DontWait));
+                    Assert.AreEqual(ZError.EFSM, exc.Error);
                 }
             }
         }
@@ -578,6 +591,30 @@ namespace ZeroMQTest
                 ZError error;
                 var message = receiveSocket.ReceiveMessage(ZSocketFlags.None, out error);
                 Assert.AreEqual(null, error);
+                Assert.AreEqual(CreateSingleFrameTestMessage(), message);
+            });
+        }
+
+        [Test]
+        public void SendAndReceiveFrame()
+        {
+            DoWithConnectedSocketPair((sendSocket, receiveSocket) =>
+            {
+                sendSocket.Send(CreateSingleFrameTestMessage());
+
+                var frame = receiveSocket.ReceiveFrame();
+                Assert.AreEqual(CreateSingleFrameTestMessage()[0], frame);
+            });
+        }
+
+        [Test]
+        public void SendAndReceiveFrames_Exception()
+        {
+            DoWithConnectedSocketPair((sendSocket, receiveSocket) =>
+            {
+                sendSocket.Send(CreateSingleFrameTestMessage());
+
+                var message = receiveSocket.ReceiveFrames(1);
                 Assert.AreEqual(CreateSingleFrameTestMessage(), message);
             });
         }
