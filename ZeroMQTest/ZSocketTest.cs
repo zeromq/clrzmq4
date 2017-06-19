@@ -484,6 +484,121 @@ namespace ZeroMQTest
             });
         }
 
+        [Test]
+        public void GetOption_ReceiveBufferSize()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(0, socket.ReceiveBufferSize);
+            });
+        }
+
+        [Test]
+        public void SetOption_ReceiveBufferSize()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.ReceiveBufferSize = 50;
+                Assert.AreEqual(50, socket.ReceiveBufferSize);
+            });
+        }
+
+        [Test]
+        public void GetOption_ReceiveHighWatermark()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(1000, socket.ReceiveHighWatermark);
+            });
+        }
+
+        [Test]
+        public void SetOption_ReceiveHighWatermark()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.ReceiveHighWatermark = 50;
+                Assert.AreEqual(50, socket.ReceiveHighWatermark);
+            });
+        }
+
+        [Test]
+        public void GetOption_ReceiveTimeout()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                // TODO Use TimeSpan? as the type of ReceiveTimeout instead, to better encode "infinity"?
+                Assert.AreEqual(TimeSpan.FromMilliseconds(-1), socket.ReceiveTimeout);
+            });
+        }
+
+        [Test]
+        public void SetOption_ReceiveTimeout()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.ReceiveTimeout = TimeSpan.FromMilliseconds(50);
+                Assert.AreEqual(TimeSpan.FromMilliseconds(50), socket.ReceiveTimeout);
+            });
+        }
+
+        [Test]
+        public void GetOption_SendBufferSize()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(0, socket.SendBufferSize);
+            });
+        }
+
+        [Test]
+        public void SetOption_SendBufferSize()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.SendBufferSize = 50;
+                Assert.AreEqual(50, socket.SendBufferSize);
+            });
+        }
+
+        [Test]
+        public void GetOption_SendHighWatermark()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(1000, socket.SendHighWatermark);
+            });
+        }
+
+        [Test]
+        public void SetOption_SendHighWatermark()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.SendHighWatermark = 50;
+                Assert.AreEqual(50, socket.SendHighWatermark);
+            });
+        }
+
+        [Test]
+        public void GetOption_SendTimeout()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                // TODO Use TimeSpan? as the type of SendTimeout instead, to better encode "infinity"?
+                Assert.AreEqual(TimeSpan.FromMilliseconds(-1), socket.SendTimeout);
+            });
+        }
+
+        [Test]
+        public void SetOption_SendTimeout()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.SendTimeout = TimeSpan.FromMilliseconds(50);
+                Assert.AreEqual(TimeSpan.FromMilliseconds(50), socket.SendTimeout);
+            });
+        }
         #endregion
 
         #region bind
