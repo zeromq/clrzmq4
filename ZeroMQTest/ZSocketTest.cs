@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using ZeroMQ;
 
 namespace ZeroMQTest
@@ -14,6 +15,7 @@ namespace ZeroMQTest
 
         static IEnumerable<ZSocketType> ValidSocketTypes { get { return Enum.GetValues(typeof(ZSocketType)).Cast<ZSocketType>().Except(new[] { ZSocketType.None }); } }
 
+        #region Create
         [Test, TestCaseSource(nameof(ValidSocketTypes))]
         public void Create_WithContext(ZSocketType socketType)
         {
@@ -37,7 +39,9 @@ namespace ZeroMQTest
                 Assert.Throws<ZException>(() => new ZSocket(context, ZSocketType.None));
             }
         }
+        #endregion
 
+        #region Close
         [Test, TestCaseSource(nameof(ValidSocketTypes))]
         public void Close(ZSocketType socketType)
         {
@@ -66,129 +70,99 @@ namespace ZeroMQTest
                 }
             }
         }
+        #endregion
 
         #region socket options
         [Test]
         public void GetOption_Affinity()
         {
-            using (var context = new ZContext())
-            {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    Assert.AreEqual(0, socket.Affinity);
-                }
-            }
+            DoWithUnconnectedPairSocket(socket => Assert.AreEqual(0, socket.Affinity));
         }
 
         [Test]
         public void SetOption_Affinity()
         {
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    socket.Affinity = 1;
-                    Assert.AreEqual(1, socket.Affinity);
-                }
+                socket.Affinity = 1;
+                Assert.AreEqual(1, socket.Affinity);
             }
+            );
         }
 
         [Test]
         public void GetOption_Backlog()
         {
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    Assert.AreEqual(100, socket.Backlog);
-                }
-            }
+                Assert.AreEqual(100, socket.Backlog);
+            });
+            
         }
 
         [Test]
         public void SetOption_Backlog()
         {
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    socket.Backlog = 0;
-                    Assert.AreEqual(0, socket.Backlog);
-                }
-            }
+                socket.Backlog = 0;
+                Assert.AreEqual(0, socket.Backlog);
+            });            
         }
 
         [Test]
         public void GetOption_Conflate()
         {
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    Assert.AreEqual(false, socket.Conflate);
-                }
-            }
+                Assert.AreEqual(false, socket.Conflate);
+            });           
         }
 
         [Test]
         public void GetOption_ConnectRID()
         {
-            using (var context = new ZContext())
+            DoWithUnconnectedRouterSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.ROUTER))
-                {
-                    // TODO: Probably this socket option cannot be queried. The property getter should be removed.
-                    Assert.Throws<ZException>(() => { var x = socket.ConnectRID; });
-                }
-            }
+                // TODO: Probably this socket option cannot be queried. The property getter should be removed.
+                Assert.Throws<ZException>(() => { var x = socket.ConnectRID; });
+            });
         }
 
         [Test]
         public void SetOption_ConnectRID()
         {
-            using (var context = new ZContext())
-            {
-                using (var socket = new ZSocket(context, ZSocketType.ROUTER))
+            DoWithUnconnectedRouterSocket(socket =>
                 {
                     socket.ConnectRID = new byte[] { 1, 2, 3, 4 };
-                }
-            }
+                });
         }
 
         [Test, Ignore("Issue in underlying libzmq fixed in commit https://github.com/zeromq/libzmq/commit/f86795350d2c37753b961018b5185cd1af33a38a")]
         public void GetOption_CurvePublicKey()
         {
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    CollectionAssert.AreEqual(Enumerable.Repeat<byte>(0, ZSocket.BinaryKeySize).ToArray(), socket.CurvePublicKey);
-                }
-            }
+                CollectionAssert.AreEqual(Enumerable.Repeat<byte>(0, ZSocket.BinaryKeySize).ToArray(), socket.CurvePublicKey);
+            });            
         }
 
         [Test, Ignore("Issue in underlying libzmq fixed in commit https://github.com/zeromq/libzmq/commit/f86795350d2c37753b961018b5185cd1af33a38a")]
         public void GetOption_CurveSecretKey()
         {
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    CollectionAssert.AreEqual(Enumerable.Repeat<byte>(0, ZSocket.BinaryKeySize).ToArray(), socket.CurveSecretKey);
-                }
-            }
+                CollectionAssert.AreEqual(Enumerable.Repeat<byte>(0, ZSocket.BinaryKeySize).ToArray(), socket.CurveSecretKey);
+            });            
         }
 
         [Test, Ignore("Issue in underlying libzmq fixed in commit https://github.com/zeromq/libzmq/commit/f86795350d2c37753b961018b5185cd1af33a38a")]
         public void GetOption_CurveServerKey()
         {
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    CollectionAssert.AreEqual(Enumerable.Repeat<byte>(0, ZSocket.BinaryKeySize).ToArray(), socket.CurveServerKey);
-                }
-            }
+                CollectionAssert.AreEqual(Enumerable.Repeat<byte>(0, ZSocket.BinaryKeySize).ToArray(), socket.CurveServerKey);
+            });            
         }
 
         [Test]
@@ -196,18 +170,15 @@ namespace ZeroMQTest
         {
             if (!ZContext.Has("curve")) Assert.Ignore("Ignored due to missing curve support");
 
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    // TODO: the interface is confusing; Z85-encoded keys should always be strings
-                    byte[] publicKeyZ85, secretKeyZ85;
-                    Z85.CurveKeypair(out publicKeyZ85, out secretKeyZ85);
-                    socket.CurvePublicKey = publicKeyZ85;
-                    byte[] publicKeyBinary = Z85.Decode(publicKeyZ85);
-                    CollectionAssert.AreEqual(publicKeyBinary, socket.CurvePublicKey);
-                }
-            }
+                // TODO: the interface is confusing; Z85-encoded keys should always be strings
+                byte[] publicKeyZ85, secretKeyZ85;
+                Z85.CurveKeypair(out publicKeyZ85, out secretKeyZ85);
+                socket.CurvePublicKey = publicKeyZ85;
+                byte[] publicKeyBinary = Z85.Decode(publicKeyZ85);
+                CollectionAssert.AreEqual(publicKeyBinary, socket.CurvePublicKey);
+            });            
         }
 
         [Test]
@@ -215,18 +186,15 @@ namespace ZeroMQTest
         {
             if (!ZContext.Has("curve")) Assert.Ignore("Ignored due to missing curve support");
 
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    // TODO: the interface is confusing; Z85-encoded keys should always be strings
-                    byte[] publicKeyZ85, secretKeyZ85;
-                    Z85.CurveKeypair(out publicKeyZ85, out secretKeyZ85);
-                    socket.CurveServerKey = publicKeyZ85;
-                    byte[] publicKeyBinary = Z85.Decode(publicKeyZ85);
-                    CollectionAssert.AreEqual(publicKeyBinary, socket.CurveServerKey);
-                }
-            }
+                // TODO: the interface is confusing; Z85-encoded keys should always be strings
+                byte[] publicKeyZ85, secretKeyZ85;
+                Z85.CurveKeypair(out publicKeyZ85, out secretKeyZ85);
+                socket.CurveServerKey = publicKeyZ85;
+                byte[] publicKeyBinary = Z85.Decode(publicKeyZ85);
+                CollectionAssert.AreEqual(publicKeyBinary, socket.CurveServerKey);
+            });            
         }
 
         [Test]
@@ -234,38 +202,31 @@ namespace ZeroMQTest
         {
             if (!ZContext.Has("curve")) Assert.Ignore("Ignored due to missing curve support");
 
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    // TODO: the interface is confusing; Z85-encoded keys should always be strings
-                    byte[] publicKeyZ85, secretKeyZ85;
-                    Z85.CurveKeypair(out publicKeyZ85, out secretKeyZ85);
-                    socket.CurveSecretKey = secretKeyZ85;
-                    byte[] secretKeyBinary = Z85.Decode(secretKeyZ85);
-                    CollectionAssert.AreEqual(secretKeyBinary, socket.CurveSecretKey);
-                }
-            }
+                // TODO: the interface is confusing; Z85-encoded keys should always be strings
+                byte[] publicKeyZ85, secretKeyZ85;
+                Z85.CurveKeypair(out publicKeyZ85, out secretKeyZ85);
+                socket.CurveSecretKey = secretKeyZ85;
+                byte[] secretKeyBinary = Z85.Decode(secretKeyZ85);
+                CollectionAssert.AreEqual(secretKeyBinary, socket.CurveSecretKey);
+            });            
         }
 
         [Test]
         public void GetOption_GSSAPIPlainText()
         {
-
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                if (!ZContext.Has("gssapi"))
                 {
-                    if (!ZContext.Has("gssapi"))
-                    {
-                        Assert.Throws<ZException>(() => { var res = socket.GSSAPIPlainText; });
-                    }
-                    else
-                    {
-                        Assert.AreEqual(false, socket.GSSAPIPlainText);
-                    }
+                    Assert.Throws<ZException>(() => { var res = socket.GSSAPIPlainText; });
                 }
-            }
+                else
+                {
+                    Assert.AreEqual(false, socket.GSSAPIPlainText);
+                }
+            });            
         }
 
         [Test]
@@ -273,33 +234,27 @@ namespace ZeroMQTest
         {
             if (!ZContext.Has("gssapi")) Assert.Ignore("libzmq does not support gssapi");
 
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    socket.GSSAPIPlainText = true;
-                    Assert.AreEqual(true, socket.GSSAPIPlainText);
-                }
-            }
+                socket.GSSAPIPlainText = true;
+                Assert.AreEqual(true, socket.GSSAPIPlainText);
+            });            
         }
 
         [Test]
         public void GetOption_GSSAPIPrincipal()
         {
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
+                if (!ZContext.Has("gssapi"))
                 {
-                    if (!ZContext.Has("gssapi"))
-                    {
-                        Assert.Throws<ZException>(() => { var res = socket.GSSAPIPrincipal; });
-                    }
-                    else
-                    {
-                        Assert.IsEmpty(socket.GSSAPIPrincipal);
-                    }
+                    Assert.Throws<ZException>(() => { var res = socket.GSSAPIPrincipal; });
                 }
-            }
+                else
+                {
+                    Assert.IsEmpty(socket.GSSAPIPrincipal);
+                }
+            });           
         }
 
         [Test]
@@ -307,14 +262,226 @@ namespace ZeroMQTest
         {
             if (!ZContext.Has("gssapi")) Assert.Ignore("libzmq does not support gssapi");
 
-            using (var context = new ZContext())
+            DoWithUnconnectedPairSocket(socket =>
             {
-                using (var socket = new ZSocket(context, ZSocketType.PAIR))
-                {
-                    socket.GSSAPIPrincipal = "foo";
-                    Assert.AreEqual("foo", socket.GSSAPIPrincipal);
-                }
-            }
+                socket.GSSAPIPrincipal = "foo";
+                Assert.AreEqual("foo", socket.GSSAPIPrincipal);
+            });            
+        }
+
+        [Test]
+        public void GetOption_HandshakeInterval()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(30000, socket.HandshakeInterval);
+            });
+        }
+
+        [Test]
+        public void SetOption_HandshakeInterval()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.HandshakeInterval = 0;
+                Assert.AreEqual(0, socket.HandshakeInterval);
+            });
+        }
+
+        [Test]
+        public void SetOption_Identity()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.Identity = new byte[] { 42 };
+                Assert.AreEqual(new byte[] { 42 }, socket.Identity);
+            });
+        }
+
+        [Test]
+        public void GetOption_Identity()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(new byte[] { }, socket.Identity);
+            });
+
+        }
+
+        [Test]
+        public void SetOption_IdentityString()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.IdentityString = "abc";
+                Assert.AreEqual(Encoding.ASCII.GetBytes("abc"), socket.Identity);
+            });
+        }
+
+        [Test]
+        public void GetOption_IdentityString()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual("", socket.IdentityString);
+            });
+
+        }
+
+        [Test]
+        public void GetOption_Immediate()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(false, socket.Immediate);
+            });
+        }
+
+        [Test]
+        public void SetOption_Immediate()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.Immediate = true;
+                Assert.AreEqual(true, socket.Immediate);
+            });
+        }
+
+        [Test]
+        public void GetOption_IPv6()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(false, socket.IPv6);
+            });
+        }
+
+        [Test]
+        public void SetOption_IPv6()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.IPv6 = true;
+                Assert.AreEqual(true, socket.IPv6);
+            });
+        }
+
+        [Test]
+        public void GetOption_Linger()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                // TODO Use TimeSpan? as the type of Linger instead, to better encode "infinity"?
+                Assert.AreEqual(TimeSpan.FromMilliseconds(-1), socket.Linger);
+            });
+        }
+
+        [Test]
+        public void SetOption_Linger()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.Linger = TimeSpan.FromMilliseconds(50);
+                Assert.AreEqual(TimeSpan.FromMilliseconds(50), socket.Linger);
+            });
+        }
+
+        [Test]
+        public void GetOption_MaxMessageSize()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                // TODO use int? as the type of MaxMessageSize to better encode infinity?
+                Assert.AreEqual(-1, socket.MaxMessageSize);
+            });
+        }
+
+        [Test]
+        public void SetOption_MaxMessageSize()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.MaxMessageSize = 0;
+                Assert.AreEqual(0, socket.MaxMessageSize);
+            });
+        }
+
+        [Test]
+        public void GetOption_MulticastHops()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(1, socket.MulticastHops);
+            });
+        }
+
+        [Test, Ignore("0 seems to be an invalid value but it is ignored")]
+        public void SetOption_MulticastHops_Invalid()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.MulticastHops = 0;
+                Assert.AreEqual(0, socket.MulticastHops);
+            });
+        }
+
+        [Test]
+        public void SetOption_MulticastHops()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.MulticastHops = 2;
+                Assert.AreEqual(2, socket.MulticastHops);
+            });
+        }
+
+        [Test]
+        public void GetOption_ProbeRouter_InvalidSocketType_Fails()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                var exc = Assert.Throws<ZException>(() => { var res = socket.ProbeRouter; });
+                Assert.AreEqual(ZError.EINVAL, exc.Error);
+            });
+        }
+
+        [Test, Ignore("Investigate why this fails with EINVAL")]
+        public void GetOption_ProbeRouter()
+        {
+            DoWithUnconnectedRouterSocket(socket =>
+            {
+                Assert.AreEqual(false, socket.ProbeRouter);
+            });
+        }
+
+        [Test, Ignore("Investigate why this fails with EINVAL")]
+        public void SetOption_ProbeRouter()
+        {
+            DoWithUnconnectedRouterSocket(socket =>
+            {
+                socket.Connect("inproc://foo");
+                socket.ProbeRouter = true;
+                Assert.AreEqual(true, socket.ProbeRouter);
+            });
+        }
+
+        [Test]
+        public void GetOption_MulticastRate()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(100, socket.MulticastRate);
+            });
+        }
+
+        [Test]
+        public void SetOption_MulticastRate()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.MulticastRate = 50;
+                Assert.AreEqual(50, socket.MulticastRate);
+            });
         }
 
         #endregion
@@ -668,7 +835,7 @@ namespace ZeroMQTest
             DoWithConnectedSocketPair((sendSocket, receiveSocket) =>
             {
                 var sentMessage = new byte[] { 42 };
-                sendSocket.SendBytes(sentMessage, 0, 1);
+                sendSocket.Send(sentMessage, 0, 1);
 
                 byte[] receivedMessage = new byte[1];
                 var result = receiveSocket.ReceiveBytes(receivedMessage, 0, 1);
@@ -759,21 +926,38 @@ namespace ZeroMQTest
             });
         }
 
+        private static void DoWithUnconnectedRouterSocket(Action<ZSocket> action)
+        {
+            DoWithUnconnectedSocket((context, socket) => action(socket), ZSocketType.ROUTER);
+        }
 
-        private static void DoWithConnectedSocketPair(Action<ZSocket, ZSocket> action)
+        private static void DoWithUnconnectedPairSocket(Action<ZSocket> action)
+        {
+            DoWithUnconnectedSocket((context, socket) => action(socket), ZSocketType.PAIR);
+        }
+
+        private static void DoWithUnconnectedSocket(Action<ZContext, ZSocket> action, ZSocketType socketType)
         {
             using (var context = new ZContext())
             {
-                using (var sendSocket = new ZSocket(context, ZSocketType.PAIR))
+                using (var socket = new ZSocket(context, socketType))
                 {
-                    sendSocket.Connect(DefaultAddress);
-                    using (var receiveSocket = new ZSocket(context, ZSocketType.PAIR))
-                    {
-                        receiveSocket.Bind(DefaultAddress);
-                        action(sendSocket, receiveSocket);
-                    }
+                    action(context, socket);
                 }
             }
+        }
+
+        private static void DoWithConnectedSocketPair(Action<ZSocket, ZSocket> action)
+        {
+            DoWithUnconnectedSocket((context, sendSocket) =>
+            {
+                sendSocket.Connect(DefaultAddress);
+                using (var receiveSocket = new ZSocket(context, ZSocketType.PAIR))
+                {
+                    receiveSocket.Bind(DefaultAddress);
+                    action(sendSocket, receiveSocket);
+                }
+            }, ZSocketType.PAIR);
         }
 
         private static ZMessage CreateSingleFrameTestMessage()
