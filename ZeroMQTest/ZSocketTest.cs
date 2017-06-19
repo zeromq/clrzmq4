@@ -1153,8 +1153,35 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.REP))
                 {
-                    var exc = Assert.Throws<ZException>(() => socket.Send(new ZMessage(new ZFrame[] { new ZFrame('a') })));
+                    var exc = Assert.Throws<ZException>(() => socket.Send(CreateSingleFrameTestMessage()));
                     Assert.AreEqual(ZError.EFSM, exc.Error);
+                }
+            }
+        }
+
+        [Test]
+        public void Send_ZMessage_WithFlags_Exception_IllegalState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REP))
+                {
+                    var exc = Assert.Throws<ZException>(() => socket.Send(CreateSingleFrameTestMessage(), ZSocketFlags.DontWait));
+                    Assert.AreEqual(ZError.EFSM, exc.Error);
+                }
+            }
+        }
+
+        [Test]
+        public void Send_ZMessage_WithFlags_IllegalState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REP))
+                {
+                    ZError error;
+                    Assert.IsFalse(socket.Send(CreateSingleFrameTestMessage(), ZSocketFlags.DontWait, out error));
+                    Assert.AreEqual(ZError.EFSM, error);
                 }
             }
         }
@@ -1166,7 +1193,7 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.REP))
                 {
-                    var exc = Assert.Throws<ZException>(() => socket.Send(new ZMessage(new ZFrame[] { new ZFrame('a') })));
+                    var exc = Assert.Throws<ZException>(() => socket.Send(new ZFrame[] { new ZFrame('a') }));
                     Assert.AreEqual(ZError.EFSM, exc.Error);
                 }
             }
@@ -1187,7 +1214,7 @@ namespace ZeroMQTest
         }
 
         [Test]
-        public void SendBytes_IllegalState_Fails()
+        public void SendBytes_Exception_IllegalState_Fails()
         {
             using (var context = new ZContext())
             {
@@ -1195,6 +1222,20 @@ namespace ZeroMQTest
                 {
                     var exc = Assert.Throws<ZException>(() => socket.Send(new byte[] { 42 }, 0, 1));
                     Assert.AreEqual(ZError.EFSM, exc.Error);
+                }
+            }
+        }
+
+        [Test]
+        public void SendBytes_IllegalState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REP))
+                {
+                    ZError error;
+                    Assert.IsFalse(socket.Send(new byte[] { 42 }, 0, 1, ZSocketFlags.DontWait, out error));
+                    Assert.AreEqual(ZError.EFSM, error);
                 }
             }
         }
