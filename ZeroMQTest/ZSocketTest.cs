@@ -72,6 +72,8 @@ namespace ZeroMQTest
         }
         #endregion
 
+        // TODO The socket options test only test whether the options can be read or set and read, 
+        // not if they have the desired effect. This would need to be tested separately.
         #region socket options
         [Test]
         public void GetOption_Affinity()
@@ -905,6 +907,23 @@ namespace ZeroMQTest
             });
         }
 
+        [Test]
+        public void AddTcpAcceptFilter()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.AddTcpAcceptFilter("127.0.0.1");
+            });
+        }
+        
+        [Test]
+        public void ClearTcpAcceptFilters()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.ClearTcpAcceptFilter();
+            });
+        }
         #endregion
 
         #region bind
