@@ -1166,7 +1166,7 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.REP))
                 {
-                    var exc = Assert.Throws<ZException>(() => socket.SendFrames(new ZMessage(new ZFrame[] { new ZFrame('a') })));
+                    var exc = Assert.Throws<ZException>(() => socket.Send(new ZMessage(new ZFrame[] { new ZFrame('a') })));
                     Assert.AreEqual(ZError.EFSM, exc.Error);
                 }
             }
@@ -1180,7 +1180,7 @@ namespace ZeroMQTest
                 using (var socket = new ZSocket(context, ZSocketType.REP))
                 {
                     ZError error;
-                    Assert.IsFalse(socket.SendFrames(new ZFrame[] { new ZFrame('a') }, out error));
+                    Assert.IsFalse(socket.Send(new ZFrame[] { new ZFrame('a') }, out error));
                     Assert.AreEqual(ZError.EFSM, error);
                 }
             }
@@ -1193,7 +1193,7 @@ namespace ZeroMQTest
             {
                 using (var socket = new ZSocket(context, ZSocketType.REP))
                 {
-                    var exc = Assert.Throws<ZException>(() => socket.SendBytes(new byte[] { 42 }, 0, 1));
+                    var exc = Assert.Throws<ZException>(() => socket.Send(new byte[] { 42 }, 0, 1));
                     Assert.AreEqual(ZError.EFSM, exc.Error);
                 }
             }
