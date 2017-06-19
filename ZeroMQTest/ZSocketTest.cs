@@ -1200,6 +1200,33 @@ namespace ZeroMQTest
         }
 
         [Test]
+        public void SendFrames_Exception_WithFlags_IllegalState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REP))
+                {
+                    var exc = Assert.Throws<ZException>(() => socket.Send(new ZFrame[] { new ZFrame('a') }, ZSocketFlags.DontWait));
+                    Assert.AreEqual(ZError.EFSM, exc.Error);
+                }
+            }
+        }
+
+        [Test]
+        public void SendFrames_WithFlags_IllegalState_Fails()
+        {
+            using (var context = new ZContext())
+            {
+                using (var socket = new ZSocket(context, ZSocketType.REP))
+                {
+                    ZError error;
+                    Assert.IsFalse(socket.Send(new ZFrame[] { new ZFrame('a') }, ZSocketFlags.DontWait, out error));
+                    Assert.AreEqual(ZError.EFSM, error);
+                }
+            }
+        }
+
+        [Test]
         public void SendFrames_IllegalState_Fails()
         {
             using (var context = new ZContext())
