@@ -485,6 +485,64 @@ namespace ZeroMQTest
         }
 
         [Test]
+        public void GetOption_MulticastRecoveryInterval()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(TimeSpan.FromSeconds(10), socket.MulticastRecoveryInterval);
+            });
+        }
+
+        [Test]
+        public void SetOption_MulticastRecoveryInterval()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.MulticastRecoveryInterval = TimeSpan.FromMilliseconds(50);
+                Assert.AreEqual(TimeSpan.FromMilliseconds(50), socket.MulticastRecoveryInterval);
+            });
+        }
+
+        [Test]
+        public void GetOption_ReconnectInterval()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(TimeSpan.FromMilliseconds(100), socket.ReconnectInterval);
+            });
+        }
+
+        [Test]
+        public void SetOption_ReconnectInterval()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.ReconnectInterval = TimeSpan.FromMilliseconds(50);
+                Assert.AreEqual(TimeSpan.FromMilliseconds(50), socket.ReconnectInterval);
+            });
+        }
+
+        [Test]
+        public void GetOption_ReconnectIntervalMax()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                // TODO Use TimeSpan? as the type of ReconnectIntervalMax instead, to better encode "none"?
+                Assert.AreEqual(TimeSpan.Zero, socket.ReconnectIntervalMax);
+            });
+        }
+
+        [Test]
+        public void SetOption_ReconnectIntervalMax()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.ReconnectIntervalMax = TimeSpan.FromMilliseconds(50);
+                Assert.AreEqual(TimeSpan.FromMilliseconds(50), socket.ReconnectIntervalMax);
+            });
+        }
+
+        [Test]
         public void GetOption_ReceiveBufferSize()
         {
             DoWithUnconnectedPairSocket(socket =>
@@ -751,6 +809,102 @@ namespace ZeroMQTest
                 Assert.AreEqual(1, socket.TcpKeepAliveInterval);
             });
         }
+
+        [Test, Ignore("Investigate why this fails, maybe libzmq too old?")]
+        public void GetOption_RouterMandatory()
+        {
+            DoWithUnconnectedRouterSocket(socket =>
+            {
+                Assert.AreEqual(RouterMandatory.Discard, socket.RouterMandatory);
+            });
+        }
+
+        [Test, Ignore("Investigate why this fails, maybe libzmq too old?")]
+        public void SetOption_RouterMandatory()
+        {
+            DoWithUnconnectedRouterSocket(socket =>
+            {
+                socket.RouterMandatory = RouterMandatory.Report;
+                Assert.AreEqual(RouterMandatory.Report, socket.RouterMandatory);
+            });
+        }
+
+        [Test]
+        public void GetOption_TypeOfService()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(0, socket.TypeOfService);
+            });
+        }
+
+        [Test]
+        public void SetOption_TypeOfService()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.TypeOfService = 1;
+                Assert.AreEqual(1, socket.TypeOfService);
+            });
+        }
+
+        [Test, Ignore("Supported from libzmq 4.2.0")]
+        public void GetOption_XPubVerbose()
+        {
+            DoWithUnconnectedSocket((context, socket) =>
+            {
+                Assert.AreEqual(false, socket.XPubVerbose);
+            }, ZSocketType.XPUB);
+        }
+
+        [Test, Ignore("Supported from libzmq 4.2.0")]
+        public void SetOption_XPubVerbose()
+        {
+            DoWithUnconnectedSocket((context, socket) =>
+            {
+                socket.XPubVerbose = true;
+                Assert.AreEqual(true, socket.XPubVerbose);
+            }, ZSocketType.XPUB);
+        }
+
+        [Test, Ignore("0 termination byte must be stripped when getting the property")]
+        public void GetOption_ZAPDomain()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual("", socket.ZAPDomain);
+            });
+        }
+
+        [Test, Ignore("0 termination byte must be stripped when getting the property")]
+        public void SetOption_ZAPDomain()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.ZAPDomain = "abc";
+                Assert.AreEqual("abc", socket.ZAPDomain);
+            });
+        }
+
+        [Test]
+        public void GetOption_IPv4Only()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(true, socket.IPv4Only);
+            });
+        }
+
+        [Test]
+        public void SetOption_IPv4Only()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.IPv4Only = false;
+                Assert.AreEqual(false, socket.IPv4Only);
+            });
+        }
+
         #endregion
 
         #region bind
