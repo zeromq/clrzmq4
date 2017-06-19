@@ -907,6 +907,82 @@ namespace ZeroMQTest
             });
         }
 
+        [Test, Ignore("0 termination byte must be stripped when getting the property")]
+        public void GetOption_PlainUserName()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual("", socket.PlainUserName);
+            });
+        }
+
+        [Test, Ignore("0 termination byte must be stripped when getting the property")]
+        public void SetOption_PlainUserName()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.PlainUserName = "abc";
+                Assert.AreEqual("abc", socket.PlainUserName);
+            });
+        }
+
+        [Test, Ignore("0 termination byte must be stripped when getting the property")]
+        public void GetOption_PlainPassword()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual("", socket.PlainPassword);
+            });
+        }
+
+        [Test, Ignore("0 termination byte must be stripped when getting the property")]
+        public void SetOption_PlainPassword()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.PlainPassword = "abc";
+                Assert.AreEqual("abc", socket.PlainPassword);
+            });
+        }
+
+        [Test]
+        public void GetOption_PlainServer()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(false, socket.PlainServer);
+            });
+        }
+
+        [Test]
+        public void SetOption_PlainServer()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.PlainServer = true;
+                Assert.AreEqual(true, socket.PlainServer);
+            });
+        }
+
+        [Test]
+        public void GetOption_CurveServer()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(false, socket.CurveServer);
+            });
+        }
+
+        [Test]
+        public void SetOption_CurveServer()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.CurveServer = true;
+                Assert.AreEqual(true, socket.CurveServer);
+            });
+        }
+
         [Test]
         public void AddTcpAcceptFilter()
         {
