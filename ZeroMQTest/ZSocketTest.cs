@@ -599,6 +599,158 @@ namespace ZeroMQTest
                 Assert.AreEqual(TimeSpan.FromMilliseconds(50), socket.SendTimeout);
             });
         }
+
+        [Test, Ignore("Investigate why this fails, maybe libzmq too old?")]
+        public void GetOption_RequestCorrelate()
+        {
+            DoWithUnconnectedReqSocket(socket =>
+            {
+                Assert.AreEqual(false, socket.RequestCorrelate);
+            });
+        }
+
+        [Test, Ignore("Investigate why this fails, maybe libzmq too old?")]
+        public void SetOption_RequestCorrelate()
+        {
+            DoWithUnconnectedReqSocket(socket =>
+            {
+                socket.RequestCorrelate = true;
+                Assert.AreEqual(true, socket.RequestCorrelate);
+            });
+        }
+
+        [Test, Ignore("Investigate why this fails, maybe libzmq too old?")]
+        public void GetOption_RequestRelaxed()
+        {
+            DoWithUnconnectedReqSocket(socket =>
+            {
+                Assert.AreEqual(false, socket.RequestRelaxed);
+            });
+        }
+
+        [Test, Ignore("Investigate why this fails, maybe libzmq too old?")]
+        public void SetOption_RequestRelaxed()
+        {
+            DoWithUnconnectedReqSocket(socket =>
+            {
+                socket.RequestRelaxed = true;
+                Assert.AreEqual(true, socket.RequestRelaxed);
+            });
+        }
+
+        [Test, Ignore("Investigate why this fails, maybe libzmq too old?")]
+        public void GetOption_RouterHandover()
+        {
+            DoWithUnconnectedRouterSocket(socket =>
+            {
+                Assert.AreEqual(false, socket.RouterHandover);
+            });
+        }
+
+        [Test, Ignore("Investigate why this fails, maybe libzmq too old?")]
+        public void SetOption_RouterHandover()
+        {
+            DoWithUnconnectedRouterSocket(socket =>
+            {
+                socket.RouterHandover = true;
+                Assert.AreEqual(true, socket.RouterHandover);
+            });
+        }
+
+        [Test, Ignore("Investigate why this fails, maybe libzmq too old?")]
+        public void GetOption_RouterRaw()
+        {
+            DoWithUnconnectedRouterSocket(socket =>
+            {
+                Assert.AreEqual(false, socket.RouterRaw);
+            });
+        }
+
+        [Test, Ignore("Investigate why this fails, maybe libzmq too old?")]
+        public void SetOption_RouterRaw()
+        {
+            DoWithUnconnectedRouterSocket(socket =>
+            {
+                socket.RouterRaw = true;
+                Assert.AreEqual(true, socket.RouterRaw);
+            });
+        }
+
+        [Test]
+        public void GetOption_TcpKeepAlive()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(TcpKeepaliveBehaviour.Default, socket.TcpKeepAlive);
+            });
+        }
+
+        [Test]
+        public void SetOption_TcpKeepAlive()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.TcpKeepAlive = TcpKeepaliveBehaviour.Enable;
+                Assert.AreEqual(TcpKeepaliveBehaviour.Enable, socket.TcpKeepAlive);
+            });
+        }
+
+        [Test]
+        public void GetOption_TcpKeepAliveCount()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(-1, socket.TcpKeepAliveCount);
+            });
+        }
+
+        [Test]
+        public void SetOption_TcpKeepAliveCount()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.TcpKeepAliveCount = 1;
+                Assert.AreEqual(1, socket.TcpKeepAliveCount);
+            });
+        }
+
+        [Test]
+        public void GetOption_TcpKeepAliveIdle()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(-1, socket.TcpKeepAliveIdle);
+            });
+        }
+
+        [Test]
+        public void SetOption_TcpKeepAliveIdle()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.TcpKeepAliveIdle = 1;
+                Assert.AreEqual(1, socket.TcpKeepAliveIdle);
+            });
+        }
+
+        [Test]
+        public void GetOption_TcpKeepAliveInterval()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                Assert.AreEqual(-1, socket.TcpKeepAliveInterval);
+            });
+        }
+
+        [Test]
+        public void SetOption_TcpKeepAliveInterval()
+        {
+            DoWithUnconnectedPairSocket(socket =>
+            {
+                socket.TcpKeepAliveInterval = 1;
+                Assert.AreEqual(1, socket.TcpKeepAliveInterval);
+            });
+        }
         #endregion
 
         #region bind
@@ -1040,6 +1192,7 @@ namespace ZeroMQTest
                 // TODO is this intended? shouldn't it yield an error if we want to receive more frames than the message contains?
             });
         }
+        #endregion
 
         private static void DoWithUnconnectedRouterSocket(Action<ZSocket> action)
         {
@@ -1049,6 +1202,11 @@ namespace ZeroMQTest
         private static void DoWithUnconnectedPairSocket(Action<ZSocket> action)
         {
             DoWithUnconnectedSocket((context, socket) => action(socket), ZSocketType.PAIR);
+        }
+
+        private static void DoWithUnconnectedReqSocket(Action<ZSocket> action)
+        {
+            DoWithUnconnectedSocket((context, socket) => action(socket), ZSocketType.REQ);
         }
 
         private static void DoWithUnconnectedSocket(Action<ZContext, ZSocket> action, ZSocketType socketType)
@@ -1084,7 +1242,6 @@ namespace ZeroMQTest
         {
             return new ZMessage(new ZFrame[] { new ZFrame('a'), new ZFrame('b') });
         }
-        #endregion
 
     }
 }
