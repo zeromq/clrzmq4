@@ -1,4 +1,6 @@
 ﻿
+[![Build status](https://ci.appveyor.com/api/projects/status/102sf149379bgwv7/branch/master?svg=true)](https://ci.appveyor.com/project/zeromq/clrzmq4/branch/master) [![Coverage Status](https://coveralls.io/repos/github/zeromq/clrzmq4/badge.svg?branch=master)](https://coveralls.io/github/zeromq/clrzmq4?branch=master)
+
 **ZeroMQ C# namespace**
 
 Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 3+.
