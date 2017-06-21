@@ -9,8 +9,6 @@ if [ -d $artifactsFolder ]; then
   rm -R $artifactsFolder
 fi
 
-nuget restore
-
 nuget install NUnit.Console -Version 3.6.1 -OutputDirectory testrunner
 
 xbuild /p:Configuration=Release clrzmq4.mono.sln
