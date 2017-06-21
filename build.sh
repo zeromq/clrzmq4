@@ -9,7 +9,8 @@ if [ -d $artifactsFolder ]; then
   rm -R $artifactsFolder
 fi
 
-if [ which sw_vers && sw_vers -productName | grep "Mac OS X" ] ; then
+# TODO or use uname? what does that return on Mac OS?
+if [ "$(sw_vers -productName)" == "Mac OS X" ] ; then
   brew install zeromq
 fi
 
