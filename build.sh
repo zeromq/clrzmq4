@@ -12,6 +12,8 @@ fi
 # TODO or use uname? what does that return on Mac OS?
 if [ "$(sw_vers -productName)" == "Mac OS X" ] ; then
   brew install zeromq
+  find /usr/local -name '*zmq*' # DEBUG
+  find /usr/local -name '*zeromq*' # DEBUG
 fi
 
 nuget install NUnit.ConsoleRunner -Version 3.6.1 -OutputDirectory testrunner
