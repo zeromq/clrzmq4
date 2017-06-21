@@ -31,6 +31,8 @@
                 "{DllPath}/{LibraryName}.dylib",
                 "{DllPath}/{LibraryName}.dylib.*",
                 "{LibraryName}.dylib",
+                "@rpath/{LibraryName}.dylib",
+                "/usr/local/lib/{LibraryName}.dylib", // DEBUG: remove this again
             };
 
 		}
