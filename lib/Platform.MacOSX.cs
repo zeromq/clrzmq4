@@ -30,6 +30,7 @@
 				"{Path}/{LibraryName}.so.*",
                 "{DllPath}/{LibraryName}.dylib",
                 "{DllPath}/{LibraryName}.dylib.*",
+                "{LibraryName}.dylib",
             };
 
 		}
