@@ -192,7 +192,7 @@ namespace ZeroMQ.lib
                     var output = p.StandardOutput.ReadToEnd();
                     // TODO: use Trace.WriteLine instead?
                     System.Console.WriteLine("Output of sw_vers was: " + output);
-                    if (output == "Mac OS X")
+                    if (output.StartsWith("Mac OS X"))
                     {
                         Name = PlatformName.MacOSX;
                     }
