@@ -9,10 +9,10 @@ if [ -d $artifactsFolder ]; then
   rm -R $artifactsFolder
 fi
 
-nuget install NUnit.Console -Version 3.6.1 -OutputDirectory testrunner
+nuget install NUnit.ConsoleRunner -Version 3.6.1 -OutputDirectory testrunner
 
 xbuild /p:Configuration=Release clrzmq4.mono.sln
-mono ./testrunner/NUnit.Console.3.6.1/tools/nunit-console.exe ./bin/Release/ZeroMQ.Test.dll
+mono ./testrunner/NUnit.ConsoleRunner.3.6.1/tools/nunit3-console.exe ./ZeroMQTest/bin/Release/ZeroMQTest.dll
 
 # TODO add MonoCov
 
