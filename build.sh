@@ -10,7 +10,7 @@ if [ -d $artifactsFolder ]; then
 fi
 
 if [ which sw_vers && sw_vers -productName | grep "Mac OS X" ] ; then
-  brew install zmq
+  brew install zeromq
 fi
 
 nuget install NUnit.ConsoleRunner -Version 3.6.1 -OutputDirectory testrunner
