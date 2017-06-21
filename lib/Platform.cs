@@ -174,11 +174,11 @@ namespace ZeroMQ.lib
 				Name = PlatformName.MacOSX;
 			}
 
-            if (IsMono && Name == PlatformName.Posix)
+            if (Name == PlatformName.Posix)
             {
                 // check again if this might be Mac OS X
                 var info = new ProcessStartInfo();
-                info.FileName = "bash";
+                info.FileName = "sh";
                 info.Arguments = "-c \"sw_vers -productName\"";
 
                 info.UseShellExecute = false;
@@ -189,7 +189,6 @@ namespace ZeroMQ.lib
 
                 using (var p = Process.Start(info))
                 {
-
                     var output = p.StandardOutput.ReadToEnd();
                     // TODO: use Trace.WriteLine instead?
                     System.Console.WriteLine("Output of sw_vers was: " + output);
