@@ -285,25 +285,44 @@
 				return libLoadConf.ToArray();
 			}
 
-			public static string[] EnumerateLibLdPATH()
-			{
-				string PATH = System.Environment.GetEnvironmentVariable("LD_LIBRARY_PATH");
-				if (PATH == null) PATH = System.Environment.GetEnvironmentVariable("PATH");
-				if (PATH == null) return new string[] { };
+            private static IEnumerable<string> EnumerateLibLdPATH()
+            {
+                string[] variables;
+                switch (Name)
+                {
+                    case PlatformName.MacOSX:
+                        variables = new[] { "DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH" };
+                        break;
+                    case PlatformName.Posix:
+                        variables = new[] { "LD_LIBRARY_PATH" };
+                        break;
+                    default:
+                        variables = new string[] { };
+                        break;
+                }
+                var inpaths = variables.Select(Environment.GetEnvironmentVariable).Where(x => !string.IsNullOrEmpty(x));
+                foreach (var inpath in inpaths)
+                {
+                    foreach (var filename in EnumeratePath(inpath))
+                    {
+                        yield return filename;
+                    }
+                }
+            }
 
-				string[] paths = PATH.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            private static IEnumerable<string> EnumeratePath(string inpath)
+            {
+                string[] paths = inpath.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 
-				var pathList = new List<string>();
-				foreach (string path in paths)
-				{
-					string _path = EnsureNotEndingSlash(path);
+                foreach (string path in paths)
+                {
+                    string _path = EnsureNotEndingSlash(path);
 
-					if (_path != null && Directory.Exists(_path)) pathList.Add(_path);
-				}
-				return pathList.ToArray();
-			}
+                    if (_path != null && Directory.Exists(_path)) yield return _path;
+                }
+            }
 
-			private static string EnsureNotEndingSlash(string path)
+            private static string EnsureNotEndingSlash(string path)
 			{
 				if (path == null) return null;
 				if (path.EndsWith("/")) return path.Substring(0, path.Length - 1);
