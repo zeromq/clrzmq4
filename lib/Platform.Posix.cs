@@ -287,6 +287,8 @@
 
             private static IEnumerable<string> EnumerateLibLdPATH()
             {
+                // TODO: does it really make sense to manually enumerate these paths? dlopen 
+                // will search them by default if the library name is given without any path fragments
                 string[] variables;
                 switch (Name)
                 {
