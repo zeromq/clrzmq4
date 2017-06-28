@@ -11,7 +11,8 @@ fi
 
 # TODO or use uname? what does that return on Mac OS?
 if [ "$(sw_vers -productName)" == "Mac OS X" ] ; then
-  brew install zeromq
+  brew install zeromq --universal
+  file /usr/local/lib/*.dylib
   find /usr/local -name '*zmq*' # DEBUG
   find /usr/local -name '*zeromq*' # DEBUG
   echo DYLD_LIBRARY_PATH=$DYDYLD_LIBRARY_PATH
