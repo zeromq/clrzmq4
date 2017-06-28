@@ -22,6 +22,9 @@ nuget install NUnit.ConsoleRunner -Version 3.6.1 -OutputDirectory testrunner
 # nuget install coveralls.net -Version 0.7.0 -OutputDirectory tools
 
 xbuild /p:Configuration=Release clrzmq4.mono.sln
+
+export MONO_TRACE_LISTENER=Console.Out
+
 # MONO_OPTIONS="--profile=monocov:outfile=ZeroMQ.cov,+[ZeroMQ]"
 mono ./testrunner/NUnit.ConsoleRunner.3.6.1/tools/nunit3-console.exe ./ZeroMQTest/bin/Release/ZeroMQTest.dll
 
