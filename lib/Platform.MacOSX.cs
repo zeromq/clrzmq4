@@ -33,6 +33,7 @@
                 "{LibraryName}.dylib",
                 "@rpath/{LibraryName}.dylib",
                 "/usr/local/lib/{LibraryName}.dylib", // DEBUG: remove this again
+                "/opt/local/lib/{LibraryName}.dylib", // DEBUG: remove this again
             };
 
 		}
