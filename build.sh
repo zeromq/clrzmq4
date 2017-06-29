@@ -21,7 +21,7 @@ if [ "$(sw_vers -productName)" == "Mac OS X" ] ; then
   echo "name local_archives" >>archive_sites.conf
   echo "urls http://packages.macports.org/ http://nue.de.packages.macports.org/" >>archive_sites.conf
   sudo cp archive_sites.conf /opt/local/etc/macports/
-  sudo port install zmq +universal
+  sudo port -v install zmq +universal
   file /usr/local/lib/*mq*.dylib
   file /opt/local/lib/*mq*.dylib
   find /usr/local -name '*zmq*' # DEBUG
