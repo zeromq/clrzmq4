@@ -17,6 +17,7 @@ if [ "$(sw_vers -productName)" == "Mac OS X" ] ; then
   sudo installer -pkg /tmp/macports.pkg -target /
   export PATH=/opt/local/bin:/opt/local/sbin:$PATH
   sudo rm /opt/local/etc/macports/archive_sites.conf
+  chmod +wx /opt/local/etc/macports
   sudo echo "name macports_archives" >/opt/local/etc/macports/archive_sites.conf
   sudo echo "name local_archives" >>/opt/local/etc/macports/archive_sites.conf
   sudo echo "urls http://packages.macports.org/ http://nue.de.packages.macports.org/" >>/opt/local/etc/macports/archive_sites.conf
