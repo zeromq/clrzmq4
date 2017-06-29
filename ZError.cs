@@ -120,7 +120,22 @@ namespace ZeroMQ
             {
                 public static readonly int 
                     EAGAIN = 35,
+					EINPROGRESS = 36,
+                    ENOTSOCK = 38,
+                    EMSGSIZE = 40,
                     EPROTONOSUPPORT = 43,
+                    EAFNOSUPPORT = 47,
+                    EADDRINUSE = 48,
+                    EADDRNOTAVAIL = 49,
+                    ENETDOWN = 50,
+                    ENETUNREACH = 51,
+                    ENETRESET = 52,
+                    ECONNABORTED = 53,
+                    ECONNRESET = 54,
+                    ENOBUFS = 55,
+                    ENOTCONN = 57,
+                    ETIMEDOUT = 60,
+                    EHOSTUNREACH = 65
                     ;
             }
 		}
