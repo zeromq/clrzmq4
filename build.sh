@@ -17,10 +17,10 @@ if [ "$(sw_vers -productName)" == "Mac OS X" ] ; then
   sudo installer -pkg /tmp/macports.pkg -target /
   export PATH=/opt/local/bin:/opt/local/sbin:$PATH
   sudo rm /opt/local/etc/macports/archive_sites.conf
-  chmod +wx /opt/local/etc/macports
-  sudo echo "name macports_archives" >/opt/local/etc/macports/archive_sites.conf
-  sudo echo "name local_archives" >>/opt/local/etc/macports/archive_sites.conf
-  sudo echo "urls http://packages.macports.org/ http://nue.de.packages.macports.org/" >>/opt/local/etc/macports/archive_sites.conf
+  echo "name macports_archives" >archive_sites.conf
+  echo "name local_archives" >>archive_sites.conf
+  echo "urls http://packages.macports.org/ http://nue.de.packages.macports.org/" >>archive_sites.conf
+  sudo cp archive_sites.conf /opt/local/etc/macports/
   sudo port install zmq +universal
   file /usr/local/lib/*mq*.dylib
   file /opt/local/lib/*mq*.dylib
