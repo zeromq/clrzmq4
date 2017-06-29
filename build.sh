@@ -11,7 +11,11 @@ fi
 
 # TODO or use uname? what does that return on Mac OS?
 if [ "$(sw_vers -productName)" == "Mac OS X" ] ; then
-  brew install zeromq --universal
+  # homebrew has zeromq only as x64 as of 2017-06-29, so we must use macports (see also https://github.com/travis-ci/travis-ci/issues/5640)
+  #brew install zeromq --universal
+  wget --retry-connrefused --waitretry=1 -O /tmp/macports.pkg https://github.com/macports/macports-base/releases/download/v2.4.1/MacPorts-2.4.1-10.11-ElCapitan.pkg
+  sudo installer -pkg /tmp/macports.pkg -target /
+  sudo port install zmq +universal
   file /usr/local/lib/*.dylib
   find /usr/local -name '*zmq*' # DEBUG
   find /usr/local -name '*zeromq*' # DEBUG
