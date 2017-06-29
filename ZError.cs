@@ -115,6 +115,14 @@ namespace ZeroMQ
 					ENETRESET = 102
 				;
 			}
+
+            internal static class MacOSX
+            {
+                public static readonly int 
+                    EAGAIN = 35,
+                    EPROTONOSUPPORT = 43,
+                    ;
+            }
 		}
 
 		public static ZError GetLastErr()
