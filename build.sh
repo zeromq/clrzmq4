@@ -15,6 +15,7 @@ if [ "$(sw_vers -productName)" == "Mac OS X" ] ; then
   #brew install zeromq --universal
   wget --retry-connrefused --waitretry=1 -O /tmp/macports.pkg https://github.com/macports/macports-base/releases/download/v2.4.1/MacPorts-2.4.1-10.11-ElCapitan.pkg
   sudo installer -pkg /tmp/macports.pkg -target /
+  export PATH=/opt/local/bin:/opt/local/sbin:$PATH
   sudo port install zmq +universal
   file /usr/local/lib/*.dylib
   find /usr/local -name '*zmq*' # DEBUG
