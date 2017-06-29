@@ -136,20 +136,30 @@
 
 				foreach (string libraryPath in libraryPaths)
 				{
-					string folder = null;
-					string filesPattern = libraryPath;
-					int filesPatternI;
-					if (-1 < (filesPatternI = filesPattern.LastIndexOf('/')))
-					{
-						folder = filesPattern.Substring(0, filesPatternI + 1);
-						filesPattern = filesPattern.Substring(filesPatternI + 1);
-					}
 
-					if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) continue;
+				    IEnumerable<string> files;
+				    if (libraryPath.Contains("/"))
+				    {
 
-					string[] files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
+				        string folder = null;
+				        string filesPattern = libraryPath;
+				        int filesPatternI;
+				        if (-1 < (filesPatternI = filesPattern.LastIndexOf('/')))
+				        {
+				            folder = filesPattern.Substring(0, filesPatternI + 1);
+				            filesPattern = filesPattern.Substring(filesPatternI + 1);
+				        }
 
-					foreach (string file in files)
+				        if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) continue;
+
+				        files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
+				    }
+				    else
+				    {
+				        files = Enumerable.Repeat(libraryPath, 1);
+				    }
+
+				    foreach (string file in files)
 					{
 						// Finally, I am really loading this file
 						SafeLibraryHandle handle = OpenHandle(file);
