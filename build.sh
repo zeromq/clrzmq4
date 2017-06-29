@@ -26,7 +26,10 @@ if [ "$(sw_vers -productName)" == "Mac OS X" ] ; then
   file /opt/local/lib/*mq*.dylib
   find /usr/local -name '*zmq*' # DEBUG
   find /usr/local -name '*zeromq*' # DEBUG
-  echo DYLD_LIBRARY_PATH=$DYDYLD_LIBRARY_PATH
+  
+  DYLD_LIBRARY_PATH=/opt/local/lib:$DYLD_LIBRARY_PATH
+  echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+  echo DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH
   echo DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH
 fi
 
