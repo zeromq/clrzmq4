@@ -8,6 +8,6 @@ build:
   project: clrzmq4.VS.sln
   verbosity: minimal
 test_script:
-- ps: test.ps1
+- ps: .\test.ps1
 after_test:
-- ps: upload_coverage.ps1
+- ps: .\upload_coverage.ps1
