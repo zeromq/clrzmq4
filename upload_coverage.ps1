@@ -6,5 +6,5 @@ if ($Env:COVERALLS_REPO_TOKEN == "") {
   $CoverallsNetVersion = "0.7.0"
   nuget install $CoverallsNetPackage -Version $CoverallsNetVersion -OutputDirectory $ToolsDirectory
 
-  $ToolsDirectory/$CoverallsNetPackage.$CoverallsNetVersion/tools/csmacnz.Coveralls.exe --opencover -i .\results.xml
+  start $ToolsDirectory/$CoverallsNetPackage.$CoverallsNetVersion/tools/csmacnz.Coveralls.exe '--opencover','-i','.\results.xml'
 }
