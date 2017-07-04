@@ -4,7 +4,7 @@ if ($Env:COVERALLS_REPO_TOKEN == "") {
   $ToolsDirectory = ".\tools"
   $CoverallsNetPackage = "coveralls.net"
   $CoverallsNetVersion = "0.7.0"
-  nuget install coveralls.net -Version $CoverallsNetVersion -OutputDirectory $ToolsDirectory
+  nuget install $CoverallsNetPackage -Version $CoverallsNetVersion -OutputDirectory $ToolsDirectory
 
-  $ToolsDirectory\$CoverallsNetPackage.$CoverallsNetVersion\tools\csmacnz.Coveralls.exe --opencover -i .\results.xml
+  $ToolsDirectory/$CoverallsNetPackage.$CoverallsNetVersion/tools/csmacnz.Coveralls.exe --opencover -i .\results.xml
 }
