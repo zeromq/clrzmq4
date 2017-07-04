@@ -1,5 +1,5 @@
-if ($Env:COVERALLS_REPO_TOKEN == "") {
-  echo Skipping coverage result upload because COVERALLS_REPO_TOKEN is not set
+if ([string]::IsNullOrEmpty($Env:COVERALLS_REPO_TOKEN)) {
+  echo "Skipping coverage result upload because COVERALLS_REPO_TOKEN is not set"
 } else {
   $ToolsDirectory = ".\tools"
   $CoverallsNetPackage = "coveralls.net"
