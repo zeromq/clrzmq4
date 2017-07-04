@@ -8,10 +8,13 @@ nuget:
   project_feed: true
 build:
   project: clrzmq4.VS.sln
-  publish_nuget: true             # package projects with .nuspec files and push to artifacts
-  publish_nuget_symbols: true     # generate and publish NuGet symbol packages
   verbosity: minimal
+after_build:
+  cmd: nuget pack ZeroMQ.nuspec
 test_script:
 - ps: .\test.ps1
 after_test:
 - ps: .\upload_coverage.ps1
+artifacts:
+- path: results.xml
+- path: '**\*.nupkg'
