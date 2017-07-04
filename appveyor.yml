@@ -9,8 +9,9 @@ nuget:
   project_feed: true
 build:
   project: clrzmq4.VS.sln
+  publish_nuget: true             # package projects with .nuspec files and push to artifacts
+  publish_nuget_symbols: true     # generate and publish NuGet symbol packages
   verbosity: minimal
-  publish_nuget: true
 test_script:
 - ps: .\test.ps1
 after_test:
