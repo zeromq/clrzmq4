@@ -1,6 +1,8 @@
 version: 1.0.{build}
 before_build:
 - cmd: nuget restore clrzmq4.VS.sln
+configuration:
+- Release
 environment:
   COVERALLS_REPO_TOKEN:
     secure: yCIV3arujsrEYPNrM/wQSs1HQThuA8lSzZ9hTcv28fhgYu3aWyPkneGdaIDElJYp
