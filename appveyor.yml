@@ -5,7 +5,6 @@ environment:
   COVERALLS_REPO_TOKEN:
     secure: yCIV3arujsrEYPNrM/wQSs1HQThuA8lSzZ9hTcv28fhgYu3aWyPkneGdaIDElJYp
 nuget:
-  account_feed: true
   project_feed: true
 build:
   project: clrzmq4.VS.sln
