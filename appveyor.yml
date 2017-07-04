@@ -19,4 +19,4 @@ after_test:
 - ps: .\upload_coverage.ps1
 artifacts:
 - path: results.xml
-- path: '**\*.nupkg'
+- path: '**\ZeroMQ*.nupkg'
