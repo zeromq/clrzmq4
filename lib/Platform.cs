@@ -2,7 +2,8 @@ namespace ZeroMQ.lib
 {
 	using System;
 	using System.Collections.Generic;
-	using System.IO;
+    using System.Diagnostics;
+    using System.IO;
 	using System.Linq;
 	using System.Reflection;
 	using System.Runtime.InteropServices;
@@ -113,7 +114,7 @@ namespace ZeroMQ.lib
 					break;
 
 				case PlatformID.Unix:
-					// TODO: older MS.NET frameworks say Unix for MacOSX ?
+					// note: current Mono versions still indicate Unix for Mac OS X
 					Kind = PlatformKind.Posix;
 					Name = PlatformName.Posix;
 					break;
@@ -172,6 +173,31 @@ namespace ZeroMQ.lib
 				Kind = PlatformKind.Posix;
 				Name = PlatformName.MacOSX;
 			}
+
+            if (Name == PlatformName.Posix)
+            {
+                // check again if this might be Mac OS X
+                var info = new ProcessStartInfo();
+                info.FileName = "sh";
+                info.Arguments = "-c \"sw_vers -productName\"";
+
+                info.UseShellExecute = false;
+                info.CreateNoWindow = true;
+
+                info.RedirectStandardOutput = true;
+                info.RedirectStandardError = true;
+
+                using (var p = Process.Start(info))
+                {
+                    var output = p.StandardOutput.ReadToEnd();
+                    // TODO: use Trace.WriteLine instead?
+                    System.Console.WriteLine("Output of sw_vers was: " + output);
+                    if (output.StartsWith("Mac OS X"))
+                    {
+                        Name = PlatformName.MacOSX;
+                    }
+                }
+            }
 
 			if (IsXamarinIOS || IsMonoTouch)
 			{
