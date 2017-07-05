@@ -1,4 +1,4 @@
-version: 1.0.{build}
+version: 4.2.0.{build}
 before_build:
 - cmd: nuget restore clrzmq4.VS.sln
 configuration:
@@ -12,7 +12,7 @@ build:
   project: clrzmq4.VS.sln
   verbosity: minimal
 after_build:
-  cmd: nuget pack ZeroMQ.nuspec
+  cmd: nuget pack ZeroMQ.nuspec -Symbols -Version %APPVEYOR_BUILD_VERSION% -Suffix unreleased
 test_script:
 - ps: .\test.ps1
 after_test:
