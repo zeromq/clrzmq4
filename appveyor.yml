@@ -12,7 +12,7 @@ build:
   project: clrzmq4.VS.sln
   verbosity: minimal
 after_build:
-  cmd: nuget pack ZeroMQ.nuspec -Symbols -Version %APPVEYOR_BUILD_VERSION% -Suffix unreleased
+  cmd: nuget pack ZeroMQ.nuspec -Symbols -Version %APPVEYOR_BUILD_VERSION% -Suffix unreleased -Verbosity detailed
 test_script:
 - ps: .\test.ps1
 after_test:
