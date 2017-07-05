@@ -101,7 +101,7 @@
 		{
 			EnsureNotDisposed();
 
-			Cancellor.Cancel();
+			Cancellor?.Cancel();
 		}
 
 		/// <summary>
@@ -113,7 +113,7 @@
 
 			Stop();
 
-			_thread.Join();	// TODO
+			_thread?.Join();	// TODO
 		}
 
 		/// <summary>
