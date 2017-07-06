@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using ZeroMQ;
+using ZeroMQ.lib;
 
 namespace ZeroMQTest
 {
@@ -78,6 +79,13 @@ namespace ZeroMQTest
             {
                 Assert.IsNotNull(context.ContextPtr);
             }
+        }
+
+        [Test]
+        public void Static_Version()
+        {
+            // TODO it is somewhat inconsistent that the version is a static property of zmq, but Has is a static property of ZContext
+            Console.WriteLine(string.Format("Loaded libzmq dynamic library is version {0}", zmq.LibraryVersion));
         }
 
         [Test]
