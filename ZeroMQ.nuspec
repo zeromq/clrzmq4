@@ -17,7 +17,7 @@
 	</metadata>
 	<files>
 		<!-- targets file -->
-		<file src="ZeroMQ.targets" target="/build/net40/ZeroMQ.targets" />
+		<file src="ZeroMQ.targets" target="build/net40/ZeroMQ.targets" />
 		
 		<!-- managed assembly -->
 		<file src="bin/Release/ZeroMQ.dll" target="lib/net40/" />
@@ -26,9 +26,9 @@
 		<file src="bin/Release/ZeroMQ.xml" target="lib/net40/" />
 		
 		<!-- native binary files -->
-		<file src="i386/libzmq.*" target="/build/i386/" />
-		<file src="i386/libsodium.*" target="/build/i386/" />
-		<file src="amd64/libzmq.*" target="/build/amd64/" />
-		<file src="amd64/libsodium.*" target="/build/amd64/" />
+		<file src="i386/libzmq.*" target="build/i386/" />
+		<file src="i386/libsodium.*" target="build/i386/" />
+		<file src="amd64/libzmq.*" target="build/amd64/" />
+		<file src="amd64/libsodium.*" target="build/amd64/" />
 	</files>
 </package>
