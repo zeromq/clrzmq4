@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -32,6 +33,7 @@ namespace ZeroMQ.Monitoring
 		protected ZMonitor(ZContext context, ZSocket socket, string endpoint)
 			: base()
 		{
+            // TODO: remove socket argument and create socket within Run?
 			_socket = socket;
 			_endpoint = endpoint;
 			_eventHandler = new Dictionary<ZMonitorEvents, Action<ZMonitorEventData>>
@@ -166,51 +168,74 @@ namespace ZeroMQ.Monitoring
 
 		// private static readonly int sizeof_MonitorEventData = Marshal.SizeOf(typeof(ZMonitorEventData));
 
-		/// <summary>
-		/// Begins monitoring for state changes, raising the appropriate events as they arrive.
-		/// </summary>
-		/// <remarks>NOTE: This is a blocking method and should be run from another thread.</remarks>
-		protected override void Run()
-		{
-			_socket.Connect(_endpoint);
+	    /// <summary>
+	    /// Begins monitoring for state changes, raising the appropriate events as they arrive.
+	    /// </summary>
+	    /// <remarks>NOTE: This is a blocking method and should be run from another thread.</remarks>
+	    protected override void Run()
+	    {
+	        using (_socket)
+	        {
+	            ZError error;
+	            if (!_socket.Connect(_endpoint, out error))
+	            {
+	                LogError(error, "connect");
+	                return;
+	            }
 
-			ZError error;
-			ZMessage incoming;
-			var poller = ZPollItem.CreateReceiver();
+	            var poller = ZPollItem.CreateReceiver();
 
-			while (!Cancellor.IsCancellationRequested)
-			{
-				if (!_socket.PollIn(poller, out incoming, out error, PollingInterval))
-				{
-					if (error == ZError.EAGAIN)
-					{
-						Thread.Sleep(1);
-						continue;
-					}
+	            while (!Cancellor.IsCancellationRequested)
+	            {
+	                ZMessage incoming;
+	                if (!_socket.PollIn(poller, out incoming, out error, PollingInterval))
+	                {
+	                    if (error == ZError.EAGAIN)
+	                    {
+	                        // TODO: why sleep here? the loop frequency is already controlled by PollingInterval
+	                        Thread.Sleep(1);
+	                        continue;
+	                    }
 
-					throw new ZException(error);
-				}
+	                    LogError(error, "poll");
+	                }
 
-				var eventValue = new ZMonitorEventData();
+	                var eventValue = new ZMonitorEventData();
 
-				using (incoming) {
-					if (incoming.Count > 0) {
-						eventValue.Event = (ZMonitorEvents)incoming[0].ReadInt16();
-						eventValue.EventValue = incoming[0].ReadInt32();
-					}
+	                using (incoming)
+	                {
+	                    if (incoming.Count > 0)
+	                    {
+	                        eventValue.Event = (ZMonitorEvents)incoming[0].ReadInt16();
+	                        eventValue.EventValue = incoming[0].ReadInt32();
+	                    }
 
-					if (incoming.Count > 1) {
-						eventValue.Address = incoming[1].ReadString();
-					}
-				}
+	                    if (incoming.Count > 1)
+	                    {
+	                        eventValue.Address = incoming[1].ReadString();
+	                    }
+	                }
 
-				OnMonitor(eventValue);
-			}
+	                OnMonitor(eventValue);
+	            }
 
-			if (!_socket.Disconnect(_endpoint, out error)) { } // ignore errors
-		}
+	            if (!_socket.Disconnect(_endpoint, out error))
+	            {
+	                LogError(error, "disconnect");
+	            }
+	        }
+	    }
 
-		internal void OnMonitor(ZMonitorEventData data)
+	    private void LogError(ZError error, string context)
+	    {
+	        // TODO: this error handling is somewhat too subtle; the client should be able to retrieve it
+	        if (error != ZError.ETERM)
+	        {
+	            Trace.TraceError("error on {0}: {1}", context, error.ToString());
+	        }
+	    }
+
+	    internal void OnMonitor(ZMonitorEventData data)
 		{
 			if (_eventHandler.ContainsKey(ZMonitorEvents.AllEvents))
 			{

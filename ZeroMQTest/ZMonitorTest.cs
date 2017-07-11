@@ -76,7 +76,7 @@ namespace ZeroMQTest
             }
         }
 
-        [Test, Ignore("This test case deadlocks because ZMonitor.Run does not close its socket when an ETERM error is encountered")]
+        [Test]
         public void StopMonitor_ViaContextClose()
         {
             ZMonitor monitor;

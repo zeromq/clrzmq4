@@ -113,7 +113,7 @@
 
 			Stop();
 
-			_thread?.Join();	// TODO
+			_thread?.Join();
 		}
 
 		/// <summary>
