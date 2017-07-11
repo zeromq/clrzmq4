@@ -13,7 +13,7 @@ namespace ZeroMQTest
     {
         private const string MonitorSocket = "inproc://test";
 
-        [Test, Ignore("Requires a fix in ZThread")]
+        [Test]
         public void Create()
         {
             using (var context = new ZContext())
