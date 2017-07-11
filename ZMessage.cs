@@ -131,7 +131,9 @@ namespace ZeroMQ
 
 		public ZFrame Pop()
 		{
-			return RemoveAt(0, false);
+			var result = RemoveAt(0, false);
+		    result.Position = 0; // TODO maybe remove this here again, see https://github.com/zeromq/clrzmq4/issues/110
+            return result;
 		}
 
 		public int PopBytes(byte[] buffer, int offset, int count)
