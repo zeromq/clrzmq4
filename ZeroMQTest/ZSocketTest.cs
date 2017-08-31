@@ -141,7 +141,7 @@ namespace ZeroMQTest
                 });
         }
 
-        [Test, Ignore("Issue in underlying libzmq fixed in commit https://github.com/zeromq/libzmq/commit/f86795350d2c37753b961018b5185cd1af33a38a")]
+        [Test]
         public void GetOption_CurvePublicKey()
         {
             DoWithUnconnectedPairSocket(socket =>
@@ -150,7 +150,7 @@ namespace ZeroMQTest
             });            
         }
 
-        [Test, Ignore("Issue in underlying libzmq fixed in commit https://github.com/zeromq/libzmq/commit/f86795350d2c37753b961018b5185cd1af33a38a")]
+        [Test]
         public void GetOption_CurveSecretKey()
         {
             DoWithUnconnectedPairSocket(socket =>
@@ -159,7 +159,7 @@ namespace ZeroMQTest
             });            
         }
 
-        [Test, Ignore("Issue in underlying libzmq fixed in commit https://github.com/zeromq/libzmq/commit/f86795350d2c37753b961018b5185cd1af33a38a")]
+        [Test]
         public void GetOption_CurveServerKey()
         {
             DoWithUnconnectedPairSocket(socket =>
