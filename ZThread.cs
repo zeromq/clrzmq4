@@ -50,10 +50,7 @@
 
 			Cancellor = cancellor;
 
-			if (_thread == null)
-			{
-				_thread = new Thread(Run);
-			}
+			if (_thread == null) _thread = new Thread(Run);
 			_thread.Start();
 		}
 
@@ -64,6 +61,7 @@
 		{
 			EnsureNotDisposed();
 
+			if (_thread == null) return;
 			_thread.Join();
 		}
 
@@ -74,6 +72,7 @@
 		{
 			EnsureNotDisposed();
 
+			if (_thread == null) return false;
 			return _thread.Join(ms);
 		}
 
@@ -91,6 +90,7 @@
 		{
 			EnsureNotDisposed();
 
+			if (_thread == null) return false;
 			return _thread.Join(timeout);
 		}
 
@@ -101,7 +101,8 @@
 		{
 			EnsureNotDisposed();
 
-			Cancellor?.Cancel();
+			if (Cancellor == null) throw new InvalidOperationException("Canceller SHOULD NOT be null.");
+			Cancellor.Cancel();
 		}
 
 		/// <summary>
@@ -113,7 +114,8 @@
 
 			Stop();
 
-			_thread?.Join();
+			if (_thread == null) return;
+			_thread.Join();
 		}
 
 		/// <summary>
@@ -135,20 +137,14 @@
 		{
 			if (!_disposed)
 			{
-				if (disposing)
-				{
-					Close();
-				}
+				if (disposing) Close();
 				_disposed = true;
 			}
 		}
 
 		protected void EnsureNotDisposed()
 		{
-			if (_disposed)
-			{
-				throw new ObjectDisposedException(GetType().FullName);
-			}
+			if (_disposed) throw new ObjectDisposedException(GetType().FullName);
 		}
 	}
 }
