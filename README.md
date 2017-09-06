@@ -5,7 +5,7 @@
 
 Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 3+.
 
-ZeroMQ is built AnyCPU, to run on Windows (VC2010) and on GNU/Linux (C 4.8.4), i386 and amd64.
+ZeroMQ is built AnyCPU, to run on Windows (VC201x) and on GNU/Linux (C 5.4.0), i386 and amd64.
 
 Get it
 - by [downloading the Release](https://github.com/zeromq/clrzmq4/releases)
