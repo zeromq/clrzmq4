@@ -1,21 +1,21 @@
 ﻿
-[![Build status](https://ci.appveyor.com/api/projects/status/102sf149379bgwv7/branch/master?svg=true)](https://ci.appveyor.com/project/zeromq/clrzmq4/branch/master) [![Build Status](https://travis-ci.org/zeromq/clrzmq4.svg?branch=master)](https://travis-ci.org/zeromq/clrzmq4) [![Coverage Status](https://coveralls.io/repos/github/zeromq/clrzmq4/badge.svg?branch=master)](https://coveralls.io/github/zeromq/clrzmq4?branch=master)
+[![travis-ci build status](https://travis-ci.org/zeromq/clrzmq4.svg?branch=master)](https://travis-ci.org/zeromq/clrzmq4)
 
 **ZeroMQ C# namespace**
 
-Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 3+.
+Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 5+.
 
-ZeroMQ is built AnyCPU, to run on Windows (VC201x) and on GNU/Linux (C 5.4.0), i386 and amd64.
+ZeroMQ is built AnyCPU, to run on Windows (VC2012) and on GNU/Linux (C 5.4.0), i386 and amd64.
 
 Get it
 - by [downloading the Release](https://github.com/zeromq/clrzmq4/releases)
 - using `git clone https://github.com/zeromq/clrzmq4`
-- using [nuget](https://www.nuget.org/packages/ZeroMQ/) `PM> Install-Package ZeroMQ` or by [downloading the nupkg](https://packages.nuget.org/api/v1/package/ZeroMQ/)
+- using [nuget](https://www.nuget.org/packages/ZeroMQ/) `PM> Install-Package ZeroMQ` or by [downloading the nupkg](https://www.nuget.org/api/v2/package/ZeroMQ/)
 
 Read [ZeroMQ - The Guide](http://zguide.zeromq.org/cs:all)
 - ZeroMQ - The Guide [Examples in C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
 
-Ask questions on [stackoverflow](http://stackoverflow.com/questions/tagged/c%23+zeromq) using tags `C#``ZeroMQ` !
+Ask questions on [stackoverflow](http://stackoverflow.com/questions/tagged/c%23+zeromq) using tags `C#` `ZeroMQ` !
 
 #### **[HWClient](https://github.com/metadings/zguide/blob/master/examples/C%23/hwclient.cs) Example**
 ```csharp
