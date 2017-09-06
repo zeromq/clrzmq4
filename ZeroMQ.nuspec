@@ -2,9 +2,11 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ZeroMQ</id>
-		<version>4.1.0.22</version>
+		<version>4.1.0.23</version>
+
 		<authors>metadings, Pieter Hintjens, Martin Sustrik</authors>
 		<projectUrl>https://github.com/zeromq/clrzmq4/</projectUrl>
+
 		<iconUrl>https://raw.githubusercontent.com/zeromq/clrzmq4/master/ZeroMQ.ico</iconUrl>
 		<licenseUrl>https://raw.githubusercontent.com/zeromq/clrzmq4/master/LICENSE.txt</licenseUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
@@ -20,15 +22,15 @@
 		<file src="ZeroMQ.targets" target="build\net40\ZeroMQ.targets" />
 		
 		<!-- managed assembly -->
-		<file src="bin\Release\ZeroMQ.dll" target="lib\net40\" />
+		<file src="bin\Release\ZeroMQ.dll" target="lib\net40" />
 		
 		<!-- XML documentation file -->
-		<file src="bin\Release\ZeroMQ.xml" target="lib\net40\" />
+		<file src="bin\Release\ZeroMQ.xml" target="lib\net40" />
 		
 		<!-- native binary files -->
-		<file src="i386\libzmq.*" target="build\i386\" />
-		<file src="i386\libsodium.*" target="build\i386\" />
-		<file src="amd64\libzmq.*" target="build\amd64\" />
-		<file src="amd64\libsodium.*" target="build\amd64\" />
+		<file src="i386\libzmq.*" target="lib\net40\i386" />
+		<file src="i386\libsodium.*" target="lib\net40\i386" />
+		<file src="amd64\libzmq.*" target="lib\net40\amd64" />
+		<file src="amd64\libsodium.*" target="lib\net40\amd64" />
 	</files>
 </package>
