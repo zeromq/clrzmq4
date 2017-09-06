@@ -177,6 +177,7 @@ namespace ZeroMQ.lib
             if (Name == PlatformName.Posix)
             {
                 // check again if this might be Mac OS X
+				// TODO: isn't there a better program to read "Mac OS X" ?
                 var info = new ProcessStartInfo();
                 info.FileName = "sh";
                 info.Arguments = "-c \"sw_vers -productName\"";
@@ -190,8 +191,10 @@ namespace ZeroMQ.lib
                 using (var p = Process.Start(info))
                 {
                     var output = p.StandardOutput.ReadToEnd();
-                    // TODO: use Trace.WriteLine instead?
-                    System.Console.WriteLine("Output of sw_vers was: " + output);
+
+					using (var writer = new StreamWriter(p.StandardError))
+						writer.WriteLine("Output of sw_vers was: " + output);
+					
                     if (output.StartsWith("Mac OS X"))
                     {
                         Name = PlatformName.MacOSX;
