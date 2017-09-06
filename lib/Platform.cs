@@ -192,8 +192,7 @@ namespace ZeroMQ.lib
                 {
                     var output = p.StandardOutput.ReadToEnd();
 
-					using (var writer = new StreamWriter(p.StandardError))
-						writer.WriteLine("Output of sw_vers was: " + output);
+					// DON'T Do Console.WriteLine("Output of sw_vers was: " + output); EVER.
 					
                     if (output.StartsWith("Mac OS X"))
                     {
