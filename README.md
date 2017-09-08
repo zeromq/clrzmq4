@@ -1,11 +1,18 @@
 ﻿
 [![Build status](https://ci.appveyor.com/api/projects/status/102sf149379bgwv7/branch/master?svg=true)](https://ci.appveyor.com/project/zeromq/clrzmq4/branch/master) [![Build Status](https://travis-ci.org/zeromq/clrzmq4.svg?branch=master)](https://travis-ci.org/zeromq/clrzmq4) [![Coverage Status](https://coveralls.io/repos/github/zeromq/clrzmq4/badge.svg?branch=master)](https://coveralls.io/github/zeromq/clrzmq4?branch=master)
 
-**ZeroMQ C# namespace**
+**ZeroMQ C# library**
 
-Hello. I've made a new ZeroMQ namespace for .NET Framework 4+ and mono 5+.
+clrzmq4 is a .NET wrapper around the native [ZeroMQ/libzmq](https://github.com/zeromq/libzmq) library, and 
+provides the ZeroMQ namespace.
 
-ZeroMQ is built AnyCPU, to run on Windows (VC2012) and on GNU/Linux (C 5.4.0), i386 and amd64.
+It is written in C# 5.0, and can be built using Visual Studio 2012+ and Mono 5+.
+
+It is built as AnyCPU to run on .NET Framework 4.0+ and mono 5+, and can currently load native shared libraries for 
+i386 and amd64 on Windows, GNU/Linux and Mac OS X.
+
+The pre-built binary packages include native shared libraries for Windows (libzmq 4.2.2) and GNU/Linux (libzmq 4.1.7), 
+for the i386 and amd64 architectures. You can replace the native shared libraries, any libzmq 4.x should work.
 
 Get it
 - by [downloading the Release](https://github.com/zeromq/clrzmq4/releases)
