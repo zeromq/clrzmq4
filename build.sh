@@ -31,6 +31,13 @@ if [ "$(sw_vers -productName)" == "Mac OS X" ] ; then
   echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
   echo DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH
   echo DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH
+else
+  # assume that we are on Ubuntu (which is used on Travis-CI.org)
+  curl http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_14.04/Release.key >Release.key
+  sudo apt-key add Release.key
+  sudo add-apt-repository "deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_14.04 ./"
+  sudo apt-get update
+  sudo apt-get install libzmq3-dev
 fi
 
 nuget install NUnit.ConsoleRunner -Version 3.6.1 -OutputDirectory testrunner
