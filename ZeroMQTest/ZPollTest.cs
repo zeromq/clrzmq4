@@ -71,7 +71,8 @@ namespace ZeroMQTest
             using (var context = new ZContext())
             {
                 var socket = new ZSocket(context, ZSocketType.PAIR);
-                task = Task.Run(() =>
+                
+                task = new Task(() =>
                  {
                      using (socket)
                      {
@@ -80,6 +81,7 @@ namespace ZeroMQTest
                          socket.PollIn(ZPollItem.CreateReceiver(), out message, out error);
                      }
                  });
+                task.Start();
             }
             Assert.IsTrue(task.Wait(1000));
             Assert.AreEqual(ZError.ETERM, error);
@@ -127,7 +129,7 @@ namespace ZeroMQTest
             using (var context = new ZContext())
             {
                 var socket = new ZSocket(context, ZSocketType.PAIR);
-                task = Task.Run(() =>
+                task = new Task(() =>
                 {
                     using (socket)
                     {
@@ -138,6 +140,7 @@ namespace ZeroMQTest
                         sockets.PollIn(pollItems, out messages, out error, TimeSpan.Zero);
                     }
                 });
+                task.Start();
             }
             Assert.IsTrue(task.Wait(1000));
             Assert.AreEqual(ZError.ETERM, error);
