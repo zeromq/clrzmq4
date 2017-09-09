@@ -4,7 +4,7 @@ namespace ZeroMQTest
 	[TestFixture]
 	public class Z85Test
 	{
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void FixtureSetUp()
         {
             if (!ZeroMQ.ZContext.Has("curve"))

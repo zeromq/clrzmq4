@@ -1,8 +1,8 @@
 ﻿namespace ZeroMQ
 {
 	using System;
-	using System.Collections.Generic;
-	using System.Threading;
+    using System.Diagnostics;
+    using System.Threading;
 
 	public abstract class ZThread : IDisposable
 	{
@@ -101,8 +101,11 @@
 		{
 			EnsureNotDisposed();
 
-			if (Cancellor == null) throw new InvalidOperationException("Canceller SHOULD NOT be null.");
-			Cancellor.Cancel();
+            if (_thread != null)
+            {
+                Debug.Assert(Cancellor != null);
+                Cancellor.Cancel();
+            }
 		}
 
 		/// <summary>
