@@ -1,8 +1,6 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQTest.mono", "ZeroMQTest\ZeroMQTest.mono.csproj", "{2640CBE6-23BD-4104-90AC-0DDCDE4D0478}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQ.mono", "ZeroMQ.mono.csproj", "{6FFD872F-A4A4-4EFA-9B4D-4342BA6CF250}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQTest.mono", "ZeroMQTest\ZeroMQTest.mono.csproj", "{2640CBE6-23BD-4104-90AC-0DDCDE4D0478}"
