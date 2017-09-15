@@ -78,7 +78,10 @@ namespace ZeroMQ.lib
 
 		public static readonly string Compiler;
 
-		static Platform()
+        [DllImport("libc")]
+        static extern int uname(IntPtr buf);
+
+        static Platform()
 		{
 			PortableExecutableKinds peKinds;
 			typeof(object).Module.GetPEKind(out peKinds, out Architecture);
@@ -177,27 +180,34 @@ namespace ZeroMQ.lib
             if (Name == PlatformName.Posix)
             {
                 // check again if this might be Mac OS X
-				// TODO: isn't there a better program to read "Mac OS X" ?
-                var info = new ProcessStartInfo();
-                info.FileName = "sh";
-                info.Arguments = "-c \"sw_vers -productName\"";
 
-                info.UseShellExecute = false;
-                info.CreateNoWindow = true;
-
-                info.RedirectStandardOutput = true;
-                info.RedirectStandardError = true;
-
-                using (var p = Process.Start(info))
+                // alternatives include:
+                // - running sw_vers or uname (but this starts an external process)
+                // - checking for existence of /System/Library/CoreServices/SystemVersion.plist (but this requires su permissions)
+                IntPtr buf = Marshal.AllocHGlobal(8192);
+                try
                 {
-                    var output = p.StandardOutput.ReadToEnd();
-
-					// DON'T Do Console.WriteLine("Output of sw_vers was: " + output); EVER.
-					
-                    if (output.StartsWith("Mac OS X"))
+                    if (uname(buf) == 0)
                     {
-                        Name = PlatformName.MacOSX;
+                        string os = Marshal.PtrToStringAnsi(buf);
+                        Trace.Write(string.Format("uname returned: {0}", os));
+                        if (os == "Darwin")
+                        {
+                            Name = PlatformName.MacOSX;
+                        }
+                        // we could identify other platforms, such as FreeBSD here as well
                     }
+                }
+                catch (DllNotFoundException e)
+                {
+                    Trace.Write(string.Format("Could not call uname: {0}", e));
+                }
+                catch (EntryPointNotFoundException e)
+                {
+                    Trace.Write(string.Format("Could not call uname: {0}", e));
+                }
+                finally {
+                    Marshal.FreeHGlobal(buf);
                 }
             }
 
