@@ -174,32 +174,10 @@ namespace ZeroMQ.lib
 				Name = PlatformName.MacOSX;
 			}
 
-            if (Name == PlatformName.Posix)
-            {
-                // check again if this might be Mac OS X
-				// TODO: isn't there a better program to read "Mac OS X" ?
-                var info = new ProcessStartInfo();
-                info.FileName = "sh";
-                info.Arguments = "-c \"sw_vers -productName\"";
-
-                info.UseShellExecute = false;
-                info.CreateNoWindow = true;
-
-                info.RedirectStandardOutput = true;
-                info.RedirectStandardError = true;
-
-                using (var p = Process.Start(info))
-                {
-                    var output = p.StandardOutput.ReadToEnd();
-
-					// DON'T Do Console.WriteLine("Output of sw_vers was: " + output); EVER.
-					
-                    if (output.StartsWith("Mac OS X"))
-                    {
-                        Name = PlatformName.MacOSX;
-                    }
-                }
-            }
+			if (Name == PlatformName.Posix && File.Exists("/System/Library/CoreServices/SystemVersion.plist")) 
+			{
+				Name = PlatformName.MacOSX;
+			}
 
 			if (IsXamarinIOS || IsMonoTouch)
 			{
