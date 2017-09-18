@@ -24,7 +24,10 @@ if [ "$(uname)" == "Darwin" ] ; then
   echo "name local_archives" >>archive_sites.conf
   echo "urls http://packages.macports.org/ http://nue.de.packages.macports.org/" >>archive_sites.conf
   sudo cp archive_sites.conf /opt/local/etc/macports/
-  sudo port -v install zmq +universal || true # ignore errors, since this seems to always fail with "Updating database of binaries failed"
+  
+  # ignore errors on call to port, since this seems to always fail with "Updating database of binaries failed"  
+  while (sudo port -v install zmq +universal || true) | grep "Error: Port zmq not found" ; do echo "port install zmq failed, retrying" ; done
+  
   file /opt/local/lib/*mq*.dylib # DIAGNOSTICS
   
   cp /opt/local/lib/libzmq.dylib amd64
