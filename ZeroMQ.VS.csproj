@@ -129,6 +129,12 @@
     <None Include="i386\libzmq.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="amd64\libzmq.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="i386\libzmq.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="README.md" />
     <None Include="ZeroMQ.snk" />
   </ItemGroup>
