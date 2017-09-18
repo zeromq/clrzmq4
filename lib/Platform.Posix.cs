@@ -23,20 +23,12 @@
 			// public const string LibraryFileExtension = ".so";
 
 			public static readonly string[] LibraryPaths = new string[] {
-				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.a",
-				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.a.*",
 				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.so",
 				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.so.*",
-				"{AppBase}/{Arch}/{LibraryName}.a",
-				"{AppBase}/{Arch}/{LibraryName}.a.*",
 				"{AppBase}/{Arch}/{LibraryName}.so",
 				"{AppBase}/{Arch}/{LibraryName}.so.*",
-				"{DllPath}/{Arch}/{LibraryName}.a",
-				"{DllPath}/{Arch}/{LibraryName}.a.*",
 				"{DllPath}/{Arch}/{LibraryName}.so",
 				"{DllPath}/{Arch}/{LibraryName}.so.*",
-				"{Path}/{LibraryName}.a",
-				"{Path}/{LibraryName}.a.*",
 				"{Path}/{LibraryName}.so",
 				"{Path}/{LibraryName}.so.*",
 			};
