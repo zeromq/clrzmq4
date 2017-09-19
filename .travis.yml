@@ -12,6 +12,11 @@ matrix:
       osx_image: xcode7.3
       mono: latest
 
+before_install:
+  - chmod a+x ./install_deps.sh
+install:
+  - ./install_deps.sh
+
 before_script:
   - chmod a+x ./build.sh
 script:
