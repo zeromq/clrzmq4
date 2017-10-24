@@ -15,7 +15,7 @@ namespace ZeroMQ.lib
 	{
 		public static class Win32
 		{
-			private const string LibraryName = "kernel32";
+			public const string LibraryName = "kernel32";
 
 			// public const string LibraryFileExtension = ".dll";
 
