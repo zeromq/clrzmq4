@@ -47,7 +47,7 @@ namespace ZeroMQ.lib
 			"mingw32",
 		};
 
-		// public static readonly string LibraryName;
+		public static readonly string LibraryName;
 
 		// public static readonly string LibraryFileExtension;
 
@@ -188,6 +188,7 @@ namespace ZeroMQ.lib
 			}
 
 			SetupImplementation(typeof(Platform));
+			LoadUnmanagedLibrary(LibraryName);
 		}
 
 		public static bool IsMono { get; private set; }
