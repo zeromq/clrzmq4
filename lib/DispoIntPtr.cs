@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace ZeroMQ.lib
+﻿namespace ZeroMQ.lib
 {
 	using System;
 	using System.Text;
@@ -9,13 +7,16 @@ namespace ZeroMQ.lib
 
     internal sealed partial class DispoIntPtr : IDisposable
 	{
-		private delegate DispoIntPtr AllocStringNativeDelegate(string str, out int byteCount);
+		private static DispoIntPtr AllocStringNative(string str, out int byteCount)
+		{
+			// use builtin allocation
+			var dispPtr = new DispoIntPtr();
+			dispPtr._ptr = Marshal.StringToHGlobalAnsi(str);
+			dispPtr.isAllocated = true;
 
-		private static readonly AllocStringNativeDelegate AllocStringNative = Ansi.AllocStringNative;
-
-		/* static DispoIntPtr() {
-			// Platform.SetupPlatformImplementation(typeof(DispoIntPtr));
-		} */
+			byteCount = Encoding.Default.GetByteCount(str);
+			return dispPtr;
+		}
 
 		public static DispoIntPtr Alloc(int size)
 		{
