@@ -53,12 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="lib\DispoIntPtr.cs" />
-    <Compile Include="lib\DispoIntPtr.Ansi.cs" />
     <Compile Include="lib\Platform.cs" />
-    <Compile Include="lib\Platform.Posix.cs" />
-    <Compile Include="lib\Platform.Win32.cs" />
-    <Compile Include="lib\Platform.MacOSX.cs" />
-    <Compile Include="lib\UnmanagedLibrary.cs" />
     <Compile Include="lib\zmq.cs" />
     <Compile Include="lib\zmq_pollitem_posix_t.cs" />
     <Compile Include="lib\zmq_pollitem_windows_t.cs" />
@@ -98,7 +93,6 @@
     <Compile Include="Devices\PushPullDevice.cs" />
     <Compile Include="Devices\RouterDealerDevice.cs" />
     <Compile Include="Devices\StreamDealerDevice.cs" />
-    <Compile Include="lib\Platform.__Internal.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -109,31 +103,13 @@
   <ItemGroup>
     <None Include="ZeroMQ.snk" />
     <None Include="README.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="amd64\libsodium.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="amd64\libzmq.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="amd64\libzmq.so">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="amd64\libzmq.dylib">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="i386\libsodium.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="i386\libzmq.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="i386\libzmq.so">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="i386\libzmq.dylib">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="i386\libsodium.dll" />
+    <None Include="i386\libzmq.dll" />
+    <None Include="i386\libzmq.so" />
+    <None Include="i386\libzmq.dylib" />
+    <None Include="amd64\libsodium.dll" />
+    <None Include="amd64\libzmq.dll" />
+    <None Include="amd64\libzmq.so" />
+    <None Include="amd64\libzmq.dylib" />
   </ItemGroup>
 </Project>

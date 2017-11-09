@@ -18,7 +18,13 @@
 
 			private const string __Internal = "__Internal";
 
+<<<<<<< HEAD
 			public const string LibraryName = "libdl";
+=======
+			// private const string LibraryName = "libdl";
+
+			// public const string LibraryFileExtension = ".so";
+>>>>>>> e7401807b22ed0ae41478d3347185fe76cb98b9c
 
 			public static readonly string[] LibraryPaths = new string[] {
 				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.so",
@@ -36,20 +42,32 @@
 			private const int RTLD_GLOBAL = 0x0100;
 			private const int RTLD_LOCAL = 0x0000;
 
-			[DllImport(LibraryName, CallingConvention = CCCdecl)]
+			[DllImport(__Internal, CallingConvention = CCCdecl)]
 			private static extern SafeLibraryHandle dlopen(IntPtr filename, int flags);
 
-			[DllImport(LibraryName, CallingConvention = CCCdecl)]
+			[DllImport(__Internal, CallingConvention = CCCdecl)]
 			private static extern int dlclose(IntPtr handle);
 
-			[DllImport(LibraryName, CallingConvention = CCCdecl)]
+			[DllImport(__Internal, CallingConvention = CCCdecl)]
 			private static extern IntPtr dlerror();
 
-			[DllImport(LibraryName, CallingConvention = CCCdecl)]
+			[DllImport(__Internal, CallingConvention = CCCdecl)]
 			private static extern IntPtr dlsym(SafeLibraryHandle handle, IntPtr symbol);
+			
+			[DllImport(__Internal)]
+			private static extern void mono_dllmap_insert(IntPtr assembly, IntPtr dll, IntPtr func, IntPtr tdll, IntPtr tfunc);
 
 			[DllImport(__Internal)]
 			private static extern void mono_dllmap_insert(IntPtr assembly, IntPtr dll, IntPtr func, IntPtr tdll, IntPtr tfunc);
+
+			private static void MonoDllMapInsert(string libraryName, string libraryPath)
+			{
+				IntPtr libraryNamePtr = Marshal.StringToHGlobalAnsi(libraryName);
+				IntPtr pathPtr = Marshal.StringToHGlobalAnsi(libraryPath);
+				mono_dllmap_insert(IntPtr.Zero, libraryNamePtr, IntPtr.Zero, pathPtr, IntPtr.Zero);
+				Marshal.FreeHGlobal(libraryNamePtr);
+				Marshal.FreeHGlobal(pathPtr);
+			}
 
 			private static void MonoDllMapInsert(string libraryName, string libraryPath)
 			{
@@ -144,7 +162,13 @@
 
 						if (!handle.IsNullOrInvalid())
 						{
+<<<<<<< HEAD
 							if (Platform.IsMono) MonoDllMapInsert(libraryName, file);
+=======
+							// This is Platform.Posix. In mono, just dlopen'ing the library doesn't work.
+							// Using DllImport("__Internal", EntryPoint = "mono_dllmap_insert") to get mono on the path.
+							MonoDllMapInsert(libraryName, file);
+>>>>>>> e7401807b22ed0ae41478d3347185fe76cb98b9c
 
 							Trace.TraceInformation(string.Format("{0} Loaded binary \"{1}\"", 
 								traceLabel, file));
@@ -172,7 +196,11 @@
 
 					if (!handle.IsNullOrInvalid())
 					{
+<<<<<<< HEAD
 						if (Platform.IsMono) MonoDllMapInsert(libraryName, tempPath);
+=======
+						MonoDllMapInsert(libraryName, tempPath);
+>>>>>>> e7401807b22ed0ae41478d3347185fe76cb98b9c
 
 						Trace.TraceInformation(string.Format("{0} Loaded binary from EmbeddedResource \"{1}\" from \"{2}\".", 
 							traceLabel, resourceName, tempPath));
