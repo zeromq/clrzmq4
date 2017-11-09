@@ -115,5 +115,6 @@
     <None Include="amd64\libzmq.dll" />
     <None Include="amd64\libzmq.so" />
     <None Include="amd64\libzmq.dylib" />
+    <None Include="app.config" />
   </ItemGroup>
 </Project>
