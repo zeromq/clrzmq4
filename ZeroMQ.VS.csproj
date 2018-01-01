@@ -56,25 +56,8 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="lib\Platform.__Internal.cs" />
-    <Compile Include="ZDevice.cs" />
-    <Compile Include="Monitoring\ZMonitors.cs" />
-    <Compile Include="Z85.cs" />
-    <Compile Include="ZActor.cs" />
-    <Compile Include="ZFrameOption.cs" />
-    <Compile Include="ZThread.cs" />
-    <Compile Include="ZSocketSetup.cs" />
-    <Compile Include="Devices\PubSubDevice.cs" />
-    <Compile Include="Devices\PushPullDevice.cs" />
-    <Compile Include="Devices\RouterDealerDevice.cs" />
-    <Compile Include="Devices\StreamDealerDevice.cs" />
     <Compile Include="lib\DispoIntPtr.cs" />
-    <Compile Include="lib\DispoIntPtr.Ansi.cs" />
     <Compile Include="lib\Platform.cs" />
-    <Compile Include="lib\Platform.Posix.cs" />
-    <Compile Include="lib\Platform.Win32.cs" />
-    <Compile Include="lib\Platform.MacOSX.cs" />
-    <Compile Include="lib\UnmanagedLibrary.cs" />
     <Compile Include="lib\zmq.cs" />
     <Compile Include="lib\zmq_pollitem_posix_t.cs" />
     <Compile Include="lib\zmq_pollitem_windows_t.cs" />
@@ -103,6 +86,17 @@
     <Compile Include="ZSymbol.cs" />
     <Compile Include="ZPoll.cs" />
     <Compile Include="ZPollItem.cs" />
+    <Compile Include="ZThread.cs" />
+    <Compile Include="ZActor.cs" />
+    <Compile Include="Monitoring\ZMonitors.cs" />
+    <Compile Include="Z85.cs" />
+    <Compile Include="ZFrameOption.cs" />
+    <Compile Include="ZDevice.cs" />
+    <Compile Include="ZSocketSetup.cs" />
+    <Compile Include="Devices\PubSubDevice.cs" />
+    <Compile Include="Devices\PushPullDevice.cs" />
+    <Compile Include="Devices\RouterDealerDevice.cs" />
+    <Compile Include="Devices\StreamDealerDevice.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -111,32 +105,16 @@
 	-->
   <Target Name="AfterBuild" />
   <ItemGroup>
-    <None Include="amd64\libsodium.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="i386\libsodium.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="i386\libzmq.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="amd64\libzmq.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="amd64\libzmq.so">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="i386\libzmq.so">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="amd64\libzmq.dylib">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="i386\libzmq.dylib">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="README.md" />
     <None Include="ZeroMQ.snk" />
+    <None Include="README.md" />
+    <None Include="i386\libsodium.dll" />
+    <None Include="i386\libzmq.dll" />
+    <None Include="i386\libzmq.so" />
+    <None Include="i386\libzmq.dylib" />
+    <None Include="amd64\libsodium.dll" />
+    <None Include="amd64\libzmq.dll" />
+    <None Include="amd64\libzmq.so" />
+    <None Include="amd64\libzmq.dylib" />
+    <None Include="app.config" />
   </ItemGroup>
-  <ItemGroup />
 </Project>

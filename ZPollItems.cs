@@ -1,5 +1,3 @@
-using System;
-
 namespace ZeroMQ
 {
 	using lib;
