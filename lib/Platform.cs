@@ -20,14 +20,14 @@ namespace ZeroMQ.lib
 
 	public enum PlatformKind : int
 	{
-		__Internal = 0,
+		NetCore = 0,
 		Posix,
 		Win32,
 	}
 
 	public enum PlatformName : int
 	{
-		__Internal = 0,
+		Internal = 0,
 		Posix,
 		Windows,
 		MacOSX,
@@ -35,9 +35,29 @@ namespace ZeroMQ.lib
 
 	public static partial class Platform
 	{
+		// public static readonly string LibraryName;
 
-		// public static readonly bool Is__Internal;
+		// public static readonly string LibraryFileExtension;
 
+		public static readonly string[] LibraryPaths;
+
+		public delegate UnmanagedLibrary LoadUnmanagedLibraryDelegate(string libraryName);
+		public static readonly LoadUnmanagedLibraryDelegate LoadUnmanagedLibrary;
+
+		public delegate SafeLibraryHandle OpenHandleDelegate(string filename);
+		public static readonly OpenHandleDelegate OpenHandle;
+
+		public delegate IntPtr LoadProcedureDelegate(SafeLibraryHandle handle, string functionName);
+		public static readonly LoadProcedureDelegate LoadProcedure;
+
+		public delegate bool ReleaseHandleDelegate(IntPtr handle);
+		public static readonly ReleaseHandleDelegate ReleaseHandle;
+
+		public delegate Exception GetLastLibraryErrorDelegate();
+		public static readonly GetLastLibraryErrorDelegate GetLastLibraryError;
+
+		public static bool Is__Internal { get { return Platform.Name == PlatformName.Internal; } }
+    
 		public static readonly PlatformKind Kind;
 
 		public static readonly PlatformName Name;
@@ -125,6 +145,7 @@ namespace ZeroMQ.lib
 				// Kind = PlatformKind.__Internal;
 				// Name = PlatformName.__Internal;
 
+				Name = PlatformName.Internal;
 				// Is__Internal = true;
 			}
 
@@ -149,10 +170,15 @@ namespace ZeroMQ.lib
 			AssignImplementations(platformDependant, platformKind);
 
 			// Overwrite by PlatformName
-			string platformName = Enum.GetName(typeof(PlatformName), Platform.Name);
-			if (platformName != platformKind)
+			if (Platform.Kind != PlatformKind.NetCore) {
+				string platformName = Enum.GetName (typeof(PlatformName), Platform.Name);
+				if (platformName != platformKind) {
+					AssignImplementations (platformDependant, platformName);
+				}
+			}
+			else if (Is__Internal) 
 			{
-				AssignImplementations(platformDependant, platformName);
+				AssignImplementations(platformDependant, "__Internal");
 			}
 		}
 
