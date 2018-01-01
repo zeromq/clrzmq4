@@ -20,14 +20,14 @@ namespace ZeroMQ.lib
 
 	public enum PlatformKind : int
 	{
-		__Internal = 0,
+		NetCore = 0,
 		Posix,
 		Win32,
 	}
 
 	public enum PlatformName : int
 	{
-		__Internal = 0,
+		Internal = 0,
 		Posix,
 		Windows,
 		MacOSX,
@@ -68,7 +68,7 @@ namespace ZeroMQ.lib
 		public delegate Exception GetLastLibraryErrorDelegate();
 		public static readonly GetLastLibraryErrorDelegate GetLastLibraryError;
 
-		public static readonly bool Is__Internal;
+		public static bool Is__Internal { get { return Platform.Name == PlatformName.Internal; } }
 
 		public static readonly PlatformKind Kind;
 
@@ -184,7 +184,8 @@ namespace ZeroMQ.lib
 				// Kind = PlatformKind.__Internal;
 				// Name = PlatformName.__Internal;
 
-				Is__Internal = true;
+				Name = PlatformName.Internal;
+				// Is__Internal = true;
 			}
 
 			SetupImplementation(typeof(Platform));
@@ -246,13 +247,13 @@ namespace ZeroMQ.lib
 			AssignImplementations(platformDependant, platformKind);
 
 			// Overwrite by PlatformName
-			string platformName = Enum.GetName(typeof(PlatformName), Platform.Name);
-			if (platformName != platformKind)
-			{
-				AssignImplementations(platformDependant, platformName);
+			if (Platform.Kind != PlatformKind.NetCore) {
+				string platformName = Enum.GetName (typeof(PlatformName), Platform.Name);
+				if (platformName != platformKind) {
+					AssignImplementations (platformDependant, platformName);
+				}
 			}
-
-			if (Is__Internal) 
+			else if (Is__Internal) 
 			{
 				AssignImplementations(platformDependant, "__Internal");
 			}
