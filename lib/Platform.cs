@@ -20,14 +20,14 @@ namespace ZeroMQ.lib
 
 	public enum PlatformKind : int
 	{
-		__Internal = 0,
+		NetCore = 0,
 		Posix,
 		Win32,
 	}
 
 	public enum PlatformName : int
 	{
-		__Internal = 0,
+		Internal = 0,
 		Posix,
 		Windows,
 		MacOSX,
@@ -35,14 +35,48 @@ namespace ZeroMQ.lib
 
 	public static partial class Platform
 	{
+		public static readonly string[] Compilers = new string[] {
+			"msvc2008",
+			"msvc2010",
+			"msvc2012",
+			"msvc2013",
+			"msvc2015",
+			"gcc3",
+			"gcc4",
+			"gcc5",
+			"mingw32",
+		};
 
-		// public static readonly bool Is__Internal;
+		// public static readonly string LibraryName;
+
+		// public static readonly string LibraryFileExtension;
+
+		public static readonly string[] LibraryPaths;
+
+		public delegate UnmanagedLibrary LoadUnmanagedLibraryDelegate(string libraryName);
+		public static readonly LoadUnmanagedLibraryDelegate LoadUnmanagedLibrary;
+
+		public delegate SafeLibraryHandle OpenHandleDelegate(string filename);
+		public static readonly OpenHandleDelegate OpenHandle;
+
+		public delegate IntPtr LoadProcedureDelegate(SafeLibraryHandle handle, string functionName);
+		public static readonly LoadProcedureDelegate LoadProcedure;
+
+		public delegate bool ReleaseHandleDelegate(IntPtr handle);
+		public static readonly ReleaseHandleDelegate ReleaseHandle;
+
+		public delegate Exception GetLastLibraryErrorDelegate();
+		public static readonly GetLastLibraryErrorDelegate GetLastLibraryError;
+
+		public static bool Is__Internal { get { return Platform.Name == PlatformName.Internal; } }
 
 		public static readonly PlatformKind Kind;
 
 		public static readonly PlatformName Name;
 
 		public static readonly ImageFileMachine Architecture;
+
+		public static readonly string Compiler;
 
 		static Platform()
 		{
@@ -101,6 +135,31 @@ namespace ZeroMQ.lib
 					break;
 			}
 
+			// TODO: Detect and distinguish available Compilers and Runtimes
+
+			/* switch (Kind) {
+
+			case PlatformKind.Windows:
+				LibraryFileNameFormat = Platform.Windows.LibraryFileNameFormat;
+				OpenPtr = Platform.Windows.OpenPtr;
+				LoadProcedure = Platform.Windows.LoadProcedure;
+				ReleasePtr = Platform.Windows.ReleasePtr;
+				GetLastLibraryError = Platform.Windows.GetLastLibraryError;
+				break;
+
+			case PlatformKind.Posix:
+				LibraryFileNameFormat = Platform.Posix.LibraryFileNameFormat;
+				OpenPtr = Platform.Posix.OpenPtr;
+				LoadProcedure = Platform.Posix.LoadProcedure;
+				ReleasePtr = Platform.Posix.ReleasePtr;
+				GetLastLibraryError = Platform.Posix.GetLastLibraryError;
+				break;
+
+			case PlatformKind.Unknown:
+			default:
+				throw new PlatformNotSupportedException ();
+			} */
+
 			IsMono = Type.GetType("Mono.Runtime") != null;
 
 			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -125,10 +184,11 @@ namespace ZeroMQ.lib
 				// Kind = PlatformKind.__Internal;
 				// Name = PlatformName.__Internal;
 
+				Name = PlatformName.Internal;
 				// Is__Internal = true;
 			}
 
-			// SetupImplementation(typeof(Platform));
+			SetupImplementation(typeof(Platform));
 		}
 
 		public static bool IsMono { get; private set; }
@@ -141,6 +201,44 @@ namespace ZeroMQ.lib
 
 		public static bool IsXamarinAndroid { get; private set; }
 
+		public static void ExpandPaths(IList<string> stream,
+			string extension, string path)
+		{
+			ExpandPaths(stream, extension, path != null ? new string[] { path } : null);
+		}
+
+		public static void ExpandPaths(IList<string> stream,
+			string extension, IEnumerable<string> paths) 
+		{
+			int pathsC = paths == null ? 0 : paths.Count();
+
+			foreach (string libraryPath in stream.ToArray())
+			{
+				if (-1 == libraryPath.IndexOf(extension)) continue;
+
+				int libraryPathI = stream.IndexOf(libraryPath);
+				stream.RemoveAt(libraryPathI);
+
+				if (pathsC == 0)
+				{
+					// just continue, don't Insert them again
+					continue;
+				}
+
+				if (pathsC == 1)
+				{
+					stream.Insert(libraryPathI, libraryPath.Replace(extension, paths.ElementAt(0)));
+					continue;
+				}
+
+				foreach (string realLibraryPath in paths)
+				{
+					stream.Insert(libraryPathI, libraryPath.Replace(extension, realLibraryPath));
+					++libraryPathI;
+				}
+
+			}
+		}
 
 		public static void SetupImplementation(Type platformDependant)
 		{
@@ -149,10 +247,15 @@ namespace ZeroMQ.lib
 			AssignImplementations(platformDependant, platformKind);
 
 			// Overwrite by PlatformName
-			string platformName = Enum.GetName(typeof(PlatformName), Platform.Name);
-			if (platformName != platformKind)
+			if (Platform.Kind != PlatformKind.NetCore) {
+				string platformName = Enum.GetName (typeof(PlatformName), Platform.Name);
+				if (platformName != platformKind) {
+					AssignImplementations (platformDependant, platformName);
+				}
+			}
+			else if (Is__Internal) 
 			{
-				AssignImplementations(platformDependant, platformName);
+				AssignImplementations(platformDependant, "Internal");
 			}
 		}
 
@@ -161,43 +264,108 @@ namespace ZeroMQ.lib
 		private static void AssignImplementations(Type platformDependant, string implementationName)
 		{
 			Type platformImplementation = platformDependant.GetNestedType(implementationName, bindings);
-			if (platformImplementation == null) return;
+			// if (platformImplementation == null) return;
 
 			FieldInfo[] fields = platformDependant.GetFields(bindings);
 			foreach (FieldInfo field in fields)
 			{
 				Type fieldType = field.FieldType;
-				string fieldName = fieldType.Name;
+				string delegateName = fieldType.Name;
+				MethodInfo methodInfo__internal = null;
+				FieldInfo fieldInfo__internal = null;
 
-				if (fieldName.EndsWith("Delegate"))
+				// TODO: This is mapping sodium.crypto_box to sodium.crypto_box__Internal. Should we also map them to sodium.__Internal.crypto_box?
+				if (implementationName == "Internal")
 				{
-					// YOU now have
-					// public static readonly UnmanagedLibrary LoadUnmanagedLibraryDelegate;
-
-					// YOU need
-					// public static readonly LoadUnmanagedLibraryDelegate LoadUnmanagedLibrary 
-					//     = Platform.__Internal.LoadUnmanagedLibrary;
-
-					fieldName = fieldName.Substring(0, fieldName.Length - "Delegate".Length);
-
-					MethodInfo methodInfo = platformImplementation.GetMethod(fieldName, bindings);
-					if (methodInfo != null)
+					if (delegateName.EndsWith("_delegate"))
 					{
-						var delegat = Delegate.CreateDelegate (fieldType, methodInfo);
-						field.SetValue (null, delegat);
+						// YOU now have
+						// public static readonly crypto_box_delegate box = crypto_box;
+
+						// YOU need
+						// public static readonly crypto_box_delegate box = crypto_box__Internal;
+
+						delegateName = delegateName.Substring(0, delegateName.Length - "_delegate".Length);
+						if (delegateName.Length > 0)
+						{
+							methodInfo__internal = platformDependant.GetMethod(delegateName + "__Internal", bindings);
+						}
 					}
 				}
-				else
+				if (methodInfo__internal == null && platformImplementation != null)
 				{
-					FieldInfo fieldInfo = platformImplementation.GetField(field.Name, bindings);
-					if (fieldInfo != null)
+					if (delegateName.EndsWith("Delegate"))
 					{
-						object value = fieldInfo.GetValue (null);
-						field.SetValue (null, value);
+						// YOU now have
+						// public static readonly UnmanagedLibrary LoadUnmanagedLibraryDelegate;
+
+						// YOU need
+						// public static readonly LoadUnmanagedLibraryDelegate LoadUnmanagedLibrary 
+						//     = Platform.__Internal.LoadUnmanagedLibrary;
+
+						delegateName = delegateName.Substring(0, delegateName.Length - "Delegate".Length);
+
+						methodInfo__internal = platformImplementation.GetMethod(delegateName, bindings);
+					}
+					else
+					{
+						methodInfo__internal = platformImplementation.GetMethod(field.Name, bindings);
+					}
+
+					if (methodInfo__internal == null)
+					{
+						fieldInfo__internal = platformImplementation.GetField(field.Name, bindings);
 					}
 				}
 
+				if (methodInfo__internal != null)
+				{
+					var delegat = Delegate.CreateDelegate(fieldType, methodInfo__internal);
+					field.SetValue(null, delegat);
+				}
+				else if (fieldInfo__internal != null)
+				{
+					object value = fieldInfo__internal.GetValue(null);
+					field.SetValue(null, value);
+				}
+				// else { field.SetValue(null, null); }
 			}
+		}
+
+		private static bool ExtractManifestResource(string resourceName, string outputPath)
+		{
+			if (File.Exists(outputPath))
+			{
+				// This is necessary to prevent access conflicts if multiple processes are run from the
+				// same location. The naming scheme implemented in UnmanagedLibrary should ensure that
+				// the correct version is always used.
+				return true;
+			}
+
+			Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+
+			if (resourceStream == null)
+			{
+				// No manifest resources were compiled into the current assembly. This is likely a 'manual
+				// deployment' situation, so do not throw an exception at this point and allow all deployment
+				// paths to be searched.
+				return false;
+			}
+
+			try
+			{
+				using (FileStream fileStream = File.Create(outputPath))
+				{
+					resourceStream.CopyTo(fileStream);
+				}
+			}
+			catch (UnauthorizedAccessException)
+			{
+				// Caller does not have write permission for the current file
+				return false;
+			}
+
+			return true;
 		}
 
 	}
