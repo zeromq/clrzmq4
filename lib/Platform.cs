@@ -35,17 +35,6 @@ namespace ZeroMQ.lib
 
 	public static partial class Platform
 	{
-		public static readonly string[] Compilers = new string[] {
-			"msvc2008",
-			"msvc2010",
-			"msvc2012",
-			"msvc2013",
-			"msvc2015",
-			"gcc3",
-			"gcc4",
-			"gcc5",
-			"mingw32",
-		};
 
 		// public static readonly string LibraryName;
 
@@ -75,8 +64,6 @@ namespace ZeroMQ.lib
 		public static readonly PlatformName Name;
 
 		public static readonly ImageFileMachine Architecture;
-
-		public static readonly string Compiler;
 
 		static Platform()
 		{
@@ -134,31 +121,6 @@ namespace ZeroMQ.lib
 					break;
 			}
 
-			// TODO: Detect and distinguish available Compilers and Runtimes
-
-			/* switch (Kind) {
-
-			case PlatformKind.Windows:
-				LibraryFileNameFormat = Platform.Windows.LibraryFileNameFormat;
-				OpenPtr = Platform.Windows.OpenPtr;
-				LoadProcedure = Platform.Windows.LoadProcedure;
-				ReleasePtr = Platform.Windows.ReleasePtr;
-				GetLastLibraryError = Platform.Windows.GetLastLibraryError;
-				break;
-
-			case PlatformKind.Posix:
-				LibraryFileNameFormat = Platform.Posix.LibraryFileNameFormat;
-				OpenPtr = Platform.Posix.OpenPtr;
-				LoadProcedure = Platform.Posix.LoadProcedure;
-				ReleasePtr = Platform.Posix.ReleasePtr;
-				GetLastLibraryError = Platform.Posix.GetLastLibraryError;
-				break;
-
-			case PlatformKind.Unknown:
-			default:
-				throw new PlatformNotSupportedException ();
-			} */
-
 			IsMono = Type.GetType("Mono.Runtime") != null;
 
 			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -180,11 +142,7 @@ namespace ZeroMQ.lib
 
 			if (IsXamarinIOS || IsMonoTouch)
 			{
-				// Kind = PlatformKind.__Internal;
-				// Name = PlatformName.__Internal;
-
 				Name = PlatformName.Internal;
-				// Is__Internal = true;
 			}
 
 			SetupImplementation(typeof(Platform));

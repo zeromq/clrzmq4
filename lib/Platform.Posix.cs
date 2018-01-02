@@ -19,14 +19,12 @@
 			private const string LibraryName = "libdl";
 
 			public static readonly string[] LibraryPaths = new string[] {
-				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.so",
-				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.so.*",
-				"{AppBase}/{Arch}/{LibraryName}.so",
-				"{AppBase}/{Arch}/{LibraryName}.so.*",
-				"{DllPath}/{Arch}/{LibraryName}.so",
-				"{DllPath}/{Arch}/{LibraryName}.so.*",
 				"{Path}/{LibraryName}.so",
 				"{Path}/{LibraryName}.so.*",
+				"{DllPath}/{Arch}/{LibraryName}.so",
+				"{DllPath}/{Arch}/{LibraryName}.so.*",
+				"{AppBase}/{Arch}/{LibraryName}.so",
+				"{AppBase}/{Arch}/{LibraryName}.so.*",
 			};
 
 			private const int RTLD_LAZY = 0x0001;
@@ -67,7 +65,7 @@
 
 				// Now look: This method should ExpandPaths on LibraryPaths.
 				// That being said, it should just enumerate
-				// Path, AppBase, Arch, Compiler, LibraryName, Extension
+				// Path, AppBase, Arch, LibraryName, Extension
 
 				// Secondly, this method should try each /lib/x86_64-linux-gnu/libload.so.2 to load,
 				// Third, this method should try EmbeddedResources,
@@ -102,9 +100,6 @@
 				if (architecture == "amd64") architecturePaths = new string[] { "amd64", "x64" };
 				if (architecturePaths == null) architecturePaths = new string[] { architecture };
 				Platform.ExpandPaths(libraryPaths, "{Arch}", architecturePaths);
-
-				// Expand Compiler
-				Platform.ExpandPaths(libraryPaths, "{Compiler}", Platform.Compiler);
 
 				// Now TRY the enumerated Directories for libFile.so.*
 
@@ -157,7 +152,7 @@
 				}
 
 				// Search ManifestResources for fileName.arch.ext
-				// TODO: Enumerate ManifestResources for ZeroMQ{Arch}{Compiler}{LibraryName}{Ext}.so.*
+				// TODO: Enumerate ManifestResources for ZeroMQ{Arch}{LibraryName}{Ext}.so.*
 				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, ".so");
 				string tempPath = Path.Combine(Path.GetTempPath(), resourceName);
 

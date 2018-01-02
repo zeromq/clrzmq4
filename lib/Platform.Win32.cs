@@ -20,13 +20,9 @@ namespace ZeroMQ.lib
 			// public const string LibraryFileExtension = ".dll";
 
 			public static readonly string[] LibraryPaths = new string[] {
-				@"{AppBase}\{Arch}\{Compiler}\{LibraryName}.dll",
-				// @"{AppBase}\{Arch}\{Compiler}\{LibraryName}-*.dll",
-				@"{AppBase}\{Arch}\{LibraryName}.dll",
-				@"{DllPath}\{Arch}\{LibraryName}.dll",
-				// @"{AppBase}\{Arch}\{LibraryName}-*.dll",
 				@"{System32}\{LibraryName}.dll",
-				// @"{System32}\{LibraryName}-*.dll",
+				@"{DllPath}\{Arch}\{LibraryName}.dll",
+				@"{AppBase}\{Arch}\{LibraryName}.dll",
 			};
 
 			[DllImport(LibraryName, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
@@ -49,7 +45,7 @@ namespace ZeroMQ.lib
 
 				// Now look: This method should ExpandPaths on LibraryPaths.
 				// That being said, it should just enumerate
-				// Path, AppBase, Arch, Compiler, LibraryName, Extension
+				// Path, AppBase, Arch, LibraryName, Extension
 
 				// Secondly, this method should try each /lib/x86_64-linux-gnu/libload.so.2 to load,
 				// Third, this method should try EmbeddedResources,
@@ -84,9 +80,6 @@ namespace ZeroMQ.lib
 				if (architecture == "amd64") architecturePaths = new string[] { "amd64", "x64" };
 				if (architecturePaths == null) architecturePaths = new string[] { architecture };
 				Platform.ExpandPaths(libraryPaths, "{Arch}", architecturePaths);
-
-				// Expand Compiler
-				Platform.ExpandPaths(libraryPaths, "{Compiler}", Platform.Compiler);
 
 				// Now TRY the enumerated Directories for libFile.so.*
 
@@ -129,7 +122,7 @@ namespace ZeroMQ.lib
 				}
 
 				// Search ManifestResources for fileName.arch.ext
-				// TODO: Enumerate ManifestResources for ZeroMQ{Arch}{Compiler}{LibraryName}{Ext}.dll
+				// TODO: Enumerate ManifestResources for ZeroMQ{Arch}{LibraryName}{Ext}.dll
 				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, ".dll");
 				string tempPath = Path.Combine(Path.GetTempPath(), resourceName);
 
