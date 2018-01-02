@@ -21,6 +21,7 @@ namespace ZeroMQ.lib
 
 			public static readonly string[] LibraryPaths = new string[] {
 				@"{System32}\{LibraryName}.dll",
+				@"{DllPath}\{LibraryName}.dll",
 				@"{DllPath}\{Arch}\{LibraryName}.dll",
 				@"{AppBase}\{Arch}\{LibraryName}.dll",
 			};
@@ -143,11 +144,6 @@ namespace ZeroMQ.lib
 							traceLabel, resourceName, tempPath));
 					}
 				}
-				else
-				{
-					Trace.TraceWarning(string.Format("{0} Unable to extract the EmbeddedResource \"{1}\" to \"{2}\".",
-						traceLabel, resourceName, tempPath));
-				}
 
 				var fnf404 = new StringBuilder();
 				fnf404.Append(traceLabel);
@@ -165,7 +161,9 @@ namespace ZeroMQ.lib
 				fnf404.Append(tempPath);
 				fnf404.Append("\". See Trace output for more information.");
 
-				throw new FileNotFoundException(fnf404.ToString());
+				string fnf404String = fnf404.ToString();
+				Trace.TraceWarning(fnf404String);
+				throw new FileNotFoundException(fnf404String);
 			}
 
 			public static string[] EnumeratePATH()

@@ -11,8 +11,10 @@
 			public static readonly string[] LibraryPaths = new string[] {
 				"{Path}/{LibraryName}.dylib",
 				"{Path}/{LibraryName}.dylib.*",
-                "{DllPath}/{LibraryName}.dylib",
-                "{DllPath}/{LibraryName}.dylib.*",
+				"{DllPath}/{LibraryName}.dylib",
+				"{DllPath}/{LibraryName}.dylib.*",
+				"{DllPath}/{Arch}/{LibraryName}.dylib",
+				"{DllPath}/{Arch}/{LibraryName}.dylib.*",
 				"{AppBase}/{Arch}/{LibraryName}.dylib",
 				"{AppBase}/{Arch}/{LibraryName}.dylib.*",
             };
