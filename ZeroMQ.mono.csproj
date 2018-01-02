@@ -93,6 +93,12 @@
     <Compile Include="Devices\PushPullDevice.cs" />
     <Compile Include="Devices\RouterDealerDevice.cs" />
     <Compile Include="Devices\StreamDealerDevice.cs" />
+    <Compile Include="lib\DispoIntPtr.Ansi.cs" />
+    <Compile Include="lib\Platform.MacOSX.cs" />
+    <Compile Include="lib\Platform.Posix.cs" />
+    <Compile Include="lib\Platform.Win32.cs" />
+    <Compile Include="lib\UnmanagedLibrary.cs" />
+    <Compile Include="lib\Platform.Internal.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
