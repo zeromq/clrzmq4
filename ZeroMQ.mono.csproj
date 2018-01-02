@@ -28,6 +28,7 @@
     <!-- XML documentation file for Debug configuration -->
     <DocumentationFile>bin\Debug\ZeroMQ.xml</DocumentationFile>
     <LangVersion>5</LangVersion>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -39,6 +40,7 @@
     <!-- XML documentation file for Release configuration -->
     <DocumentationFile>bin\Release\ZeroMQ.xml</DocumentationFile>
     <LangVersion>5</LangVersion>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
