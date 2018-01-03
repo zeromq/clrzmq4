@@ -139,6 +139,5 @@
     <None Include="amd64\libzmq.dylib">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="app.config" />
   </ItemGroup>
 </Project>
