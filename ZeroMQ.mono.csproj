@@ -28,6 +28,7 @@
     <!-- XML documentation file for Debug configuration -->
     <DocumentationFile>bin\Debug\ZeroMQ.xml</DocumentationFile>
     <LangVersion>5</LangVersion>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -39,6 +40,7 @@
     <!-- XML documentation file for Release configuration -->
     <DocumentationFile>bin\Release\ZeroMQ.xml</DocumentationFile>
     <LangVersion>5</LangVersion>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -93,6 +95,12 @@
     <Compile Include="Devices\PushPullDevice.cs" />
     <Compile Include="Devices\RouterDealerDevice.cs" />
     <Compile Include="Devices\StreamDealerDevice.cs" />
+    <Compile Include="lib\DispoIntPtr.Ansi.cs" />
+    <Compile Include="lib\Platform.MacOSX.cs" />
+    <Compile Include="lib\Platform.Posix.cs" />
+    <Compile Include="lib\Platform.Win32.cs" />
+    <Compile Include="lib\UnmanagedLibrary.cs" />
+    <Compile Include="lib\Platform.Internal.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -103,14 +111,29 @@
   <ItemGroup>
     <None Include="ZeroMQ.snk" />
     <None Include="README.md" />
-    <None Include="i386\libsodium.dll" />
-    <None Include="i386\libzmq.dll" />
-    <None Include="i386\libzmq.so" />
-    <None Include="i386\libzmq.dylib" />
-    <None Include="amd64\libsodium.dll" />
-    <None Include="amd64\libzmq.dll" />
-    <None Include="amd64\libzmq.so" />
-    <None Include="amd64\libzmq.dylib" />
-    <None Include="app.config" />
+    <None Include="i386\libsodium.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="i386\libzmq.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="i386\libzmq.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="i386\libzmq.dylib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="amd64\libsodium.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="amd64\libzmq.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="amd64\libzmq.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="amd64\libzmq.dylib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
