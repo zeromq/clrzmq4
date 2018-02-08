@@ -11,3 +11,4 @@ i386/v*
 ZeroMQ.*.zip
 **/bin/*
 **/obj/*
+.vs

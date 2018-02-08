@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroMQ", "src\ZeroMQ\ZeroMQ.csproj", "{24B8456C-9953-48FD-9DD8-2733F8844CDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQTest", "src\ZeroMQTest\ZeroMQTest.csproj", "{18911325-7149-4EE9-ADD0-8E840F23508C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24B8456C-9953-48FD-9DD8-2733F8844CDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24B8456C-9953-48FD-9DD8-2733F8844CDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24B8456C-9953-48FD-9DD8-2733F8844CDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24B8456C-9953-48FD-9DD8-2733F8844CDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18911325-7149-4EE9-ADD0-8E840F23508C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18911325-7149-4EE9-ADD0-8E840F23508C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18911325-7149-4EE9-ADD0-8E840F23508C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18911325-7149-4EE9-ADD0-8E840F23508C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DDD5EEEB-078D-4FA2-BD1E-8B7BE3DD0646}
+	EndGlobalSection
+EndGlobal
