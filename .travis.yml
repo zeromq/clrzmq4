@@ -1,0 +1,23 @@
+language: csharp
+sudo: required
+solution: clrzmq4.mono.sln
+#dotnet: 1.0.3
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      mono: latest
+    - os: osx
+      osx_image: xcode7.3
+      mono: latest
+
+before_install:
+  - chmod a+x ./travis.preinstall.sh
+install:
+  - ./travis.preinstall.sh
+
+before_script:
+  - chmod a+x ./MacOSX.build.sh
+script:
+  - ./MacOSX.build.sh
