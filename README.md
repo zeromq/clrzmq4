@@ -1,5 +1,5 @@
 ﻿
-[![Build status](https://ci.appveyor.com/api/projects/status/102sf149379bgwv7/branch/master?svg=true)](https://ci.appveyor.com/project/zeromq/clrzmq4/branch/master) [![Build Status](https://travis-ci.org/zeromq/clrzmq4.svg?branch=master)](https://travis-ci.org/zeromq/clrzmq4) [![Coverage Status](https://coveralls.io/repos/github/zeromq/clrzmq4/badge.svg?branch=master)](https://coveralls.io/github/zeromq/clrzmq4?branch=master)
+[![Build Status](https://travis-ci.org/zeromq/clrzmq4.svg?branch=master)](https://travis-ci.org/zeromq/clrzmq4)
 
 **ZeroMQ C# library**
 
