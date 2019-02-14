@@ -1,23 +1,32 @@
-language: csharp
-sudo: required
 solution: clrzmq4.mono.sln
-#dotnet: 1.0.3
+language: csharp
+mono: latest
+sudo: required
 
 matrix:
   include:
     - os: linux
-      dist: trusty
-      mono: latest
+      dist: xenial
+
     - os: osx
-      osx_image: xcode7.3
-      mono: latest
+      osx_image: xcode9.4
+#      osx_image: xcode7.3
 
 before_install:
-  - chmod a+x ./travis.preinstall.sh
+  - sudo apt-get install -y libzmq5 
+#  - chmod a+x ./travis.preinstall.sh
+
 install:
-  - ./travis.preinstall.sh
+  - nuget restore clrzmq4.mono.sln
+#  - ./travis.preinstall.sh
 
 before_script:
-  - chmod a+x ./MacOSX.build.sh
+  - msbuild clrzmq4.mono.sln /p:Configuration=Release
+#  - chmod a+x ./build.sh
+#  - ./build.sh
+
 script:
-  - ./MacOSX.build.sh
+  - mono bin/Release/ZGuideExamples.exe EAgain
+  - mono bin/Release/ZGuideExamples.exe Espresso
+  - mono bin/Release/ZGuideExamples.exe AsyncSrv
+  - mono bin/Release/ZGuideExamples.exe SuiSnail

@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQ.mono", "ZeroMQ.mono.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQTest.mono", "ZeroMQTest\ZeroMQTest.mono.csproj", "{2640CBE6-23BD-4104-90AC-0DDCDE4D0478}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZGuideExamples.mono", "..\zguide\examples\C#\ZGuideExamples.mono.csproj", "{EF3A0578-42E7-42D2-9D1D-1DF526FE97AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZGuideExamples.mono", "ZGuideExamples\ZGuideExamples.mono.csproj", "{EF3A0578-42E7-42D2-9D1D-1DF526FE97AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
