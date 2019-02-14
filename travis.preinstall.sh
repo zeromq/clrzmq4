@@ -9,16 +9,16 @@ set -e
 
 if [ "$(uname)" == "Darwin" ] ; then
   # DIAGNOSTICS
-  otool -L amd64/libzmq.dylib
-  otool -L i386/libzmq.dylib
+  # otool -L amd64/libzmq.dylib
+  # otool -L i386/libzmq.dylib
   
   if [ "INSTALL_LIBZMQ_MACOS" == "brew" ] ; then
     brew install zeromq --universal
 
-    file /usr/local/lib/*mq*.dylib # DIAGNOSTICS
+    # file /usr/local/lib/*mq*.dylib # DIAGNOSTICS
 
-    cp /usr/local/lib/libzmq.dylib amd64
-    cp /usr/local/lib/libzmq.dylib i386  
+    # cp /usr/local/lib/libzmq.dylib amd64
+    # cp /usr/local/lib/libzmq.dylib i386  
   elif [ "INSTALL_LIBZMQ_MACOS" == "port" ] ; then
     wget --retry-connrefused --waitretry=1 -O /tmp/macports.pkg https://github.com/macports/macports-base/releases/download/v2.4.1/MacPorts-2.4.1-10.11-ElCapitan.pkg
     sudo installer -pkg /tmp/macports.pkg -target /
@@ -32,10 +32,10 @@ if [ "$(uname)" == "Darwin" ] ; then
     # ignore errors on call to port, since this seems to always fail with "Updating database of binaries failed"  
     while (sudo port -v install zmq +universal || true) | grep "Error: Port zmq not found" ; do echo "port install zmq failed, retrying" ; done
   
-    file /opt/local/lib/*mq*.dylib # DIAGNOSTICS
+    # file /opt/local/lib/*mq*.dylib # DIAGNOSTICS
   
-    cp /opt/local/lib/libzmq.dylib amd64
-    cp /opt/local/lib/libzmq.dylib i386  
+    # cp /opt/local/lib/libzmq.dylib amd64
+    # cp /opt/local/lib/libzmq.dylib i386  
   fi
 else
   # assume that we are on Ubuntu (which is used on Travis-CI.org)
@@ -43,7 +43,7 @@ else
   sudo apt-key add Release.key
   sudo add-apt-repository "deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_14.04 ./"
   sudo apt-get update
-  sudo apt-get install libzmq3-dev
+  sudo apt-get install libzmq5
 fi
 
 nuget restore clrzmq4.mono.sln
