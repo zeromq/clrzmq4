@@ -26,4 +26,3 @@ script:
   - mono bin/Release/ZGuideExamples.exe EAgain
   - mono bin/Release/ZGuideExamples.exe Espresso
   - mono bin/Release/ZGuideExamples.exe AsyncSrv
-  - mono bin/Release/ZGuideExamples.exe SuiSnail
