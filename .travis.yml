@@ -1,7 +1,7 @@
 solution: clrzmq4.mono.sln
 language: csharp
 mono: latest
-sudo: required
+#sudo: required
 
 matrix:
   include:
@@ -13,17 +13,14 @@ matrix:
 #      osx_image: xcode7.3
 
 before_install:
-  - sudo apt-get install -y libzmq5 
-#  - chmod a+x ./travis.preinstall.sh
+  - chmod a+x ./travis.preinstall.sh
+  - chmod a+x ./build.sh
 
 install:
-  - nuget restore clrzmq4.mono.sln
-#  - ./travis.preinstall.sh
+  - ./travis.preinstall.sh
+  - ./build.sh
 
-before_script:
-  - msbuild clrzmq4.mono.sln /p:Configuration=Release
-#  - chmod a+x ./build.sh
-#  - ./build.sh
+#before_script:
 
 script:
   - mono bin/Release/ZGuideExamples.exe EAgain
