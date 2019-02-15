@@ -9,14 +9,14 @@
 			// public const string LibraryFileExtension = ".dylib";
 
 			public static readonly string[] LibraryPaths = new string[] {
+                "{DllPath}/{LibraryName}.dylib",
+                "{DllPath}/{LibraryName}.dylib.*",
                 "{Path}/{LibraryName}.dylib",
                 "{Path}/{LibraryName}.dylib.*",
                 "{AppBase}/{Arch}/{Compiler}/{LibraryName}.dylib",
 				"{AppBase}/{Arch}/{Compiler}/{LibraryName}.dylib.*",
 				"{AppBase}/{Arch}/{LibraryName}.dylib",
 				"{AppBase}/{Arch}/{LibraryName}.dylib.*",
-                "{DllPath}/{LibraryName}.dylib",
-                "{DllPath}/{LibraryName}.dylib.*",
             };
 
 		}

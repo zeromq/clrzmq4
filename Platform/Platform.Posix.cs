@@ -23,12 +23,12 @@
 			// public const string LibraryFileExtension = ".so";
 
 			public static readonly string[] LibraryPaths = new string[] {
+				"{DllPath}/{LibraryName}.so",
+				"{DllPath}/{LibraryName}.so.*",
                 "{Path}/{LibraryName}.so",
                 "{Path}/{LibraryName}.so.*",
 				"{AppBase}/{Arch}/{LibraryName}.so",
 				"{AppBase}/{Arch}/{LibraryName}.so.*",
-				"{DllPath}/{Arch}/{LibraryName}.so",
-				"{DllPath}/{Arch}/{LibraryName}.so.*",
 			};
 
 			private const int RTLD_LAZY = 0x0001;
