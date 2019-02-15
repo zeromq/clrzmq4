@@ -56,7 +56,7 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="lib\Platform.__Internal.cs" />
+    <Compile Include="Platform\Platform.__Internal.cs" />
     <Compile Include="ZDevice.cs" />
     <Compile Include="Monitoring\ZMonitors.cs" />
     <Compile Include="Z85.cs" />
@@ -68,16 +68,16 @@
     <Compile Include="Devices\PushPullDevice.cs" />
     <Compile Include="Devices\RouterDealerDevice.cs" />
     <Compile Include="Devices\StreamDealerDevice.cs" />
-    <Compile Include="lib\DispoIntPtr.cs" />
-    <Compile Include="lib\DispoIntPtr.Ansi.cs" />
-    <Compile Include="lib\Platform.cs" />
-    <Compile Include="lib\Platform.Posix.cs" />
-    <Compile Include="lib\Platform.Win32.cs" />
-    <Compile Include="lib\Platform.MacOSX.cs" />
-    <Compile Include="lib\UnmanagedLibrary.cs" />
-    <Compile Include="lib\zmq.cs" />
-    <Compile Include="lib\zmq_pollitem_posix_t.cs" />
-    <Compile Include="lib\zmq_pollitem_windows_t.cs" />
+    <Compile Include="Platform\DispoIntPtr.cs" />
+    <Compile Include="Platform\DispoIntPtr.Ansi.cs" />
+    <Compile Include="Platform\Platform.cs" />
+    <Compile Include="Platform\Platform.Posix.cs" />
+    <Compile Include="Platform\Platform.Win32.cs" />
+    <Compile Include="Platform\Platform.MacOSX.cs" />
+    <Compile Include="Platform\UnmanagedLibrary.cs" />
+    <Compile Include="Platform\zmq.cs" />
+    <Compile Include="Platform\zmq_pollitem_posix_t.cs" />
+    <Compile Include="Platform\zmq_pollitem_windows_t.cs" />
     <Compile Include="Monitoring\ZMonitorEventData.cs" />
     <Compile Include="Monitoring\ZMonitorEvents.cs" />
     <Compile Include="Monitoring\ZMonitor.cs" />
