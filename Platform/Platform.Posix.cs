@@ -302,10 +302,9 @@
                         variables = new string[] { };
                         break;
                 }
-                var inpaths = variables.Select(Environment.GetEnvironmentVariable).Where(x => !string.IsNullOrEmpty(x));
-                foreach (var inpath in inpaths)
+                foreach (string inpath in variables)
                 {
-                    foreach (var filename in EnumeratePath(inpath))
+                    foreach (string filename in EnumeratePath(inpath))
                     {
                         yield return filename;
                     }
