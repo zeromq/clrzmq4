@@ -22,8 +22,13 @@ namespace ZeroMQ.lib
 			public static readonly string[] LibraryPaths = new string[] {
                 @"{System32}\{LibraryName}.dll",
                 @"{System32}\{LibraryName}-*.dll",
+<<<<<<< HEAD
                 @"{DllPath}\{LibraryName}.dll",
                 @"{DllPath}\{LibraryName}-*.dll",
+=======
+                @"{DllPath}\{Arch}\{LibraryName}.dll",
+                @"{DllPath}\{Arch}\{LibraryName}-*.dll",
+>>>>>>> 0038133f4f306d8bdf880b284d7b51341d875646
                 @"{AppBase}\{Arch}\{LibraryName}.dll",
 				@"{AppBase}\{Arch}\{LibraryName}-*.dll",
             };

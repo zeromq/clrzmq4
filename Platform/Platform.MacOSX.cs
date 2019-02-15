@@ -9,8 +9,11 @@
 			// public const string LibraryFileExtension = ".dylib";
 
 			public static readonly string[] LibraryPaths = new string[] {
+<<<<<<< HEAD
                 "/usr/lib/{LibraryName}.dylib",
                 "/usr/local/lib/{LibraryName}.dylib.*",
+=======
+>>>>>>> 0038133f4f306d8bdf880b284d7b51341d875646
                 "{DllPath}/{LibraryName}.dylib",
                 "{DllPath}/{LibraryName}.dylib.*",
                 "{Path}/{LibraryName}.dylib",
