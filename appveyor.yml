@@ -15,8 +15,8 @@ build:
 #  cmd: nuget pack ZeroMQ.nuspec -Symbols -Verbosity detailed # -Version %APPVEYOR_BUILD_VERSION% -Suffix unreleased 
 
 test_script:
-- cmd: bin/Release/ZGuideExamples.exe EAgain
-- cmd: bin/Release/ZGuideExamples.exe Espresso
+- cmd: .\bin\Release\ZGuideExamples.exe EAgain
+- cmd: .\bin\Release\ZGuideExamples.exe Espresso
 #- ps: .\test.ps1
 #after_test:
 #- ps: .\upload_coverage.ps1
