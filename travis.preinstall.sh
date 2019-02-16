@@ -10,14 +10,7 @@ if [ "$(uname)" = "Darwin" ] ; then
   # otool -L amd64/libzmq.dylib
   # otool -L i386/libzmq.dylib
   
-  if [ "INSTALL_LIBZMQ_MACOS" == "brew" ] ; then
-    brew install zeromq --universal
-
-    # file /usr/local/lib/*mq*.dylib # DIAGNOSTICS
-
-    # cp /usr/local/lib/libzmq.dylib amd64
-    # cp /usr/local/lib/libzmq.dylib i386  
-  elif [ "INSTALL_LIBZMQ_MACOS" == "port" ] ; then
+  if [ "INSTALL_LIBZMQ_MACOS" == "port" ] ; then
     wget --retry-connrefused --waitretry=1 -O /tmp/macports.pkg\
       https://github.com/macports/macports-base/releases/download/v2.4.1/MacPorts-2.4.1-10.11-ElCapitan.pkg
     sudo installer -pkg /tmp/macports.pkg -target /
@@ -35,14 +28,24 @@ if [ "$(uname)" = "Darwin" ] ; then
   
     # cp /opt/local/lib/libzmq.dylib amd64
     # cp /opt/local/lib/libzmq.dylib i386  
+
+  else # if [ "INSTALL_LIBZMQ_MACOS" == "brew" ] ; then
+
+    brew install zeromq --universal
+
+    # file /usr/local/lib/*mq*.dylib # DIAGNOSTICS
+
+    # cp /usr/local/lib/libzmq.dylib amd64
+    # cp /usr/local/lib/libzmq.dylib i386  
   fi
 
 else # if [ "$(uname)" = "Linux" ]
   # assume that we are on Ubuntu (which is used on Travis-CI.org)
-  curl http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_14.04/Release.key >Release.key
-  sudo apt-key add Release.key
-  sudo add-apt-repository "deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_14.04 ./"
-  sudo apt-get update
+
+#  curl http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_14.04/Release.key >Release.key
+#  sudo apt-key add Release.key
+#  sudo add-apt-repository "deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_14.04 ./"
+#  sudo apt-get update
   sudo apt-get install libzmq5
 fi
 
