@@ -123,7 +123,7 @@ namespace Examples
                     request.DumpZmsg("I: send request to '{0}' service:", service);
 
                 ZError error; 
-                if(!Client.Send(request, out error));
+                if(!Client.Send(request, out error))
                 {
                     if (Equals(error, ZError.ETERM))
                         cancellor.Cancel(); // Interrupted
