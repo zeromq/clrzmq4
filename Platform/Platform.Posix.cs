@@ -171,6 +171,8 @@
 							return new UnmanagedLibrary(libraryName, handle);
 						}
 
+                        handle.DangerousRelease();
+
 						Exception nativeEx = GetLastLibraryError();
 						Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
 							traceLabel, file, nativeEx.Message));
@@ -194,9 +196,11 @@
 							traceLabel, resourceName, tempPath));
 						
 						return new UnmanagedLibrary(libraryName, handle);
-					}					
+					}
 
-					Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
+                    handle.DangerousRelease();
+
+                    Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
 						traceLabel, resourceName, tempPath));
 				}
 				else

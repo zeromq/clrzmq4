@@ -113,7 +113,9 @@ namespace ZeroMQ.lib
 							return new UnmanagedLibrary(libraryName, handle);
 						}
 
-						Exception nativeEx = GetLastLibraryError();
+                        handle.DangerousRelease();
+
+                        Exception nativeEx = GetLastLibraryError();
 						Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
 							traceLabel, file, nativeEx.Message));
 					}
@@ -135,7 +137,9 @@ namespace ZeroMQ.lib
 						return new UnmanagedLibrary(libraryName, handle);
 					}
 
-					Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
+                    handle.DangerousRelease();
+
+                    Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
 						traceLabel, resourceName, tempPath));
 				}
 				else
