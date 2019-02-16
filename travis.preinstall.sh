@@ -31,7 +31,7 @@ if [ "$(uname)" = "Darwin" ] ; then
 
   else # if [ "INSTALL_LIBZMQ_MACOS" == "brew" ] ; then
 
-    brew install zeromq --universal
+    brew install zeromq # --universal
 
     # file /usr/local/lib/*mq*.dylib # DIAGNOSTICS
 
