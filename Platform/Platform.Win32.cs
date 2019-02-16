@@ -20,9 +20,9 @@ namespace ZeroMQ.lib
 			// public const string LibraryFileExtension = ".dll";
 
 			public static readonly string[] LibraryPaths = new string[] {
-                @"{System32}\{LibraryName}*.dll",
-                @"{DllPath}\{LibraryName}*.dll",
-				@"{AppBase}\{Arch}\{LibraryName}*.dll",
+                @"{System32}\{LibraryName}.dll",
+                @"{DllPath}\{LibraryName}.dll",
+				@"{AppBase}\{Arch}\{LibraryName}.dll",
             };
 
 			[DllImport(LibraryName, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
