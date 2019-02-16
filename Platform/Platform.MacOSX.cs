@@ -9,18 +9,18 @@
 			// public const string LibraryFileExtension = ".dylib";
 
 			public static readonly string[] LibraryPaths = new string[] {
-                "/lib/{LibraryName}*.dylib",
-                "/lib/{LibraryName}*.dylib.*",
-                "/usr/lib/{LibraryName}*.dylib",
-                "/usr/lib/{LibraryName}*.dylib.*",
-                "/usr/local/lib/{LibraryName}*.dylib",
-                "/usr/local/lib/{LibraryName}*.dylib.*",
-                "{DllPath}/{LibraryName}*.dylib",
-                "{DllPath}/{LibraryName}*.dylib.*",
-                "{Path}/{LibraryName}*.dylib",
-                "{Path}/{LibraryName}*.dylib.*",
-				"{AppBase}/{Arch}/{LibraryName}*.dylib",
-				"{AppBase}/{Arch}/{LibraryName}*.dylib.*",
+                "/lib/lib{LibraryName}*.dylib",
+                "/lib/lib{LibraryName}*.dylib.*",
+                "/usr/lib/lib{LibraryName}*.dylib",
+                "/usr/lib/lib{LibraryName}*.dylib.*",
+                "/usr/local/lib/lib{LibraryName}*.dylib",
+                "/usr/local/lib/lib{LibraryName}*.dylib.*",
+                "{DllPath}/lib{LibraryName}*.dylib",
+                "{DllPath}/lib{LibraryName}*.dylib.*",
+                "{Path}/lib{LibraryName}*.dylib",
+                "{Path}/lib{LibraryName}*.dylib.*",
+                "{AppBase}/{Arch}/lib{LibraryName}*.dylib",
+                "{AppBase}/{Arch}/lib{LibraryName}*.dylib.*",
             };
 
 		}
