@@ -13,8 +13,8 @@ install:
 #- cmd: vcpkg integrate install
 - cmd: nuget restore clrzmq4.vs.sln
 
-before_build:
-- cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+#before_build:
+
 build:
   project: clrzmq4.vs.sln
 
