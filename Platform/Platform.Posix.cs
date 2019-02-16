@@ -18,23 +18,23 @@
 
 			private const string __Internal = "__Internal";
 
-			private const string LibraryName = "dl";
+			private const string LibraryName = "libdl";
 
 			// public const string LibraryFileExtension = ".so";
 
 			public static readonly string[] LibraryPaths = new string[] {
-                "/lib/lib{LibraryName}*.so",
-                "/lib/lib{LibraryName}*.so.*",
-                "/usr/lib/lib{LibraryName}*.so",
-                "/usr/lib/lib{LibraryName}*.so.*",
-                "/usr/local/lib/lib{LibraryName}*.so",
-                "/usr/local/lib/lib{LibraryName}*.so.*",
-				"{DllPath}/lib{LibraryName}*.so",
-				"{DllPath}/lib{LibraryName}*.so.*",
-                "{Path}/lib{LibraryName}*.so",
-                "{Path}/lib{LibraryName}*.so.*",
-				"{AppBase}/{Arch}/lib{LibraryName}*.so",
-				"{AppBase}/{Arch}/lib{LibraryName}*.so.*",
+                "/lib/{LibraryName}*.so",
+                "/lib/{LibraryName}*.so.*",
+                "/usr/lib/{LibraryName}*.so",
+                "/usr/lib/{LibraryName}*.so.*",
+                "/usr/local/lib/{LibraryName}*.so",
+                "/usr/local/lib/{LibraryName}*.so.*",
+				"{DllPath}/{LibraryName}*.so",
+				"{DllPath}/{LibraryName}*.so.*",
+                "{Path}/{LibraryName}*.so",
+                "{Path}/{LibraryName}*.so.*",
+				"{AppBase}/{Arch}/{LibraryName}*.so",
+				"{AppBase}/{Arch}/{LibraryName}*.so.*",
 			};
 
 			private const int RTLD_LAZY = 0x0001;

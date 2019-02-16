@@ -9,12 +9,12 @@
 
 		private const CallingConvention CCCdecl = CallingConvention.Cdecl;
 
-		private const string SodiumLibraryName = "sodium";
+		private const string SodiumLibraryName = "libsodium";
 
 		private static readonly UnmanagedLibrary NativeLibSodium;
 
 		// Use a const for the library name
-		private const string LibraryName = "zmq";
+		private const string LibraryName = "libzmq";
 
 		// Hold a handle to the static instance
 		private static readonly UnmanagedLibrary NativeLib;
