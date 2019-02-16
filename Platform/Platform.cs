@@ -47,7 +47,7 @@ namespace ZeroMQ.lib
 			"mingw32",
 		};
 
-		// public static readonly string LibraryName;
+		public static readonly string LibraryName;
 
 		// public static readonly string LibraryFileExtension;
 

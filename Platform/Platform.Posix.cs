@@ -18,17 +18,23 @@
 
 			private const string __Internal = "__Internal";
 
-			// private const string LibraryName = "libdl";
+			private const string LibraryName = "libdl";
 
 			// public const string LibraryFileExtension = ".so";
 
 			public static readonly string[] LibraryPaths = new string[] {
-				"{DllPath}/{LibraryName}.so",
-				"{DllPath}/{LibraryName}.so.*",
-                "{Path}/{LibraryName}.so",
-                "{Path}/{LibraryName}.so.*",
-				"{AppBase}/{Arch}/{LibraryName}.so",
-				"{AppBase}/{Arch}/{LibraryName}.so.*",
+                "/lib/{LibraryName}*.so",
+                "/lib/{LibraryName}*.so.*",
+                "/usr/lib/{LibraryName}*.so",
+                "/usr/lib/{LibraryName}*.so.*",
+                "/usr/local/lib/{LibraryName}*.so",
+                "/usr/local/lib/{LibraryName}*.so.*",
+				"{DllPath}/{LibraryName}*.so",
+				"{DllPath}/{LibraryName}*.so.*",
+                "{Path}/{LibraryName}*.so",
+                "{Path}/{LibraryName}*.so.*",
+				"{AppBase}/{Arch}/{LibraryName}*.so",
+				"{AppBase}/{Arch}/{LibraryName}*.so.*",
 			};
 
 			private const int RTLD_LAZY = 0x0001;
@@ -117,9 +123,6 @@
 				if (architecturePaths == null) architecturePaths = new string[] { architecture };
 				Platform.ExpandPaths(libraryPaths, "{Arch}", architecturePaths);
 
-				// Expand Compiler
-				Platform.ExpandPaths(libraryPaths, "{Compiler}", Platform.Compiler);
-
 				// Now TRY the enumerated Directories for libFile.so.*
 
 				string traceLabel = string.Format("UnmanagedLibrary[{0}]", libraryName);
@@ -165,17 +168,14 @@
 
 							return new UnmanagedLibrary(libraryName, handle);
 						}
-						else
-						{
-							Exception nativeEx = GetLastLibraryError();
-							Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
-								traceLabel, file, nativeEx.Message));
-						}
+
+						Exception nativeEx = GetLastLibraryError();
+						Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
+							traceLabel, file, nativeEx.Message));
 					}					
 				}
 
 				// Search ManifestResources for fileName.arch.ext
-				// TODO: Enumerate ManifestResources for ZeroMQ{Arch}{Compiler}{LibraryName}{Ext}.so.*
 				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, ".so");
 				string tempPath = Path.Combine(Path.GetTempPath(), resourceName);
 
@@ -193,11 +193,9 @@
 						
 						return new UnmanagedLibrary(libraryName, handle);
 					}					
-					else
-					{
-						Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
-							traceLabel, resourceName, tempPath));
-					}
+
+					Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
+						traceLabel, resourceName, tempPath));
 				}
 				else
 				{
@@ -287,19 +285,16 @@
 
             private static IEnumerable<string> EnumerateLibLdPATH()
             {
-                // TODO: does it really make sense to manually enumerate these paths? dlopen 
-                // will search them by default if the library name is given without any path fragments
-                string[] variables;
+                var variables = new string[] { };
                 switch (Name)
                 {
                     case PlatformName.MacOSX:
-                        variables = new[] { "DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH" };
+                        variables = new[] { "LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH" };
                         break;
                     case PlatformName.Posix:
                         variables = new[] { "LD_LIBRARY_PATH" };
                         break;
                     default:
-                        variables = new string[] { };
                         break;
                 }
                 foreach (string inpath in variables)
