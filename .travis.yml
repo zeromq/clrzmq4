@@ -23,6 +23,7 @@ install:
 #before_script:
 
 script:
+  - mono bin/Release/ZGuideExamples.exe Version
   - mono bin/Release/ZGuideExamples.exe EAgain
   - mono bin/Release/ZGuideExamples.exe Espresso
   - mono bin/Release/ZGuideExamples.exe AsyncSrv

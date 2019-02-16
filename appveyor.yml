@@ -1,25 +1,25 @@
-#version: 4.0.0.{build}
+version: "{build}"
+platform: x64
 configuration: Release
-environment:
-  COVERALLS_REPO_TOKEN:
-    secure: yCIV3arujsrEYPNrM/wQSs1HQThuA8lSzZ9hTcv28fhgYu3aWyPkneGdaIDElJYp
-nuget:
-  project_feed: true
+
+#image:
+#- Visual Studio 2017
+
+init:
+- cmd: msbuild /version
+
+install:
+- cmd: vcpkg install zeromq:x64-windows
+#- cmd: vcpkg integrate install
+- cmd: nuget restore clrzmq4.vs.sln
 
 before_build:
-- cmd: nuget restore clrzmq4.vs.sln
+- cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 build:
   project: clrzmq4.vs.sln
-#  verbosity: minimal
-#after_build: 
-#  cmd: nuget pack ZeroMQ.nuspec -Symbols -Verbosity detailed # -Version %APPVEYOR_BUILD_VERSION% -Suffix unreleased 
 
 test_script:
+- cmd: .\bin\Release\ZGuideExamples.exe Version
 - cmd: .\bin\Release\ZGuideExamples.exe EAgain
 - cmd: .\bin\Release\ZGuideExamples.exe Espresso
-#- ps: .\test.ps1
-#after_test:
-#- ps: .\upload_coverage.ps1
-#artifacts:
-#- path: results.xml
-#- path: '**\ZeroMQ*.nupkg'
+
