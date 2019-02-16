@@ -113,7 +113,7 @@ namespace ZeroMQ.lib
 							return new UnmanagedLibrary(libraryName, handle);
 						}
 
-                        handle.DangerousRelease();
+                        handle.Close();
 
                         Exception nativeEx = GetLastLibraryError();
 						Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
@@ -137,7 +137,7 @@ namespace ZeroMQ.lib
 						return new UnmanagedLibrary(libraryName, handle);
 					}
 
-                    handle.DangerousRelease();
+                    handle.Close();
 
                     Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
 						traceLabel, resourceName, tempPath));

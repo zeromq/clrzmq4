@@ -100,7 +100,7 @@
 				var PATHs = new List<string>();
 				PATHs.Add(EnsureNotEndingSlash(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
 				PATHs.AddRange(EnumerateLibLdPATH());
-				Platform.ExpandPaths(libraryPaths, "{DllPath}", PATHs.ToArray());
+				Platform.ExpandPaths(libraryPaths, "{DllPath}", PATHs);
 
 				Platform.ExpandPaths(libraryPaths, "{AppBase}", EnsureNotEndingSlash(
 						AppDomain.CurrentDomain.BaseDirectory));
@@ -129,28 +129,18 @@
 
 				foreach (string libraryPath in libraryPaths)
 				{
+			        string folder = null;
+			        string filesPattern = libraryPath;
+			        int filesPatternI;
+			        if (-1 < (filesPatternI = filesPattern.LastIndexOf('/')))
+			        {
+			            folder = filesPattern.Substring(0, filesPatternI + 1);
+			            filesPattern = filesPattern.Substring(filesPatternI + 1);
+			        }
 
-				    IEnumerable<string> files;
-				    if (libraryPath.Contains("/"))
-				    {
+			        if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) continue;
 
-				        string folder = null;
-				        string filesPattern = libraryPath;
-				        int filesPatternI;
-				        if (-1 < (filesPatternI = filesPattern.LastIndexOf('/')))
-				        {
-				            folder = filesPattern.Substring(0, filesPatternI + 1);
-				            filesPattern = filesPattern.Substring(filesPatternI + 1);
-				        }
-
-				        if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) continue;
-
-				        files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
-				    }
-				    else
-				    {
-				        files = Enumerable.Repeat(libraryPath, 1);
-				    }
+			        string[] files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
 
 				    foreach (string file in files)
 					{
@@ -171,9 +161,9 @@
 							return new UnmanagedLibrary(libraryName, handle);
 						}
 
-                        handle.DangerousRelease();
+                        handle.Close();
 
-						Exception nativeEx = GetLastLibraryError();
+                        Exception nativeEx = GetLastLibraryError();
 						Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
 							traceLabel, file, nativeEx.Message));
 					}					
@@ -198,7 +188,7 @@
 						return new UnmanagedLibrary(libraryName, handle);
 					}
 
-                    handle.DangerousRelease();
+                    handle.Close();
 
                     Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
 						traceLabel, resourceName, tempPath));
