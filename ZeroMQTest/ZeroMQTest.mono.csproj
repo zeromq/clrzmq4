@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>ZeroMQTest</RootNamespace>
     <AssemblyName>ZeroMQTest</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
