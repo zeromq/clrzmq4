@@ -22,7 +22,7 @@ build:
   project: clrzmq4.vs.sln
 
 test_script:
-- cmd: set PATH="%PATH%;c:\Tools\vcpkg\installed\x64-windows\lib;c:\Tools\vcpkg\installed\x64-windows\bin"
+#- cmd: set PATH="%PATH%;c:\Tools\vcpkg\installed\x64-windows\lib;c:\Tools\vcpkg\installed\x64-windows\bin"
 #- cmd: set PATH="%PATH%;c:\Tools\vcpkg\installed\x64-windows\debug\lib;c:\Tools\vcpkg\installed\x64-windows\debug\bin"
 - cmd: .\bin\Release\ZGuideExamples.exe Version
 - cmd: .\bin\Release\ZGuideExamples.exe EAgain
