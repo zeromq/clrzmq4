@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<ItemGroup>
+
+<!-- Windows -->
+
+    <None Include="$(MSBuildThisFileDirectory)../amd64/libzmq.dll">
+        <Link>amd64/libzmq.dll</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+    <None Include="$(MSBuildThisFileDirectory)../i386/libzmq.dll">
+        <Link>i386/libzmq.dll</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+	
+<!-- Linux -->
+
+    <None Include="$(MSBuildThisFileDirectory)../amd64/libzmq.so">
+        <Link>amd64/libzmq.so</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+    <None Include="$(MSBuildThisFileDirectory)../i386/libzmq.so">
+        <Link>i386/libzmq.so</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+
+<!-- MacOS -->
+
+    <None Include="$(MSBuildThisFileDirectory)../amd64/libzmq.dylib">
+        <Link>amd64/libzmq.dylib</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+    <None Include="$(MSBuildThisFileDirectory)../i386/libzmq.dylib">
+        <Link>i386/libzmq.dylib</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+</ItemGroup>
+</Project>

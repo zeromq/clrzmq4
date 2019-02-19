@@ -13,8 +13,8 @@ packages/*
 *.old*
 *.nupkg
 
-amd64/v*
-i386/v*
+amd64/*
+i386/*
 
 ZeroMQ.*.zip
 
