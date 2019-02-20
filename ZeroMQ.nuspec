@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ZeroMQ</id>
-		<version>4.1.0.29</version>
+		<version>4.1.0.30</version>
 
 		<authors>metadings, Pieter Hintjens, Martin Sustrik</authors>
 		<projectUrl>https://github.com/zeromq/clrzmq4/</projectUrl>

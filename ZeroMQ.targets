@@ -22,10 +22,10 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
-    <None Include="$(MSBuildThisFileDirectory)../i386/libzmq.so">
+    <!-- None Include="$(MSBuildThisFileDirectory)../i386/libzmq.so">
         <Link>i386/libzmq.so</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </None -->
 
 
 <!-- MacOS -->
@@ -35,10 +35,10 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
-    <None Include="$(MSBuildThisFileDirectory)../i386/libzmq.dylib">
+    <!-- None Include="$(MSBuildThisFileDirectory)../i386/libzmq.dylib">
         <Link>i386/libzmq.dylib</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </None -->
 
 </ItemGroup>
 </Project>
