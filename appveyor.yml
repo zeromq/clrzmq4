@@ -1,0 +1,30 @@
+version: "{build}"
+#platform: AnyCPU
+configuration: Release
+
+#image:
+#- Visual Studio 2017
+
+#cache:
+#- c:\Tools\vcpkg\installed
+
+init:
+- cmd: msbuild /version
+
+install:
+- cmd: vcpkg install zeromq:x64-windows
+#- cmd: vcpkg integrate install
+- cmd: dir c:\Tools\vcpkg\installed\x64-windows\bin\* 
+- cmd: mkdir C:\projects\clrzmq4\bin\Release\amd64
+- cmd: mklink /h C:\projects\clrzmq4\bin\Release\amd64\libzmq.dll c:\Tools\vcpkg\installed\x64-windows\bin\libzmq-mt-4_3_1.dll
+
+- cmd: nuget restore clrzmq4.vs.sln
+
+build:
+  project: clrzmq4.vs.sln
+
+test_script:
+- cmd: .\bin\Release\ZGuideExamples.exe Version
+- cmd: .\bin\Release\ZGuideExamples.exe EAgain
+- cmd: .\bin\Release\ZGuideExamples.exe Espresso
+

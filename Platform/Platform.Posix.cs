@@ -18,17 +18,23 @@
 
 			private const string __Internal = "__Internal";
 
-			// private const string LibraryName = "libdl";
+			private const string LibraryName = "libdl";
 
 			// public const string LibraryFileExtension = ".so";
 
 			public static readonly string[] LibraryPaths = new string[] {
-                "{Path}/{LibraryName}.so",
-                "{Path}/{LibraryName}.so.*",
-				"{AppBase}/{Arch}/{LibraryName}.so",
-				"{AppBase}/{Arch}/{LibraryName}.so.*",
-				"{DllPath}/{Arch}/{LibraryName}.so",
-				"{DllPath}/{Arch}/{LibraryName}.so.*",
+                "/lib/{LibraryName}*.so",
+                "/lib/{LibraryName}*.so.*",
+                "/usr/lib/{LibraryName}*.so",
+                "/usr/lib/{LibraryName}*.so.*",
+                "/usr/local/lib/{LibraryName}*.so",
+                "/usr/local/lib/{LibraryName}*.so.*",
+				"{DllPath}/{LibraryName}*.so",
+				"{DllPath}/{LibraryName}*.so.*",
+                "{Path}/{LibraryName}*.so",
+                "{Path}/{LibraryName}*.so.*",
+				"{AppBase}/{Arch}/{LibraryName}*.so",
+				"{AppBase}/{Arch}/{LibraryName}*.so.*",
 			};
 
 			private const int RTLD_LAZY = 0x0001;
@@ -94,7 +100,7 @@
 				var PATHs = new List<string>();
 				PATHs.Add(EnsureNotEndingSlash(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
 				PATHs.AddRange(EnumerateLibLdPATH());
-				Platform.ExpandPaths(libraryPaths, "{DllPath}", PATHs.ToArray());
+				Platform.ExpandPaths(libraryPaths, "{DllPath}", PATHs);
 
 				Platform.ExpandPaths(libraryPaths, "{AppBase}", EnsureNotEndingSlash(
 						AppDomain.CurrentDomain.BaseDirectory));
@@ -117,37 +123,24 @@
 				if (architecturePaths == null) architecturePaths = new string[] { architecture };
 				Platform.ExpandPaths(libraryPaths, "{Arch}", architecturePaths);
 
-				// Expand Compiler
-				Platform.ExpandPaths(libraryPaths, "{Compiler}", Platform.Compiler);
-
 				// Now TRY the enumerated Directories for libFile.so.*
 
 				string traceLabel = string.Format("UnmanagedLibrary[{0}]", libraryName);
 
 				foreach (string libraryPath in libraryPaths)
 				{
+			        string folder = null;
+			        string filesPattern = libraryPath;
+			        int filesPatternI;
+			        if (-1 < (filesPatternI = filesPattern.LastIndexOf('/')))
+			        {
+			            folder = filesPattern.Substring(0, filesPatternI + 1);
+			            filesPattern = filesPattern.Substring(filesPatternI + 1);
+			        }
 
-				    IEnumerable<string> files;
-				    if (libraryPath.Contains("/"))
-				    {
+			        if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) continue;
 
-				        string folder = null;
-				        string filesPattern = libraryPath;
-				        int filesPatternI;
-				        if (-1 < (filesPatternI = filesPattern.LastIndexOf('/')))
-				        {
-				            folder = filesPattern.Substring(0, filesPatternI + 1);
-				            filesPattern = filesPattern.Substring(filesPatternI + 1);
-				        }
-
-				        if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) continue;
-
-				        files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
-				    }
-				    else
-				    {
-				        files = Enumerable.Repeat(libraryPath, 1);
-				    }
+			        string[] files = Directory.EnumerateFiles(folder, filesPattern, SearchOption.TopDirectoryOnly).ToArray();
 
 				    foreach (string file in files)
 					{
@@ -156,26 +149,27 @@
 
 						if (!handle.IsNullOrInvalid())
 						{
-							// This is Platform.Posix. In mono, just dlopen'ing the library doesn't work.
-							// Using DllImport("__Internal", EntryPoint = "mono_dllmap_insert") to get mono on the path.
-							MonoDllMapInsert(libraryName, file);
+							if (Platform.IsMono) {
+								// This is Platform.Posix. In mono, just dlopen'ing the library doesn't work.
+								// Using DllImport("__Internal", EntryPoint = "mono_dllmap_insert") to get mono on the path.
+								MonoDllMapInsert(libraryName, file);
+							}
 
 							Trace.TraceInformation(string.Format("{0} Loaded binary \"{1}\"", 
 								traceLabel, file));
 
 							return new UnmanagedLibrary(libraryName, handle);
 						}
-						else
-						{
-							Exception nativeEx = GetLastLibraryError();
-							Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
-								traceLabel, file, nativeEx.Message));
-						}
+
+                        handle.Close();
+
+                        Exception nativeEx = GetLastLibraryError();
+						Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
+							traceLabel, file, nativeEx.Message));
 					}					
 				}
 
 				// Search ManifestResources for fileName.arch.ext
-				// TODO: Enumerate ManifestResources for ZeroMQ{Arch}{Compiler}{LibraryName}{Ext}.so.*
 				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, ".so");
 				string tempPath = Path.Combine(Path.GetTempPath(), resourceName);
 
@@ -186,18 +180,18 @@
 
 					if (!handle.IsNullOrInvalid())
 					{
-						MonoDllMapInsert(libraryName, tempPath);
+						if (Platform.IsMono) MonoDllMapInsert(libraryName, tempPath);
 
 						Trace.TraceInformation(string.Format("{0} Loaded binary from EmbeddedResource \"{1}\" from \"{2}\".", 
 							traceLabel, resourceName, tempPath));
 						
 						return new UnmanagedLibrary(libraryName, handle);
-					}					
-					else
-					{
-						Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
-							traceLabel, resourceName, tempPath));
 					}
+
+                    handle.Close();
+
+                    Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
+						traceLabel, resourceName, tempPath));
 				}
 				else
 				{
@@ -287,25 +281,21 @@
 
             private static IEnumerable<string> EnumerateLibLdPATH()
             {
-                // TODO: does it really make sense to manually enumerate these paths? dlopen 
-                // will search them by default if the library name is given without any path fragments
-                string[] variables;
+                var variables = new string[] { };
                 switch (Name)
                 {
                     case PlatformName.MacOSX:
-                        variables = new[] { "DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH" };
+                        variables = new[] { "LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH" };
                         break;
                     case PlatformName.Posix:
                         variables = new[] { "LD_LIBRARY_PATH" };
                         break;
                     default:
-                        variables = new string[] { };
                         break;
                 }
-                var inpaths = variables.Select(Environment.GetEnvironmentVariable).Where(x => !string.IsNullOrEmpty(x));
-                foreach (var inpath in inpaths)
+                foreach (string inpath in variables)
                 {
-                    foreach (var filename in EnumeratePath(inpath))
+                    foreach (string filename in EnumeratePath(inpath))
                     {
                         yield return filename;
                     }

@@ -21,11 +21,8 @@ namespace ZeroMQ.lib
 
 			public static readonly string[] LibraryPaths = new string[] {
                 @"{System32}\{LibraryName}.dll",
-                @"{System32}\{LibraryName}-*.dll",
-                @"{AppBase}\{Arch}\{LibraryName}.dll",
-				@"{AppBase}\{Arch}\{LibraryName}-*.dll",
-                @"{DllPath}\{Arch}\{LibraryName}.dll",
-                @"{DllPath}\{Arch}\{LibraryName}-*.dll",
+                @"{DllPath}\{LibraryName}.dll",
+				@"{AppBase}\{Arch}\{LibraryName}.dll",
             };
 
 			[DllImport(LibraryName, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
@@ -84,9 +81,6 @@ namespace ZeroMQ.lib
 				if (architecturePaths == null) architecturePaths = new string[] { architecture };
 				Platform.ExpandPaths(libraryPaths, "{Arch}", architecturePaths);
 
-				// Expand Compiler
-				Platform.ExpandPaths(libraryPaths, "{Compiler}", Platform.Compiler);
-
 				// Now TRY the enumerated Directories for libFile.so.*
 
 				string traceLabel = string.Format("UnmanagedLibrary[{0}]", libraryName);
@@ -118,17 +112,16 @@ namespace ZeroMQ.lib
 
 							return new UnmanagedLibrary(libraryName, handle);
 						}
-						else
-						{
-							Exception nativeEx = GetLastLibraryError();
-							Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
-								traceLabel, file, nativeEx.Message));
-						}
+
+                        handle.Close();
+
+                        Exception nativeEx = GetLastLibraryError();
+						Trace.TraceInformation(string.Format("{0} Custom binary \"{1}\" not loaded: {2}", 
+							traceLabel, file, nativeEx.Message));
 					}
 				}
 
 				// Search ManifestResources for fileName.arch.ext
-				// TODO: Enumerate ManifestResources for ZeroMQ{Arch}{Compiler}{LibraryName}{Ext}.dll
 				string resourceName = string.Format("ZeroMQ.{0}.{1}{2}", libraryName, architecture, ".dll");
 				string tempPath = Path.Combine(Path.GetTempPath(), resourceName);
 
@@ -143,11 +136,11 @@ namespace ZeroMQ.lib
 						
 						return new UnmanagedLibrary(libraryName, handle);
 					}
-					else
-					{
-						Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
-							traceLabel, resourceName, tempPath));
-					}
+
+                    handle.Close();
+
+                    Trace.TraceWarning(string.Format("{0} Unable to run the extracted EmbeddedResource \"{1}\" from \"{2}\".",
+						traceLabel, resourceName, tempPath));
 				}
 				else
 				{
