@@ -70,6 +70,8 @@
     <Compile Include="hwserver.cs" />
     <Compile Include="identity.cs" />
     <Compile Include="interrupt.cs" />
+    <Compile Include="ironhouseclient.cs" />
+    <Compile Include="ironhouseserver.cs" />
     <Compile Include="lbbroker.cs" />
     <Compile Include="lpclient.cs" />
     <Compile Include="lpserver.cs" />
