@@ -69,6 +69,9 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="RouterMandatory.cs" />
     <Compile Include="TcpKeepaliveBehaviour.cs" />
+    <Compile Include="ZAuth.cs" />
+    <Compile Include="ZCert.cs" />
+    <Compile Include="ZCertStore.cs" />
     <Compile Include="ZContext.cs" />
     <Compile Include="ZContextOption.cs" />
     <Compile Include="ZError.cs" />

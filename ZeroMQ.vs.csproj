@@ -59,6 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Platform\Platform.__Internal.cs" />
+    <Compile Include="ZAuth.cs" />
+    <Compile Include="ZCert.cs" />
+    <Compile Include="ZCertStore.cs" />
     <Compile Include="ZDevice.cs" />
     <Compile Include="Monitoring\ZMonitors.cs" />
     <Compile Include="Z85.cs" />
