@@ -15,7 +15,7 @@ namespace Examples
             //
             // Hello World client with ironhouse security
             //
-            // Author: hakgra
+            // Author: hawkans
             //
 
             if (args == null || args.Length < 1)
