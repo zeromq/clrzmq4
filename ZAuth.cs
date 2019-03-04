@@ -17,7 +17,7 @@ namespace ZeroMQ
 
         /// <summary>
         /// A small class for working with ZAP requests and replies.
-        // Used internally in ZAuth to simplify working with RFC 27 messages.
+        /// Used internally in ZAuth to simplify working with RFC 27 messages.
         /// </summary>
         private class ZAP
         {
