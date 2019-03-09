@@ -13,7 +13,13 @@ i386 and amd64 on Windows, GNU/Linux and Mac OS X.
 
 The pre-built [nuget.org/packages/ZeroMQ/](https://www.nuget.org/packages/ZeroMQ/) includes native shared libraries for Windows (libzmq 4.1.n) and GNU/Linux (libzmq 4.1.n), for Windows i386 and linux/MacOSX x86_64 architectures.
 
-You can place the native shared libraries, any libzmq.dll/.so/.dylib 3.x and 4.x will work, into a folder /home/user/clrzmq4/amd64 or i386.
+You can place any native shared library or dynamic link libraries into a folder ~/Downloads/clrzmq4/amd64 or ~/Downloads/clrzmq4/i386, any libzmq.dll/.so/.dylib 3.x 4.x will work, important is just that the file name is `libzmq.dll`.
+
+Note: On ubuntu 18.04 / Linux Mint 19.1 I'm going to apt install `libzmq5` and create a link explicitly named `libzmq.so`:
+```
+    sudo apt-get install libzmq5
+    sudo ln -s /usr/lib/x86_64-linux-gnu/libzmq.so.5  /usr/lib/x86_64-linux-gnu/libzmq.so
+```
 
 Get it
 - by [downloading the Release](https://github.com/zeromq/clrzmq4/releases)
