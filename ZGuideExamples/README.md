@@ -5,10 +5,14 @@ Hello! I've made some new examples for C#.
 
 Also read: [ZeroMQ - The Guide](http://zguide.zeromq.org/cs:all). Current version: [ZeroMQ - The Guide Examples](https://github.com/metadings/zguide/tree/master/examples/C%23/).
 
-You can open the `ZGuideExamples.*.csproj` in Visual C# on Windows or in MonoDevelop on Linux.  
-Add a Reference to the project [`/zeromq/clrzmq4`](http://github.com/zeromq/clrzmq4) (or the release ZeroMQ.dll).
+You can open the `ZGuideExamples.*.csproj` in Visual C# on Windows or in MonoDevelop on Linux.
+Add a Reference to the project `ZeroMQ` [`/zeromq/clrzmq4`](http://github.com/zeromq/clrzmq4).
 
-Now compile the project and run `./ZGuideExamples.exe` !
+You also can do `msbuild ZGuideExamples.mono.sln` if you prefer to use mono framework,
+or do `dotnet msbuild ZGuideExamples.netcore.sln` if you prefer to use dotnet framework .NET Standard and .NET Core.
+
+Now run the project using `mono bin/Release/ZGuideExamples.exe Espresso` if you are using mono framework,
+or do `dotnet run --project ZGuideExamples.netcore.csproj Espresso` if you're using dotnet framework.
 
 ```
 Usage: ./ZGuideExamples.exe [--option] <command> World
@@ -289,9 +293,9 @@ Use with LPClient.
 
 ```
 	Usage: ./ZGuideExamples.exe [--verbose] MDBroker
-				
+
 	Usage: ./ZGuideExamples.exe [--verbose] MDWorker
-				
+
 	Usage: ./ZGuideExamples.exe [--verbose] MDClient
 ```
 
@@ -299,9 +303,9 @@ Use with LPClient.
 
 ```
 	Usage: ./ZGuideExamples.exe [--verbose] MDBroker
-				
+
 	Usage: ./ZGuideExamples.exe [--verbose] MDWorker
-				
+
 	Usage: ./ZGuideExamples.exe [--verbose] MDClient2
 ```
 
@@ -315,15 +319,15 @@ Use with LPClient.
 
 ```
 	Usage: ./ZGuideExamples.exe [--verbose] MDBroker
-				
+
 	Usage: ./ZGuideExamples.exe [--verbose] MMIECHO
 
     ---
 
 	Usage: ./ZGuideExamples.exe [--verbose] MDBroker
-				
+
 	Usage: ./ZGuideExamples.exe [--verbose] MDWorker
-				
+
 	Usage: ./ZGuideExamples.exe [--verbose] MMIECHO
 ```
 

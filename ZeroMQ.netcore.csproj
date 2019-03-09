@@ -7,6 +7,7 @@
 	<RootNamespace>ZeroMQ</RootNamespace>
 	<AssemblyName>ZeroMQ</AssemblyName>
 	<AssemblyOriginatorKeyFile>ZeroMQ.snk</AssemblyOriginatorKeyFile>
+    <DefaultItemExcludes>$(DefaultItemExcludes);AssemblyInfo.cs;ZGuideExamples\**\*</DefaultItemExcludes>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -19,9 +20,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(TargetFramework)', '^netcoreapp\d'))">
     <DefineConstants>NETCORE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DefaultItemExcludes>$(DefaultItemExcludes);AssemblyInfo.cs;ZGuideExamples\**\*</DefaultItemExcludes>
   </PropertyGroup>
 
 </Project>

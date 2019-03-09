@@ -7,6 +7,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>ZGuideExamples</RootNamespace>
     <AssemblyName>ZGuideExamples</AssemblyName>
+    <DefaultItemExcludes>$(DefaultItemExcludes);AssemblyInfo.cs</DefaultItemExcludes>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -14,9 +15,6 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>..\bin\Release</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DefaultItemExcludes>$(DefaultItemExcludes);AssemblyInfo.cs</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ZeroMQ.netcore.csproj">
