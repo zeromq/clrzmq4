@@ -8,11 +8,11 @@ Also read: [ZeroMQ - The Guide](http://zguide.zeromq.org/cs:all). Current versio
 You can open the `ZGuideExamples.*.csproj` in Visual C# on Windows or in MonoDevelop on Linux.
 Add a Reference to the project `ZeroMQ` [`/zeromq/clrzmq4`](http://github.com/zeromq/clrzmq4).
 
-You also can do `msbuild ZeroMQ.mono.sln` if you prefer to use mono framework,
-or do `dotnet msbuild ZeroMQ.netcore.sln` if you prefer to use dotnet framework .NET Standard and .NET Core.
+You also can do `msbuild ZGuideExamples.mono.sln` if you prefer to use mono framework,
+or do `dotnet msbuild ZGuideExamples.netcore.sln` if you prefer to use dotnet framework .NET Standard and .NET Core.
 
 Now run the project using `mono ./bin/Release/ZGuideExamples.exe Espresso` if you are using mono framework,
-or do `dotnet run ZGuideExamples/ZGuideExamples.netcore.csproj Espresso` if you're using dotnet framework.
+or do `dotnet run ZGuideExamples.netcore.csproj Espresso` if you're using dotnet framework.
 
 ```
 Usage: ./ZGuideExamples.exe [--option] <command> World
