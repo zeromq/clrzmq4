@@ -40,17 +40,11 @@ namespace ZeroMQ
             // the buffer dest must be one byte larger than destLen to accomodate the null termination character
 			using (var dest = DispoIntPtr.Alloc(destLen + 1))
 			{
-				if (IntPtr.Zero == zmq.z85_encode(dest, data.AddrOfPinnedObject(), dataLen))
-				{
-					data.Free();
-					throw new InvalidOperationException();
-				}
+                zmq.z85_encode(dest, data.AddrOfPinnedObject(), dataLen);
 				data.Free();
 
 				var bytes = new byte[destLen];
-
 				Marshal.Copy(dest, bytes, 0, destLen);
-
 				return bytes;
 			}
 		}
@@ -116,11 +110,7 @@ namespace ZeroMQ
 
 			using (var dest = DispoIntPtr.Alloc(destLen))
 			{
-				if (IntPtr.Zero == zmq.z85_decode(dest, data.AddrOfPinnedObject()))
-				{
-					data.Free();
-					throw new InvalidOperationException();
-				}
+                zmq.z85_decode(dest, data.AddrOfPinnedObject());
 				data.Free();
 
 				var decoded = new byte[destLen];
