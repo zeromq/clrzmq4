@@ -9,10 +9,6 @@
 
 		private const CallingConvention CCCdecl = CallingConvention.Cdecl;
 
-		private const string SodiumLibraryName = "libsodium";
-
-		private static readonly UnmanagedLibrary NativeLibSodium;
-
 		// Use a const for the library name
 		private const string LibraryName = "libzmq";
 
@@ -32,10 +28,6 @@
 		// The static constructor prepares static readonly fields
 		static zmq()
 		{
-			// (0) Initialize Library handle (try libsodium.* before libzmq.*)
-			try { NativeLibSodium = Platform.LoadUnmanagedLibrary(SodiumLibraryName); }
-			catch (System.IO.FileNotFoundException) { }
-
 			// (0) Initialize Library handle
 			NativeLib = Platform.LoadUnmanagedLibrary(LibraryName);
 

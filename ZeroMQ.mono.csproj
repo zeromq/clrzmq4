@@ -8,11 +8,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ZeroMQ</RootNamespace>
     <AssemblyName>ZeroMQ</AssemblyName>
-    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\src\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
     <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -102,7 +100,7 @@
     <Compile Include="Platform\Platform.__Internal.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
 			 Other similar extension points exist, see Microsoft.Common.targets.
 	<Target Name="BeforeBuild" />
 	-->

@@ -9,16 +9,19 @@ namespace ZeroMQ
 
 	public static partial class ZPollItems
 	{
+#pragma warning disable 649
 
-		// unsafe native delegate
-		internal delegate bool PollManyDelegate(IEnumerable<ZSocket> sockets, IEnumerable<ZPollItem> items, ZPoll pollFirst, out ZError error, TimeSpan? timeoutMs);
+        // unsafe native delegate
+        internal delegate bool PollManyDelegate(IEnumerable<ZSocket> sockets, IEnumerable<ZPollItem> items, ZPoll pollFirst, out ZError error, TimeSpan? timeoutMs);
 		internal static readonly PollManyDelegate PollMany;
 
 		// unsafe native delegate
 		internal delegate bool PollSingleDelegate(ZSocket socket, ZPollItem item, ZPoll pollFirst, out ZError error, TimeSpan? timeout);
 		internal static readonly PollSingleDelegate PollSingle;
 
-		static ZPollItems()
+#pragma warning restore 649
+
+        static ZPollItems()
 		{
 			// Initialize static Fields
 			Platform.SetupImplementation(typeof(ZPollItems));
