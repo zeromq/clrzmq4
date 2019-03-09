@@ -17,7 +17,7 @@ namespace ZeroMQ
 
         internal static class Code
 		{
-			static Code() 
+			static Code()
 			{
 				Platform.SetupImplementation(typeof(Code));
 			}
@@ -87,7 +87,7 @@ namespace ZeroMQ
 				EFSM = HAUSNUMERO + 51,
 				ENOCOMPATPROTO = HAUSNUMERO + 52,
 				ETERM = HAUSNUMERO + 53,
-				EMTHREAD // = HAUSNUMERO + 54
+				EMTHREAD = HAUSNUMERO + 54
 			;
 
 			internal static class Posix
@@ -118,7 +118,7 @@ namespace ZeroMQ
 
             internal static class MacOSX
             {
-                public static readonly int 
+                public static readonly int
                     EAGAIN = 35,
 					EINPROGRESS = 36,
                     ENOTSOCK = 38,
