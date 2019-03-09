@@ -1,23 +1,33 @@
-﻿
+
 [![Build Status](https://travis-ci.org/zeromq/clrzmq4.svg?branch=master)](https://travis-ci.org/zeromq/clrzmq4) [![Build status](https://ci.appveyor.com/api/projects/status/102sf149379bgwv7/branch/master?svg=true)](https://ci.appveyor.com/project/zeromq/clrzmq4/branch/master)
 
 **ZeroMQ C# library**
 
-clrzmq4 is a .NET wrapper around the native [ZeroMQ/libzmq](https://github.com/zeromq/libzmq) library, and 
+clrzmq4 is a .NET wrapper around the native [ZeroMQ/libzmq](https://github.com/zeromq/libzmq) library, and
 provides the ZeroMQ namespace.
 
-It is written in C# 5.0, and can be built using Visual Studio 2012+ and Mono 5+.
+It is written in C# 5.0, and can be opened and built using Visual Studio 2012+ and MonoDevelop 5+.
 
-It is built as AnyCPU to run on .NET Framework 4.0+ and mono 5+, and can currently load native shared libraries for 
+It is built as AnyCPU to run on .NET Framework 4.0+ and mono 5+, and can currently load native shared libraries for
 i386 and amd64 on Windows, GNU/Linux and Mac OS X.
 
-The pre-built binary packages include native shared libraries for Windows (libzmq 4.2.2) and GNU/Linux (libzmq 4.1.7), 
-for the i386 and amd64 architectures. You can replace the native shared libraries, any libzmq 4.x should work.
+The pre-built [nuget.org/packages/ZeroMQ/](https://www.nuget.org/packages/ZeroMQ/) includes native shared libraries for Windows (libzmq 4.1.n) and GNU/Linux (libzmq 4.1.n), for Windows i386 and linux/MacOSX x86_64 architectures.
+
+You can place the native shared libraries, any libzmq.dll/.so/.dylib 3.x and 4.x will work, into a folder /home/user/clrzmq4/amd64 or i386.
 
 Get it
 - by [downloading the Release](https://github.com/zeromq/clrzmq4/releases)
 - using `git clone https://github.com/zeromq/clrzmq4`
 - using [nuget](https://www.nuget.org/packages/ZeroMQ/) `PM> Install-Package ZeroMQ` or by [downloading the nupkg](https://www.nuget.org/api/v2/package/ZeroMQ/)
+
+Open it
+- using MonoDevelop or Visual Studio
+- using Texteditor gedit or GNU emacs do `msbuild clrzmq4.mono.sln` or `msbuild clrzmq4.netcore.sln`.
+
+Run it
+- You can't run ZeroMQ/clrzmq4 directly, because this is a library.
+- using mono framework: `mono bin/Debug/ZGuideExamples.exe`
+- using dotnet framwork: `dotnet run --project ZGuideExamples/ZGuideExamples.netcore.csproj`
 
 Read [ZeroMQ - The Guide](http://zguide.zeromq.org/cs:all)
 - ZeroMQ - The Guide [Examples in C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
@@ -50,7 +60,7 @@ public static void HWClient(string[] args)
 			requester.Send(new ZFrame(requestText));
 
 			// Receive
-			using (ZFrame reply = requester.ReceiveFrame()) 
+			using (ZFrame reply = requester.ReceiveFrame())
 			{
 				Console.WriteLine(" Received: {0} {1}!", requestText, reply.ReadString());
 			}
@@ -207,3 +217,4 @@ public static void WUServer(string[] args)
 Also look into the [WUProxy](https://github.com/metadings/zguide/blob/master/examples/C%23/wuproxy.cs) Example.
 
 Learn more: ZeroMQ - [The Guide](http://zguide.zeromq.org/cs:all) and the [Examples in C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
+
