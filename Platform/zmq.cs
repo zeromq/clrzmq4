@@ -28,11 +28,14 @@
 		// The static constructor prepares static readonly fields
 		static zmq()
 		{
+
+#if !NETSTANDARD && !NETCORE
 			// (0) Initialize Library handle
 			NativeLib = Platform.LoadUnmanagedLibrary(LibraryName);
 
 			// (1) Initialize Platform information 
 			Platform.SetupImplementation(typeof(zmq));
+#endif
 
 			// Set once LibVersion to libversion()
 			int major, minor, patch;

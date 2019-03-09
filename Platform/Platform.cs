@@ -252,11 +252,11 @@ namespace ZeroMQ.lib
 				AssignImplementations(platformDependant, platformName);
 			}
 
-			if (Is__Internal) 
+            if (Is__Internal) 
 			{
 				AssignImplementations(platformDependant, "__Internal");
 			}
-		}
+        }
 
 		private const BindingFlags bindings = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
