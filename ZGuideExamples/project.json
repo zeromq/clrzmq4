@@ -1,0 +1,13 @@
+{
+    "version": "1.0.0.*",
+    "description": "ZeroMQ/clrzmq4/ZGuideExamples",
+
+    "dependencies": { },
+    "runtimes": {
+        "win": { }
+    },
+    "frameworks": {
+        ".NETFramework,Version=v4.0": {},
+        "netstandard2.0": {}
+    }
+}
