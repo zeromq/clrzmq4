@@ -7,10 +7,12 @@ obj/*
 
 packages/*
 
-*.user
+*.lock*
+*.cache*
+*.old*
+*.user*
 *.userprefs
 *.suo
-*.old*
 *.nupkg
 
 amd64/*
