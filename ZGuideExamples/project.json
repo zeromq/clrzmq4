@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0.*",
+    "version": "1.0.0-*",
     "description": "ZeroMQ/clrzmq4/ZGuideExamples",
 
     "dependencies": { },
@@ -7,7 +7,6 @@
         "win": { }
     },
     "frameworks": {
-        ".NETFramework,Version=v4.0": {},
-        "netstandard2.0": {}
+        ".NETFramework,Version=v4.0": {}
     }
 }
