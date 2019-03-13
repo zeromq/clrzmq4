@@ -28,12 +28,21 @@ Get it
 
 Open it
 - using MonoDevelop or Visual Studio
-- using Texteditor gedit or GNU emacs do `msbuild clrzmq4.mono.sln` or `nuget restore && msbuild clrzmq4.netcore.sln`.
+- using Texteditor gedit or GNU emacs
 
 Run it
 - You can't run ZeroMQ/clrzmq4 directly, because this is a library.
-- using mono framework: `mono bin/Debug/ZGuideExamples.exe`
-- using dotnet framwork: `dotnet run --project ZGuideExamples/ZGuideExamples.netcore.csproj`
+- using mono framework:
+```
+msbuild clrzmq4.mono.sln /p:Configuration=Release
+mono bin/Release/ZGuideExamples.exe Espresso
+```
+- using dotnet framwork
+```
+nuget restore clrzmq4.netcore.sln
+dotnet msbuild clrzmq4.netcore.sln
+dotnet run --project ZGuideExamples/ZGuideExamples.netcore.csproj Espresso
+```
 
 Read [ZeroMQ - The Guide](http://zguide.zeromq.org/cs:all)
 - ZeroMQ - The Guide [Examples in C#](http://github.com/metadings/zguide/tree/master/examples/C%23)
