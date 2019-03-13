@@ -28,7 +28,7 @@ Get it
 
 Open it
 - using MonoDevelop or Visual Studio
-- using Texteditor gedit or GNU emacs do `msbuild clrzmq4.mono.sln` or `msbuild clrzmq4.netcore.sln`.
+- using Texteditor gedit or GNU emacs do `msbuild clrzmq4.mono.sln` or `nuget restore && msbuild clrzmq4.netcore.sln`.
 
 Run it
 - You can't run ZeroMQ/clrzmq4 directly, because this is a library.
