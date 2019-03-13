@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ZeroMQ</id>
-		<version>4.1.0.30</version>
+		<version>4.1.0.31</version>
 
 		<authors>metadings, Pieter Hintjens, Martin Sustrik</authors>
 		<projectUrl>https://github.com/zeromq/clrzmq4/</projectUrl>
@@ -20,13 +20,13 @@
 	<files>
 		<!-- targets file -->
 		<file src="ZeroMQ.targets" target="build\net40\ZeroMQ.targets" />
-		
+
 		<!-- managed assembly -->
 		<file src="bin\Release\ZeroMQ.dll" target="lib\net40" />
-		
+
 		<!-- XML documentation file -->
 		<file src="bin\Release\ZeroMQ.xml" target="lib\net40" />
-		
+
 		<!-- native binary files -->
 		<file src="i386\libzmq.*" target="build\i386" />
 		<file src="amd64\libzmq.*" target="build\amd64" />
