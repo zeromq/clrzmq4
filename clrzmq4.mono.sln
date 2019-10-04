@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQ.mono", "ZeroMQ.mono.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZGuideExamples.mono", "ZGuideExamples\ZGuideExamples.mono.csproj", "{EF3A0578-42E7-42D2-9D1D-1DF526FE97AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQ.Tests", "ZeroMQ.Tests\ZeroMQ.Tests.csproj", "{B57E66F4-B77E-48A1-A7D0-EB551E357111}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
