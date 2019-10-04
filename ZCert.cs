@@ -118,7 +118,7 @@ namespace ZeroMQ
             {
                 throw new InvalidOperationException("secret key length must be of length 32");
             }
-            Array.Copy(secretKey, this.secretKey, 32);
+            Array.Copy(publicKey, this.publicKey, 32);
             Array.Copy(secretKey, this.secretKey, 32);
 
             publicTxt = Encoding.UTF8.GetString(Z85.Encode(publicKey)).ToCharArray();
@@ -145,8 +145,9 @@ namespace ZeroMQ
             PublicTxt = publicTxt;
             SecretTxt = secretTxt;
 
-            publicKey = Z85.EncodeBytes(PublicTxt);
-            secretKey = Z85.EncodeBytes(SecretTxt);
+            publicKey = Z85.ToZ85DecodedBytes(PublicTxt);
+            secretKey = Z85.ToZ85DecodedBytes(SecretTxt);
+
         }
 
         /// <summary>
@@ -204,7 +205,7 @@ namespace ZeroMQ
         /// </summary>
         /// <param name="cert">Certificate to deep clone. Public and private keys must not be null.</param>
         /// <returns>A copy of the given certificate.</returns>
-        public ZCert Dup(ZCert cert)
+        public static ZCert Dup(ZCert cert)
         {
             if (cert == null)
                 return null;
