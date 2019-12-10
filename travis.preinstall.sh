@@ -32,7 +32,7 @@ else # if [ "$(uname)" = "Linux" ]
 #  sudo apt-key add Release.key
 #  sudo add-apt-repository "deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/Debian_9.0 ./"
 #  sudo apt-get update
-  sudo apt-get install libzmq5
+  sudo apt-get install libzmq3-dev
 fi
 
 nuget restore clrzmq4.mono.sln
