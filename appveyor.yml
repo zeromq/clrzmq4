@@ -20,10 +20,10 @@ install:
 - cmd: echo "there may be a new libzmq-mt-4_n_n.dll file, and do change this appveyor.yml accordingly:"
 - cmd: dir /s C:\Tools\vcpkg\installed\x64-windows\*zmq*
 
-- cmd: nuget restore clrzmq4.vs.sln
+- cmd: nuget restore clrzmq4.netcore.sln
 
 build:
-  project: clrzmq4.vs.sln
+  project: clrzmq4.netcore.sln
 
 test_script:
 - cmd: .\bin\Release\ZGuideExamples.exe Version
