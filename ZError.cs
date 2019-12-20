@@ -169,7 +169,7 @@ namespace ZeroMQ
 			}
 		}
 
-		public static readonly ZError
+		public static ZError
 			// DEFAULT = new ZmqError(0),
 			EPERM,
 			ENOENT,
