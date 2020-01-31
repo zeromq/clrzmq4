@@ -631,7 +631,29 @@ namespace ZeroMQ
 
 		public virtual bool SendMessage(ZMessage msg, ZSocketFlags flags, out ZError error)
 		{
-			return SendFrames((IEnumerable<ZFrame>)msg, flags, out error);
+            error = ZError.None;
+            bool more = (flags & ZSocketFlags.More) == ZSocketFlags.More;
+		    flags = flags | ZSocketFlags.More;
+		    ZFrame[] _frames = msg.ToArray();
+		    
+		    for (int i = 0, l = _frames.Length; i < l; ++i)
+		    {	   
+			ZFrame frame = msg.Remove(_frames[i], false);
+			
+			if (i == l - 1 && !more)
+			{
+			    flags = flags & ~ZSocketFlags.More;
+			}
+			
+			if (!SendFrame(frame, flags, out error))
+			{
+			    return false;
+			}
+			
+		    }
+		    
+		    return true;
+	
 		}
 
 		public virtual void SendFrames(IEnumerable<ZFrame> frames)
