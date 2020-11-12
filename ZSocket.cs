@@ -920,7 +920,9 @@ namespace ZeroMQ
 			{
 				if (GetOption(option, optionValue, ref optionLength))
 				{
-					value = Marshal.PtrToStringAnsi(optionValue, optionLength);
+                    if (optionLength > 0 && Marshal.ReadByte(optionValue.Ptr, optionLength - 1) == 0)
+                        optionLength--; // remove traling '\0'
+					value = Marshal.PtrToStringAnsi(optionValue, optionLength); 
 					return true;
 				}
 				return false;
