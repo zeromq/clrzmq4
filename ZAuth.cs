@@ -284,21 +284,6 @@ namespace ZeroMQ
             //  Is address explicitly whitelisted or blacklisted?
             bool allowed = false;
             bool denied = false;
-            if (whitelist.Count > 0)
-            {
-                if (whitelist.Contains(request.Address))
-                {
-                    allowed = true;
-                    if (verbose)
-                        Info("zauth: - passed (whitelist) address=" + request.Address);
-                }
-                else
-                {
-                    denied = true;
-                    if (verbose)
-                        Info("zauth: - denied (whitelist) address=" + request.Address);
-                }
-            }
 
             if (blacklist.Count > 0)
             {
@@ -313,6 +298,22 @@ namespace ZeroMQ
                     allowed = true;
                     if (verbose)
                         Info("zauth: -  passed (not in blacklist) address=" + request.Address);
+                }
+            }
+
+            if (!denied && whitelist.Count > 0)
+            {
+                if (whitelist.Contains(request.Address))
+                {
+                    allowed = true;
+                    if (verbose)
+                        Info("zauth: - passed (whitelist) address=" + request.Address);
+                }
+                else
+                {
+                    denied = true;
+                    if (verbose)
+                        Info("zauth: - denied (whitelist) address=" + request.Address);
                 }
             }
 
