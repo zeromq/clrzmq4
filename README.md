@@ -35,7 +35,7 @@ Run it
 msbuild clrzmq4.mono.sln /p:Configuration=Release
 mono bin/Release/ZGuideExamples.exe Espresso
 ```
-- using dotnet framwork
+- using dotnet framework
 ```
 nuget restore clrzmq4.netcore.sln
 dotnet msbuild clrzmq4.netcore.sln
